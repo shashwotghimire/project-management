@@ -19,4 +19,5 @@ router.post("/register", validate(registerUserSchema), registerUser);
 router.post("/login", validate(loginUserSchema), loginUser);
 router.get("/verify-email", validate(verifyEmailSchema), verifyEmail);
 router.get("/me", authMiddleware, getUserProfile);
+
 export default router;
