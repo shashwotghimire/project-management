@@ -6,7 +6,7 @@ import {
   Model,
 } from "sequelize";
 import { sequelize } from "../configs/db.config";
-import type { userRoles } from "../types/roles";
+import type { UserRoles } from "../types/roles";
 
 export class User extends Model<
   InferAttributes<User>,
@@ -18,7 +18,8 @@ export class User extends Model<
   declare password: CreationOptional<string>;
   declare githubId: CreationOptional<string>;
   declare emailVerified: CreationOptional<boolean>;
-  declare role: userRoles;
+  declare emailVerificationToken: CreationOptional<string | null>;
+  declare role: UserRoles;
   declare gravatarUrl: CreationOptional<string>;
 }
 
@@ -52,6 +53,11 @@ User.init(
       allowNull: true,
       defaultValue: false,
     },
+    emailVerificationToken: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: true,
+    },
     role: {
       type: DataTypes.ENUM("user", "superadmin"),
       defaultValue: "user",
@@ -62,5 +68,13 @@ User.init(
       allowNull: true,
     },
   },
-  { sequelize, tableName: "users", underscored: true },
+  {
+    sequelize,
+    tableName: "users",
+    underscored: true,
+    defaultScope: { attributes: { exclude: ["password"] } },
+    scopes: {
+      withPassword: { attributes: { include: ["password"] } },
+    },
+  },
 );

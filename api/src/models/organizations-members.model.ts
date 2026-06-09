@@ -6,7 +6,7 @@ import {
   InferCreationAttributes,
   Model,
 } from "sequelize";
-import { userRoleInOrg } from "../types/roles";
+import { UserRoleInOrg } from "../types/roles";
 import { sequelize } from "../configs/db.config";
 export class OrganizationsMember extends Model<
   InferAttributes<OrganizationsMember>,
@@ -15,7 +15,7 @@ export class OrganizationsMember extends Model<
   declare id: CreationOptional<string>;
   declare userId: ForeignKey<string>;
   declare orgId: ForeignKey<string>;
-  declare userRoleInOrg: userRoleInOrg;
+  declare userRoleInOrg: UserRoleInOrg;
 }
 
 OrganizationsMember.init(

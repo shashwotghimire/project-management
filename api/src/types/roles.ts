@@ -1,2 +1,2 @@
-export type userRoles = ["user", "superadmin"];
-export type userRoleInOrg = ["member", "org admin"];
+export type UserRoles = "user" | "superadmin";
+export type UserRoleInOrg = "member" | "org admin";
