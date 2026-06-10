@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuthStore } from "@/store/auth.store";
+import { useGetUserProfile } from "@/features/auth/hooks/useAuth";
 import { UserRoles } from "@/types/auth-api.types";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
@@ -12,13 +12,17 @@ export default function RolesGuard({
   roles: UserRoles[];
   children: React.ReactNode;
 }) {
-  const hasRoles = useAuthStore((s) => s.hasRoles);
+  const { isLoading, data } = useGetUserProfile();
   const router = useRouter();
-  const allowed = hasRoles(...roles);
+  const allowed = data?.role === "superadmin" ? true : false;
   useEffect(() => {
-    if (!allowed) router.replace("/onboarding");
-  }, [allowed]);
-
+    if (!isLoading && !allowed) {
+      router.push("/dashboard");
+    }
+  }, [allowed, isLoading]);
+  if (isLoading) {
+    return null;
+  }
   if (!allowed) {
     return null;
   }

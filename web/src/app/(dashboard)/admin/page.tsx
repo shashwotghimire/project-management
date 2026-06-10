@@ -1,11 +1,11 @@
 import RolesGuard from "@/components/RolesGuard";
 
-const page = () => {
+const Admin = () => {
   return (
     <RolesGuard roles={["superadmin"]}>
-      <div>admin</div>
+      <div>Admin Panel</div>
     </RolesGuard>
   );
 };
 
-export default page;
+export default Admin;
