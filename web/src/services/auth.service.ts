@@ -1,5 +1,9 @@
 import api from "@/lib/axios";
-import { LoginResponse, RegisterResponse } from "@/types/auth-api.types";
+import {
+  GetUserResponse,
+  LoginResponse,
+  RegisterResponse,
+} from "@/types/auth-api.types";
 
 export const loginService = async (
   email: string,
@@ -23,5 +27,12 @@ export const registerService = async (
       username,
     })
   ).data;
+  return res.data;
+};
+
+export const getUserProfileService = async (): Promise<
+  GetUserResponse["data"]
+> => {
+  const res = (await api.get<GetUserResponse>("/auth/me")).data;
   return res.data;
 };

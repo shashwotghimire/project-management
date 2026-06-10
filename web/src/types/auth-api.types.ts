@@ -1,3 +1,4 @@
+export type UserRoles = "user" | "superadmin";
 export interface LoginRequest {
   email: string;
   password: string;
@@ -37,4 +38,19 @@ export interface RegisterResponse {
   success: boolean;
   message: string;
   data: string;
+}
+
+export interface GetUserResponse {
+  success: boolean;
+  message: string;
+  data: AuthUser;
+}
+
+export interface AuthStore {
+  user: AuthUser | null;
+  isLoggedIn: boolean;
+  setUser: (user: AuthUser | null) => void;
+  setIsLoggedIn: (loggedIn: boolean) => void;
+  logOut: () => void;
+  hasRoles: (...roles: UserRoles[]) => boolean;
 }
