@@ -21,3 +21,24 @@ export const getUsersOrganizationsSchema = z.object({
     query: z.string().optional(),
   }),
 });
+
+export const updateOrganizationSchema = z.object({
+  params: z.object({
+    orgId: z.uuidv4("Invalid organization ID "),
+  }),
+  body: z.object({
+    name: z
+      .string()
+      .min(3, "Organization name must be at least 3 characters")
+      .optional(),
+    logoUrl: z.url("Invalid URL format").optional(),
+    description: z.string().optional(),
+    websiteUrl: z.url("Invalid URL format").optional(),
+  }),
+});
+
+export const deleteOrganizationSchema = z.object({
+  params: z.object({
+    orgId: z.uuidv4("Invalid organization ID"),
+  }),
+});

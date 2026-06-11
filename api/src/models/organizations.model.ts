@@ -15,6 +15,9 @@ export class Organization extends Model<
   declare name: string;
   declare adminId: ForeignKey<string>;
   declare blocked: CreationOptional<boolean>;
+  declare logoUrl: CreationOptional<string>;
+  declare description: CreationOptional<string>;
+  declare websiteUrl: CreationOptional<string>;
 }
 
 Organization.init(
@@ -37,6 +40,18 @@ Organization.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       allowNull: false,
+    },
+    logoUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    websiteUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   { sequelize, underscored: true, tableName: "organizations" },

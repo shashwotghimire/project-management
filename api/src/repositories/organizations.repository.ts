@@ -7,15 +7,24 @@ import { User } from "../models/users.model";
 export const createOrganization = ({
   name,
   adminId,
+  logoUrl,
+  description,
+  websiteUrl,
 }: {
   name: string;
   adminId: string;
+  logoUrl?: string;
+  description?: string;
+  websiteUrl?: string;
 }) => {
   return sequelize.transaction(async (t) => {
     const org = await Organization.create(
       {
         name,
         adminId,
+        logoUrl,
+        description,
+        websiteUrl,
       },
       { transaction: t },
     );
@@ -97,4 +106,46 @@ export const joinAnOrganization = ({
     orgId,
     userRoleInOrg: "member",
   });
+};
+
+export const getOrgById = (orgId: string) => {
+  return Organization.findByPk(orgId);
+};
+
+export const getOrgByAdminId = (adminId: string, orgId: string) => {
+  return Organization.findOne({ where: { id: orgId, adminId } });
+};
+
+export const updateOrganization = async ({
+  orgId,
+  name,
+  logoUrl,
+  description,
+  websiteUrl,
+  userId,
+}: {
+  orgId: string;
+  name?: string | undefined;
+  logoUrl?: string | undefined;
+  description?: string | undefined;
+  websiteUrl?: string | undefined;
+  userId: string;
+}) => {
+  const org = await getOrgByAdminId(userId, orgId);
+  if (!org) return null;
+  if (name) org.name = name;
+  if (logoUrl !== undefined) org.logoUrl = logoUrl;
+  if (description !== undefined) org.description = description;
+  if (websiteUrl !== undefined) org.websiteUrl = websiteUrl;
+  await org.save();
+  return org;
+};
+
+export const deleteOrganization = async (orgId: string, userId: string) => {
+  const org = await getOrgByAdminId(userId, orgId);
+  if (!org) {
+    return null;
+  }
+  await org.destroy();
+  return true;
 };
