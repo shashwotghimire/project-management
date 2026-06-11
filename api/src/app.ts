@@ -1,7 +1,9 @@
 import express from "express";
+import cors from "cors";
 import { errorHandler } from "./middlewares/error.middleware";
 import authRoutes from "./routes/auth.route";
-import cors from "cors";
+import organizationRoutes from "./routes/organizations.route";
+
 const app = express();
 app.use(express.json());
 app.use(
@@ -10,6 +12,6 @@ app.use(
   }),
 );
 app.use("/api/auth", authRoutes);
-
+app.use("/api/organizations", organizationRoutes);
 app.use(errorHandler);
 export default app;
