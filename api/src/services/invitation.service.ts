@@ -1,0 +1,109 @@
+import { ApiError } from "../helpers/ApiError";
+import {
+  createInvitation,
+  existingPendingInvitation,
+  getInvitationByToken,
+  updateInvitationStatus,
+} from "../repositories/invitation.repository";
+import {
+  getOrgByAdminId,
+  getOrgById,
+  joinAnOrganization,
+} from "../repositories/organizations.repository";
+import { createInvitationToken } from "../utils/crypto.utils";
+import { sendEmail } from "./email.service";
+import { invitationEmailTemplate } from "../utils/email-template.utils";
+import {
+  findUserByEmail,
+  findUserById,
+} from "../repositories/users.repository";
+
+export const createInvitationService = async ({
+  email,
+  organizationId,
+  invitedBy,
+}: {
+  email: string;
+  organizationId: string;
+  invitedBy: string;
+}) => {
+  const org = await getOrgById(organizationId);
+  if (!org) {
+    throw new ApiError(404, "Organization not found", "Organization not found");
+  }
+  const user = await findUserById(invitedBy);
+  if (!user) {
+    throw new ApiError(404, "User not found", "User not found");
+  }
+  const isSenderAdmin = await getOrgByAdminId(invitedBy, organizationId);
+  if (!isSenderAdmin) {
+    throw new ApiError(
+      403,
+      "You do not have permission to send invitations.",
+      "Forbidden",
+    );
+  }
+  const existingInvitation = await existingPendingInvitation({
+    email,
+    organizationId,
+  });
+  if (existingInvitation) {
+    throw new ApiError(
+      400,
+      "Invitation already sent.",
+      "Invitation already sent to this user",
+    );
+  }
+  const invitationToken = createInvitationToken();
+  sendEmail(
+    email,
+    `You're invited to join ${org.name}`,
+    invitationEmailTemplate(org.name, user.username, invitationToken),
+  );
+  return await createInvitation({
+    email,
+    organizationId,
+    invitedBy,
+    token: invitationToken,
+  });
+};
+
+export const updateInvitationStatusService = async ({
+  token,
+  status,
+}: {
+  token: string;
+  status: "accepted" | "declined";
+}) => {
+  const invitation = await getInvitationByToken(token);
+  if (!invitation) {
+    throw new ApiError(404, "Invitation not found", "Invitation not found");
+  }
+  if (invitation.status !== "pending") {
+    throw new ApiError(
+      400,
+      "Invitation already responded to.",
+      "This invitation has already been accepted or declined",
+    );
+  }
+  if (status === "accepted") {
+    const user = await findUserByEmail(invitation.email);
+    if (!user) {
+      throw new ApiError(
+        404,
+        "User not found",
+        "No user found with the email associated with this invitation",
+      );
+    }
+    const org = await getOrgById(invitation.organizationId);
+    if (!org) {
+      throw new ApiError(
+        404,
+        "Organization not found",
+        "Organization not found",
+      );
+    }
+    await joinAnOrganization({ userId: user.id, orgId: org.id });
+  }
+  return await updateInvitationStatus({ token, status });
+};
