@@ -24,7 +24,6 @@ api.interceptors.response.use(
   (error: AxiosError<ApiError>) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("accessToken");
-      window.location.href = "/login";
     }
     const apiError: ApiError = {
       message: error.response?.data.error || "Something went wrong",

@@ -15,11 +15,5 @@ export const PublicRoutes = ({ children }: { children: React.ReactNode }) => {
   if (isLoading) {
     return <div>Loading...</div>;
   }
-  if (error) {
-    return null;
-  }
-  if (!data) {
-    return null;
-  }
   return <>{children}</>;
 };
