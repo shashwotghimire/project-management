@@ -17,7 +17,7 @@ export default function RolesGuard({
   const allowed = data?.role === "superadmin" ? true : false;
   useEffect(() => {
     if (!isLoading && !allowed) {
-      router.push("/dashboard");
+      router.push("/onboarding");
     }
   }, [allowed, isLoading]);
   if (isLoading) {

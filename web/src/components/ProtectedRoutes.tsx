@@ -1,3 +1,5 @@
+"use client";
+
 import { useGetUserProfile } from "@/features/auth/hooks/useAuth";
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";

@@ -22,6 +22,24 @@ export interface OrganizationMember {
   };
 }
 
+export interface OrgAdmin {
+  id: string;
+  userId: string;
+  orgId: string;
+  userRoleInOrg: OrgMemberRole;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateOrganizationResponse {
+  success: boolean;
+  message: string;
+  data: {
+    org: Organization;
+    admin: OrgAdmin;
+  };
+}
+
 export interface GetUsersOrganizationsResponse {
   success: boolean;
   message: string;
