@@ -42,3 +42,9 @@ export const deleteOrganizationSchema = z.object({
     orgId: z.uuidv4("Invalid organization ID"),
   }),
 });
+
+export const getOrgByIdSchema = z.object({
+  params: z.object({
+    orgId: z.uuidv4("Invalid organization ID"),
+  }),
+});

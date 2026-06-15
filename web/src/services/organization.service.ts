@@ -2,6 +2,7 @@ import api from "@/lib/axios";
 import {
   CreateOrganizationResponse,
   GetUsersOrganizationsResponse,
+  OrganizationByIdResponse,
 } from "@/types/organization-api.types";
 
 export const getUsersOrganizationsService = async (
@@ -25,6 +26,13 @@ export const createOrganizationService = async (
       description,
       websiteUrl,
     },
+  );
+  return response.data.data;
+};
+
+export const getOrganizationByIdService = async (orgId: string) => {
+  const response = await api.get<OrganizationByIdResponse>(
+    `/organizations/${orgId}`,
   );
   return response.data.data;
 };

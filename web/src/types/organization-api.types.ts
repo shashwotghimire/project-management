@@ -53,3 +53,9 @@ export interface GetUsersOrganizationsResponse {
     };
   };
 }
+
+export interface OrganizationByIdResponse {
+  success: boolean;
+  message: string;
+  data: Organization;
+}

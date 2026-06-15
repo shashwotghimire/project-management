@@ -4,6 +4,7 @@ import { AuthRequest } from "../middlewares/auth.middleware";
 import {
   createOrganizationService,
   deleteOrganizationService,
+  getOrgByIdService,
   getUsersOrganizationsService,
   updateOrganizationService,
 } from "../services/organizations.service";
@@ -86,5 +87,16 @@ export const deleteOrganization = asyncHandler<AuthRequest>(
     return res
       .status(200)
       .json(new ApiResponse(true, "Organization deleted successfully", null));
+  },
+);
+
+export const getOrgById = asyncHandler<AuthRequest>(
+  async (req: AuthRequest, res: Response) => {
+    const orgId = req.params.orgId;
+    const orgID = isString(orgId);
+    const org = await getOrgByIdService(orgID, req.user.id);
+    return res
+      .status(200)
+      .json(new ApiResponse(true, "Organization fetched successfully", org));
   },
 );

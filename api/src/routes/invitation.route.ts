@@ -8,7 +8,7 @@ import {
 import {
   createInvitation,
   respondToInvitation,
-} from "../controller/invitation.controller";
+} from "../controllers/invitation.controller";
 
 const router = Router();
 

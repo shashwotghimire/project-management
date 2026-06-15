@@ -149,3 +149,10 @@ export const deleteOrganization = async (orgId: string, userId: string) => {
   await org.destroy();
   return true;
 };
+
+export const userMemberOfOrg = async (userId: string, orgId: string) => {
+  const membership = await OrganizationsMember.findOne({
+    where: { userId, orgId },
+  });
+  return !!membership;
+};

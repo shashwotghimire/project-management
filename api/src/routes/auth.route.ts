@@ -4,7 +4,7 @@ import {
   loginUser,
   registerUser,
   verifyEmail,
-} from "../controller/auth.controller";
+} from "../controllers/auth.controller";
 import { validate } from "../middlewares/validation.middleware";
 import {
   loginUserSchema,

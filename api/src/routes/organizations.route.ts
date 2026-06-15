@@ -2,14 +2,16 @@ import { Router } from "express";
 import {
   createOrganizaiton,
   deleteOrganization,
+  getOrgById,
   getUsersOrganizations,
   updateOrganization,
-} from "../controller/organizations.controller";
+} from "../controllers/organizations.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { validate } from "../middlewares/validation.middleware";
 import {
   createOrganizationSchema,
   deleteOrganizationSchema,
+  getOrgByIdSchema,
   getUsersOrganizationsSchema,
   updateOrganizationSchema,
 } from "../validations/organizations.validation";
@@ -29,6 +31,8 @@ router.get(
   validate(getUsersOrganizationsSchema),
   getUsersOrganizations,
 );
+
+router.get("/:orgId", authMiddleware, validate(getOrgByIdSchema), getOrgById);
 
 router.patch(
   "/:orgId",
