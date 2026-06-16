@@ -156,3 +156,18 @@ export const userMemberOfOrg = async (userId: string, orgId: string) => {
   });
   return !!membership;
 };
+
+export const getAllMembersOfOrg = async (orgId: string) => {
+  return OrganizationsMember.findAll({
+    where: { orgId },
+    include: [
+      {
+        model: User,
+        attributes: ["id", "username", "email"],
+      },
+    ],
+    attributes: {
+      exclude: ["id", "createdAt", "updatedAt", "userId", "orgId"],
+    },
+  });
+};

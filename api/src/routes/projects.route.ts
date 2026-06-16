@@ -43,4 +43,5 @@ router.post(
   validate(addMemberToProjectSchema),
   addMemberToProject,
 );
+
 export default router;

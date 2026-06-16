@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createOrganizaiton,
   deleteOrganization,
+  getAllMembersOfOrg,
   getOrgById,
   getUsersOrganizations,
   updateOrganization,
@@ -11,6 +12,7 @@ import { validate } from "../middlewares/validation.middleware";
 import {
   createOrganizationSchema,
   deleteOrganizationSchema,
+  getAllMembersOfOrgSchema,
   getOrgByIdSchema,
   getUsersOrganizationsSchema,
   updateOrganizationSchema,
@@ -47,4 +49,12 @@ router.delete(
   validate(deleteOrganizationSchema),
   deleteOrganization,
 );
+
+router.get(
+  "/:orgId/members",
+  authMiddleware,
+  validate(getAllMembersOfOrgSchema),
+  getAllMembersOfOrg,
+);
+
 export default router;

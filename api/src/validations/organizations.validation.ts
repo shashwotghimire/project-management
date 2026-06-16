@@ -48,3 +48,9 @@ export const getOrgByIdSchema = z.object({
     orgId: z.uuidv4("Invalid organization ID"),
   }),
 });
+
+export const getAllMembersOfOrgSchema = z.object({
+  params: z.object({
+    orgId: z.uuidv4("Invalid organization ID"),
+  }),
+});

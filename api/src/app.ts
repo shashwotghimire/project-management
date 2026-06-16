@@ -4,6 +4,7 @@ import { errorHandler } from "./middlewares/error.middleware";
 import authRoutes from "./routes/auth.route";
 import organizationRoutes from "./routes/organizations.route";
 import invitationRoutes from "./routes/invitation.route";
+import projectRoutes from "./routes/projects.route";
 
 const app = express();
 app.use(express.json());
@@ -15,6 +16,7 @@ app.use(
 app.use("/api/auth", authRoutes);
 app.use("/api/organizations", organizationRoutes);
 app.use("/api/invitations", invitationRoutes);
+app.use("/api/organizations/:orgId/projects", projectRoutes);
 
 app.use(errorHandler);
 export default app;

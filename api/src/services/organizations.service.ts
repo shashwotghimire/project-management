@@ -2,6 +2,7 @@ import { ApiError } from "../helpers/ApiError";
 import {
   createOrganization,
   deleteOrganization,
+  getAllMembersOfOrg,
   getOrgByAdminId,
   getOrgById,
   getUsersOrganizations,
@@ -111,4 +112,23 @@ export const getOrgByIdService = async (orgId: string, userId: string) => {
     throw new ApiError(404, "Organization not found", "Organization not found");
   }
   return org;
+};
+
+export const getAllMembersOfOrgService = async (
+  orgId: string,
+  userId: string,
+) => {
+  const isMember = await userMemberOfOrg(userId, orgId);
+  if (!isMember) {
+    throw new ApiError(
+      403,
+      "You do not have access to this organization",
+      "You do not have access to this organization",
+    );
+  }
+  const org = await getOrgById(orgId);
+  if (!org) {
+    throw new ApiError(404, "Organization not found", "Organization not found");
+  }
+  return await getAllMembersOfOrg(orgId);
 };
