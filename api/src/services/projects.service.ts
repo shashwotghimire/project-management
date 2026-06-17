@@ -5,8 +5,10 @@ import {
   createProject,
   deleteProject,
   getProjectById,
+  getProjectMembers,
   getProjectsByUserId,
   isUserAdminOfProject,
+  isUserMemberOfProject,
   updateProject,
 } from "../repositories/projects.repository";
 
@@ -43,11 +45,13 @@ export const updateProjectService = async ({
   userId,
   name,
   logoUrl,
+  status,
 }: {
   projectId: string;
   userId: string;
   name?: string;
   logoUrl?: string;
+  status?: "active" | "archived";
 }) => {
   const project = await getProjectById(projectId);
   if (!project) {
@@ -66,17 +70,28 @@ export const updateProjectService = async ({
   return await updateProject(projectId, {
     ...(name && { name }),
     ...(logoUrl && { logoUrl }),
+    ...(status && { status }),
   });
 };
 
 export const getUserProjectsService = async ({
   userId,
   organizationId,
+  page,
+  limit,
+  search = "",
 }: {
   userId: string;
   organizationId: string;
+  page: number;
+  limit: number;
+  search?: string;
 }) => {
-  return await getProjectsByUserId(userId, organizationId);
+  return await getProjectsByUserId(userId, organizationId, {
+    page,
+    limit,
+    search,
+  });
 };
 
 export const deleteProjectService = async ({
@@ -101,6 +116,26 @@ export const deleteProjectService = async ({
   }
 
   await deleteProject(projectId);
+};
+
+export const getProjectMembersService = async ({
+  projectId,
+  userId,
+}: {
+  projectId: string;
+  userId: string;
+}) => {
+  const project = await getProjectById(projectId);
+  if (!project) {
+    throw new ApiError(404, "Project not found", "Project not found");
+  }
+
+  const isMember = await isUserMemberOfProject(userId, projectId);
+  if (!isMember) {
+    throw new ApiError(403, "Access denied", "Access denied");
+  }
+
+  return await getProjectMembers(projectId);
 };
 
 export const addMemberToProjectService = async ({

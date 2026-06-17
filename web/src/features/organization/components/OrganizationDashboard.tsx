@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { useGetOrganizationById } from "../hooks/useOrganization";
+import ProjectsCard from "@/features/projects/components/ProjectsCard";
 
 function OrganizationDashboard({ organizationId }: { organizationId: string }) {
   const {
@@ -8,7 +9,13 @@ function OrganizationDashboard({ organizationId }: { organizationId: string }) {
     isLoading,
     error,
   } = useGetOrganizationById(organizationId);
-  return <div>OrganizationDashboard</div>;
+  return (
+    <div>
+      OrganizationDashboard
+      <div>hello</div>
+      <ProjectsCard orgId={organizationId} />
+    </div>
+  );
 }
 
 export default OrganizationDashboard;

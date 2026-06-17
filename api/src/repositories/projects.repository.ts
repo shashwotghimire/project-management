@@ -1,6 +1,8 @@
+import { Op } from "sequelize";
 import { Project } from "../models/projects.model";
 import { ProjectMembers } from "../models/project-members.model";
 import { OrganizationsMember } from "../models/organizations-members.model";
+import { User } from "../models/users.model";
 import { sequelize } from "../configs/db.config";
 
 export async function createProject(data: {
@@ -61,11 +63,41 @@ export async function isUserAdminOfProject(
 export async function getProjectsByUserId(
   userId: string,
   organizationId: string,
+  { page, limit, search }: { page: number; limit: number; search?: string },
 ) {
-  return ProjectMembers.findAll({
-    where: { userId },
-    include: [{ model: Project, where: { organizationId }, required: true }],
-  });
+  const pageInt = parseInt(String(page), 10) || 1;
+  const limitInt = parseInt(String(limit), 10) || 10;
+  const offset = (pageInt - 1) * limitInt;
+  const whereClause: any = { organizationId };
+  if (search?.trim()) {
+    whereClause.name = {
+      [Op.iLike]: `%${search.trim()}%`,
+    };
+  }
+
+  const [rows, count] = await Promise.all([
+    ProjectMembers.findAll({
+      where: { userId },
+      include: [{ model: Project, where: whereClause, required: true }],
+      limit: limitInt,
+      offset,
+      order: [["createdAt", "DESC"]],
+    }),
+    ProjectMembers.count({
+      where: { userId },
+      include: [{ model: Project, where: whereClause, required: true }],
+      distinct: true,
+      col: "id",
+    }),
+  ]);
+
+  return {
+    data: rows,
+    total: count,
+    page: pageInt,
+    limit: limitInt,
+    totalPages: Math.ceil(count / limitInt),
+  };
 }
 
 export async function deleteProject(projectId: string): Promise<void> {
@@ -74,7 +106,7 @@ export async function deleteProject(projectId: string): Promise<void> {
 
 export async function updateProject(
   projectId: string,
-  data: { name?: string; logoUrl?: string },
+  data: { name?: string; logoUrl?: string; status?: "active" | "archived" },
 ): Promise<[number, Project[]]> {
   return Project.update(data, { where: { id: projectId }, returning: true });
 }
@@ -85,4 +117,17 @@ export async function addMemberToProject(data: {
   assignedBy: string;
 }) {
   return ProjectMembers.create(data);
+}
+
+export async function getProjectMembers(projectId: string) {
+  return ProjectMembers.findAll({
+    where: { projectId },
+    include: [
+      {
+        model: User,
+        as: "member",
+        attributes: ["id", "username", "email", "gravatarUrl"],
+      },
+    ],
+  });
 }

@@ -6,6 +6,7 @@ import {
   addMemberToProjectService,
   createProjectService,
   deleteProjectService,
+  getProjectMembersService,
   getUserProjectsService,
   updateProjectService,
 } from "../services/projects.service";
@@ -35,8 +36,23 @@ export const getUserProjects = asyncHandler<AuthRequest>(
   async (req: AuthRequest, res: Response) => {
     const organizationId = isString(req.params.orgId);
     const userId = req.user.id;
+    const {
+      page,
+      limit,
+      search = "",
+    } = req.query as {
+      page: string;
+      limit: string;
+      search?: string;
+    };
 
-    const projects = await getUserProjectsService({ userId, organizationId });
+    const projects = await getUserProjectsService({
+      userId,
+      organizationId,
+      page: Number(page) || 1,
+      limit: Number(limit) || 10,
+      search,
+    });
 
     return res
       .status(200)
@@ -47,7 +63,7 @@ export const getUserProjects = asyncHandler<AuthRequest>(
 export const updateProject = asyncHandler<AuthRequest>(
   async (req: AuthRequest, res: Response) => {
     const projectId = isString(req.params.projectId);
-    const { name, logoUrl } = req.body;
+    const { name, logoUrl, status } = req.body;
     const userId = req.user.id;
 
     const updated = await updateProjectService({
@@ -55,6 +71,7 @@ export const updateProject = asyncHandler<AuthRequest>(
       userId,
       name,
       logoUrl,
+      status,
     });
 
     return res
@@ -73,6 +90,21 @@ export const deleteProject = asyncHandler<AuthRequest>(
     return res
       .status(200)
       .json(new ApiResponse(true, "Project deleted successfully", null));
+  },
+);
+
+export const getProjectMembers = asyncHandler<AuthRequest>(
+  async (req: AuthRequest, res: Response) => {
+    const projectId = isString(req.params.projectId);
+    const userId = req.user.id;
+
+    const members = await getProjectMembersService({ projectId, userId });
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(true, "Project members fetched successfully", members),
+      );
   },
 );
 

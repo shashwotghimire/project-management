@@ -17,6 +17,7 @@ export class Project extends Model<
   declare organizationId: ForeignKey<string>;
   declare createdBy: ForeignKey<string>;
   declare logoUrl: CreationOptional<string>;
+  declare status: CreationOptional<"active" | "archived">;
 }
 
 Project.init(
@@ -43,6 +44,10 @@ Project.init(
     logoUrl: {
       type: DataTypes.STRING,
       allowNull: true,
+    },
+    status: {
+      type: DataTypes.ENUM("active", "archived"),
+      defaultValue: "active",
     },
   },
   { sequelize, underscored: true, tableName: "projects" },

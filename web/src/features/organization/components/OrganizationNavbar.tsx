@@ -1,16 +1,19 @@
 "use client";
 
+import React from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useGetOrganizationById } from "@/features/organization/hooks/useOrganization";
 import { useParams } from "next/navigation";
 import { Bell, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CreateProjectModal } from "@/features/projects/components/CreateProjectModal";
 
 export function OrganizationNavbar() {
   const params = useParams<{ id: string }>();
   const orgId = params?.id ?? "";
   const { data: org } = useGetOrganizationById(orgId);
 
+  const handleCreateProject = () => {};
   return (
     <header className="h-14 flex items-center justify-between px-4 border-b bg-white">
       <div className="flex items-center gap-3">
@@ -22,10 +25,7 @@ export function OrganizationNavbar() {
         <Button variant="ghost" size="icon" className="text-muted-foreground">
           <Bell className="size-4" />
         </Button>
-        <Button size="sm" className="gap-1.5">
-          <Plus className="size-4" />
-          New Project
-        </Button>
+        <CreateProjectModal orgId={orgId} />
       </div>
     </header>
   );

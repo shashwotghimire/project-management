@@ -26,12 +26,24 @@ export const updateProjectSchema = z.object({
       .min(3, "Project name must be at least 3 characters")
       .optional(),
     logoUrl: z.url("Invalid URL format").optional(),
+    status: z.enum(["active", "archived"]).optional(),
   }),
 });
 
 export const getUserProjectsSchema = z.object({
   params: z.object({
     orgId: z.uuidv4("Invalid organization ID"),
+  }),
+  query: z.object({
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(100).default(10),
+    search: z.string().optional(),
+  }),
+});
+
+export const getProjectMembersSchema = z.object({
+  params: z.object({
+    projectId: z.uuidv4("Invalid project ID"),
   }),
 });
 
