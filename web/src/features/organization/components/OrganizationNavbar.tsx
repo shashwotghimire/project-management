@@ -13,7 +13,6 @@ export function OrganizationNavbar() {
   const orgId = params?.id ?? "";
   const { data: org } = useGetOrganizationById(orgId);
 
-  const handleCreateProject = () => {};
   return (
     <header className="h-14 flex items-center justify-between px-4 border-b bg-white">
       <div className="flex items-center gap-3">

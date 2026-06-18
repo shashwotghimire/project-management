@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { FolderOpen } from "lucide-react";
 import ProjectCardItem from "./ProjectCardItem";
 import ProjectCardSkeleton from "./ProjectCardSkeleton";
+import Link from "next/link";
 
 export default function ProjectsCard({ orgId }: { orgId: string }) {
   const { data, isLoading, error } = useGetDashboardProjects(orgId);
@@ -49,7 +50,12 @@ export default function ProjectsCard({ orgId }: { orgId: string }) {
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {projectMembers.map((member) => (
-            <ProjectCardItem key={member.id} project={member.Project} />
+            <Link
+              key={member.id}
+              href={`/organization/${orgId}/projects/${member.Project.id}`}
+            >
+              <ProjectCardItem project={member.Project} />
+            </Link>
           ))}
         </div>
       )}

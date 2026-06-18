@@ -87,8 +87,9 @@ export function AppSidebar() {
           <SidebarMenu className="gap-2">
             {workspaceNav.map(({ label, href, icon: Icon }) => {
               const fullHref = href ? `${basePath}/${href}` : basePath;
-              const isActive =
-                pathname === fullHref || pathname.startsWith(fullHref + "/");
+              const isActive = href
+                ? pathname === fullHref || pathname.startsWith(fullHref + "/")
+                : pathname === fullHref;
               return (
                 <SidebarMenuItem key={href}>
                   <Button
