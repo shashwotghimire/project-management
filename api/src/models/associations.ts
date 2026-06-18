@@ -2,6 +2,7 @@ import { OrganizationsMember } from "./organizations-members.model";
 import { Organization } from "./organizations.model";
 import { ProjectMembers } from "./project-members.model";
 import { Project } from "./projects.model";
+import { Tasks } from "./tasks.model";
 import { User } from "./users.model";
 
 Organization.belongsToMany(User, {
@@ -54,3 +55,15 @@ ProjectMembers.belongsTo(User, {
   foreignKey: "assignedBy",
   as: "assignedByUser",
 });
+
+Project.hasMany(Tasks, { foreignKey: "projectId", as: "tasks" });
+Tasks.belongsTo(Project, { foreignKey: "projectId", as: "project" });
+
+Tasks.belongsTo(User, { foreignKey: "createdBy", as: "creator" });
+User.hasMany(Tasks, { foreignKey: "createdBy", as: "createdTasks" });
+
+Tasks.belongsTo(User, { foreignKey: "assignedTo", as: "assignedTo" });
+User.hasMany(Tasks, { foreignKey: "assignedTo", as: "assignedTasks" }); //tasks assigned to user
+
+Tasks.belongsTo(User, { foreignKey: "assignedBy", as: "assignedBy" });
+User.hasMany(Tasks, { foreignKey: "assignedBy", as: "tasksAssigned" }); // tasks assigned by user
