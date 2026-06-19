@@ -62,8 +62,8 @@ Tasks.belongsTo(Project, { foreignKey: "projectId", as: "project" });
 Tasks.belongsTo(User, { foreignKey: "createdBy", as: "creator" });
 User.hasMany(Tasks, { foreignKey: "createdBy", as: "createdTasks" });
 
-Tasks.belongsTo(User, { foreignKey: "assignedTo", as: "assignedTo" });
-User.hasMany(Tasks, { foreignKey: "assignedTo", as: "assignedTasks" }); //tasks assigned to user
+Tasks.belongsTo(User, { foreignKey: "assignedTo", as: "assignee" });
+User.hasMany(Tasks, { foreignKey: "assignedTo", as: "assignedTasks" });
 
-Tasks.belongsTo(User, { foreignKey: "assignedBy", as: "assignedBy" });
-User.hasMany(Tasks, { foreignKey: "assignedBy", as: "tasksAssigned" }); // tasks assigned by user
+Tasks.belongsTo(User, { foreignKey: "assignedBy", as: "assigner" });
+User.hasMany(Tasks, { foreignKey: "assignedBy", as: "tasksAssigned" });

@@ -7,6 +7,7 @@ import {
   getUsersOrganizations,
   updateOrganization,
 } from "../controllers/organizations.controller";
+import { getTasksAssignedToUser } from "../controllers/tasks.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { validate } from "../middlewares/validation.middleware";
 import {
@@ -17,6 +18,7 @@ import {
   getUsersOrganizationsSchema,
   updateOrganizationSchema,
 } from "../validations/organizations.validation";
+import { getTasksAssignedToUserSchema } from "../validations/tasks.validation";
 
 const router = Router();
 
@@ -55,6 +57,13 @@ router.get(
   authMiddleware,
   validate(getAllMembersOfOrgSchema),
   getAllMembersOfOrg,
+);
+
+router.get(
+  "/:orgId/my-tasks",
+  authMiddleware,
+  validate(getTasksAssignedToUserSchema),
+  getTasksAssignedToUser,
 );
 
 export default router;
