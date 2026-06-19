@@ -6,14 +6,16 @@ import {
 import {
   getProjectById,
   isUserMemberOfProject,
-  isUserMemberOfProject,
 } from "../repositories/projects.repository";
 import {
   createTask,
+  deleteTask,
   getTaskById,
   getTasksAssignedToUser,
   getTasksAssignedToUserInProject,
   getTasksInProject,
+  reassignTaskToAnotherUser,
+  updateTask,
 } from "../repositories/tasks.repository";
 import { TaskPriority, TaskStatus } from "../types/tasks";
 
@@ -149,6 +151,70 @@ export const getTasksAssignedToUserService = async ({
   return await getTasksAssignedToUser(userId);
 };
 
+export const deleteTaskService = async ({
+  taskId,
+  projectId,
+  userId,
+}: {
+  taskId: string;
+  projectId: string;
+  userId: string;
+}) => {
+  const project = await getProjectById(projectId);
+  if (!project) {
+    throw new ApiError(404, "Project with the given ID does not exist.", "Project not found");
+  }
+  const isMember = await isUserMemberOfProject(userId, projectId);
+  if (!isMember) {
+    throw new ApiError(403, "Forbidden", "Only members of the project can delete tasks.");
+  }
+  const isOrgAdmin = await getOrgByAdminId(userId, project.organizationId);
+  if (!isOrgAdmin) {
+    throw new ApiError(403, "Forbidden", "Only org admins can delete tasks.");
+  }
+  const task = await getTaskById(taskId);
+  if (!task) {
+    throw new ApiError(404, "Task with the given ID does not exist.", "Task not found");
+  }
+  return await deleteTask(taskId);
+};
+
+export const updateTaskService = async ({
+  taskId,
+  projectId,
+  userId,
+  data,
+}: {
+  taskId: string;
+  projectId: string;
+  userId: string;
+  data: {
+    title?: string;
+    description?: string;
+    status?: TaskStatus;
+    priority?: TaskPriority;
+    dueDate?: string;
+  };
+}) => {
+  const project = await getProjectById(projectId);
+  if (!project) {
+    throw new ApiError(404, "Project with the given ID does not exist.", "Project not found");
+  }
+  const isMember = await isUserMemberOfProject(userId, projectId);
+  if (!isMember) {
+    throw new ApiError(403, "Forbidden", "Only members of the project can update tasks.");
+  }
+  const isOrgAdmin = await getOrgByAdminId(userId, project.organizationId);
+  if (!isOrgAdmin) {
+    throw new ApiError(403, "Forbidden", "Only org admins can update tasks.");
+  }
+  const task = await getTaskById(taskId);
+  if (!task) {
+    throw new ApiError(404, "Task with the given ID does not exist.", "Task not found");
+  }
+  return await updateTask(taskId, data);
+};
+
 export const getTasksAssignedToUserInProjectService = async ({
   userId,
   projectId,
@@ -174,4 +240,61 @@ export const getTasksAssignedToUserInProjectService = async ({
   }
   const tasks = await getTasksAssignedToUserInProject(userId, projectId);
   return tasks;
+};
+
+export const reassignTaskToAnotherUserService = async ({
+  taskId,
+  newUserId,
+  projectId,
+  userId,
+}: {
+  taskId: string;
+  newUserId: string;
+  projectId: string;
+  userId: string;
+}) => {
+  const project = await getProjectById(projectId);
+  if (!project) {
+    throw new ApiError(
+      404,
+      "Project with the given ID does not exist.",
+      "Project not found",
+    );
+  }
+  const isMember = await isUserMemberOfProject(userId, projectId);
+  if (!isMember) {
+    throw new ApiError(
+      403,
+      "Forbidden",
+      "Only members of the project can reassign tasks.",
+    );
+  }
+  const isMemberOrgAdmin = await getOrgByAdminId(
+    userId,
+    project.organizationId,
+  );
+  if (!isMemberOrgAdmin) {
+    throw new ApiError(
+      403,
+      "Forbidden",
+      "Only members who are admins can reassign tasks.",
+    );
+  }
+  const task = await getTaskById(taskId);
+  if (!task) {
+    throw new ApiError(
+      404,
+      "Task with the given ID does not exist.",
+      "Task not found",
+    );
+  }
+  const isNewUserMember = await isUserMemberOfProject(newUserId, projectId);
+  if (!isNewUserMember) {
+    throw new ApiError(
+      400,
+      "The user you are trying to assign the task to is not a member of the project.",
+      "User not a member of project",
+    );
+  }
+  return await reassignTaskToAnotherUser({ taskId, newUserId });
 };

@@ -6,6 +6,7 @@ import organizationRoutes from "./routes/organizations.route";
 import invitationRoutes from "./routes/invitation.route";
 import projectRoutes from "./routes/projects.route";
 import taskRoutes from "./routes/tasks.route";
+import commentRoutes from "./routes/comments.route";
 
 const app = express();
 app.use(express.json());
@@ -19,6 +20,7 @@ app.use("/api/organizations", organizationRoutes);
 app.use("/api/invitations", invitationRoutes);
 app.use("/api/organizations/:orgId/projects", projectRoutes);
 app.use("/api/organizations/:orgId/projects/:projectId/tasks", taskRoutes);
+app.use("/api/organizations/:orgId/projects/:projectId/tasks/:taskId/comments", commentRoutes);
 
 app.use(errorHandler);
 export default app;

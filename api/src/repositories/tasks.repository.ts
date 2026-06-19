@@ -45,3 +45,33 @@ export const getTasksAssignedToUserInProject = async (
 ) => {
   return await Tasks.findAll({ where: { assignedTo: userId, projectId } });
 };
+
+export const updateTask = async (
+  taskId: string,
+  data: {
+    title?: string;
+    description?: string;
+    status?: TaskStatus;
+    priority?: TaskPriority;
+    dueDate?: string;
+  },
+) => {
+  return await Tasks.update(data, { where: { id: taskId } });
+};
+
+export const deleteTask = async (taskId: string) => {
+  return await Tasks.destroy({ where: { id: taskId } });
+};
+
+export const reassignTaskToAnotherUser = async ({
+  taskId,
+  newUserId,
+}: {
+  taskId: string;
+  newUserId: string;
+}) => {
+  return await Tasks.update(
+    { assignedTo: newUserId },
+    { where: { id: taskId } },
+  );
+};

@@ -3,10 +3,13 @@ import { AuthRequest } from "../middlewares/auth.middleware";
 import { Response } from "express";
 import {
   createTaskService,
+  deleteTaskService,
   getTaskByIdService,
   getTasksAssignedToUserInProjectService,
   getTasksAssignedToUserService,
   getTasksInProjectService,
+  reassignTaskToAnotherUserService,
+  updateTaskService,
 } from "../services/tasks.service";
 import { ApiResponse } from "../helpers/ApiResponse";
 import { isString } from "../helpers/check-string.helper";
@@ -80,5 +83,55 @@ export const getTasksAssignedToUserInProject = asyncHandler<AuthRequest>(
     return res
       .status(200)
       .json(new ApiResponse(true, "Tasks fetched successfully", tasks));
+  },
+);
+
+export const deleteTask = asyncHandler<AuthRequest>(
+  async (req: AuthRequest, res: Response) => {
+    const taskId = isString(req.params.taskId);
+    const projectId = isString(req.params.projectId);
+    const userId = req.user.id;
+    await deleteTaskService({ taskId, projectId, userId });
+    return res
+      .status(200)
+      .json(new ApiResponse(true, "Task deleted successfully", null));
+  },
+);
+
+export const updateTask = asyncHandler<AuthRequest>(
+  async (req: AuthRequest, res: Response) => {
+    const taskId = isString(req.params.taskId);
+    const projectId = isString(req.params.projectId);
+    const userId = req.user.id;
+    const { title, description, status, priority, dueDate } = req.body;
+
+    const task = await updateTaskService({
+      taskId,
+      projectId,
+      userId,
+      data: { title, description, status, priority, dueDate },
+    });
+    return res
+      .status(200)
+      .json(new ApiResponse(true, "Task updated successfully", task));
+  },
+);
+
+export const reassignTaskToAnotherUser = asyncHandler<AuthRequest>(
+  async (req: AuthRequest, res: Response) => {
+    const taskId = isString(req.params.taskId);
+    const newUserId = isString(req.body.newUserId);
+    const projectId = isString(req.params.projectId);
+    const userId = req.user.id;
+
+    await reassignTaskToAnotherUserService({
+      taskId,
+      newUserId,
+      userId,
+      projectId,
+    });
+    return res
+      .status(200)
+      .json(new ApiResponse(true, "Task reassigned successfully", null));
   },
 );
