@@ -6,6 +6,7 @@ import {
   addMemberToProjectService,
   createProjectService,
   deleteProjectService,
+  getProjectByIdService,
   getProjectMembersService,
   getUserProjectsService,
   updateProjectService,
@@ -29,6 +30,19 @@ export const createProject = asyncHandler<AuthRequest>(
     return res
       .status(201)
       .json(new ApiResponse(true, "Project created successfully", project));
+  },
+);
+
+export const getProjectById = asyncHandler<AuthRequest>(
+  async (req: AuthRequest, res: Response) => {
+    const projectId = isString(req.params.projectId);
+    const userId = req.user.id;
+
+    const project = await getProjectByIdService({ projectId, userId });
+
+    return res
+      .status(200)
+      .json(new ApiResponse(true, "Project fetched successfully", project));
   },
 );
 

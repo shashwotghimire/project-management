@@ -2,6 +2,7 @@ import api from "@/lib/axios";
 import {
   CreateProjectRequest,
   CreateProjectResponse,
+  GetProjectByIdResponse,
   GetProjectMembersResponse,
   GetUsersProjectsParams,
   GetUsersProjectsResponse,
@@ -25,6 +26,16 @@ export const createProjectService = async (
   const response = await api.post<CreateProjectResponse>(
     `/organizations/${orgId}/projects`,
     body,
+  );
+  return response.data.data;
+};
+
+export const getProjectByIdService = async (
+  orgId: string,
+  projectId: string,
+): Promise<GetProjectByIdResponse["data"]> => {
+  const response = await api.get<GetProjectByIdResponse>(
+    `/organizations/${orgId}/projects/${projectId}`,
   );
   return response.data.data;
 };

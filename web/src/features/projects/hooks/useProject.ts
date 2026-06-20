@@ -1,5 +1,6 @@
 import {
   createProjectService,
+  getProjectByIdService,
   getProjectMembersService,
   getUsersProjectsService,
 } from "@/services/project.service";
@@ -34,6 +35,13 @@ export const useGetDashboardProjects = (orgId: string) => {
   return useQuery({
     queryKey: ["projects", orgId, { limit: 3 }],
     queryFn: () => getUsersProjectsService(orgId, { limit: 3 }),
+  });
+};
+
+export const useGetProjectById = (orgId: string, projectId: string) => {
+  return useQuery({
+    queryKey: ["project", orgId, projectId],
+    queryFn: () => getProjectByIdService(orgId, projectId),
   });
 };
 

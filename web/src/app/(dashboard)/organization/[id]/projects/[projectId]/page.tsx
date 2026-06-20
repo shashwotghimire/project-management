@@ -1,3 +1,6 @@
+import ProjectDetails from "@/features/projects/components/ProjectDetails";
+import { ProjectNavbar } from "@/features/projects/components/ProjectNavbar";
+
 export default async function ProjectPage({
   params,
 }: {
@@ -7,9 +10,8 @@ export default async function ProjectPage({
 
   return (
     <div>
-      <div>
-        Your project {projectId} in organization {id}
-      </div>
+      <ProjectNavbar />
+      <ProjectDetails orgId={id} projectId={projectId} />
     </div>
   );
 }

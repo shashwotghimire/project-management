@@ -138,6 +138,26 @@ export const getProjectMembersService = async ({
   return await getProjectMembers(projectId);
 };
 
+export const getProjectByIdService = async ({
+  projectId,
+  userId,
+}: {
+  projectId: string;
+  userId: string;
+}) => {
+  const project = await getProjectById(projectId);
+  if (!project) {
+    throw new ApiError(404, "Project not found", "Project not found");
+  }
+
+  const isMember = await isUserMemberOfProject(userId, projectId);
+  if (!isMember) {
+    throw new ApiError(403, "Access denied", "Access denied");
+  }
+
+  return project;
+};
+
 export const addMemberToProjectService = async ({
   userId,
   projectId,

@@ -72,3 +72,9 @@ export interface GetProjectMembersResponse {
   message: string;
   data: ProjectMemberWithUser[];
 }
+
+export interface GetProjectByIdResponse {
+  success: boolean;
+  message: string;
+  data: Project;
+}

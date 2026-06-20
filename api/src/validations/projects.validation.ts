@@ -41,6 +41,12 @@ export const getUserProjectsSchema = z.object({
   }),
 });
 
+export const getProjectByIdSchema = z.object({
+  params: z.object({
+    projectId: z.uuidv4("Invalid project ID"),
+  }),
+});
+
 export const getProjectMembersSchema = z.object({
   params: z.object({
     projectId: z.uuidv4("Invalid project ID"),

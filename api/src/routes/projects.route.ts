@@ -5,6 +5,7 @@ import {
   addMemberToProjectSchema,
   createProjectSchema,
   deleteProjectSchema,
+  getProjectByIdSchema,
   getProjectMembersSchema,
   getUserProjectsSchema,
   updateProjectSchema,
@@ -13,6 +14,7 @@ import {
   addMemberToProject,
   createProject,
   deleteProject,
+  getProjectById,
   getProjectMembers,
   getUserProjects,
   updateProject,
@@ -27,6 +29,13 @@ router.get(
   getUserProjects,
 );
 router.post("/", authMiddleware, validate(createProjectSchema), createProject);
+
+router.get(
+  "/:projectId",
+  authMiddleware,
+  validate(getProjectByIdSchema),
+  getProjectById,
+);
 
 router.patch(
   "/:projectId",
