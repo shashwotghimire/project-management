@@ -10,6 +10,8 @@ import {
   getTasksInProjectService,
   reassignTaskToAnotherUserService,
   updateTaskService,
+  updateTaskStatusService,
+  updateTaskPositionService,
 } from "../services/tasks.service";
 import { ApiResponse } from "../helpers/ApiResponse";
 import { isString } from "../helpers/check-string.helper";
@@ -114,6 +116,28 @@ export const updateTask = asyncHandler<AuthRequest>(
     return res
       .status(200)
       .json(new ApiResponse(true, "Task updated successfully", task));
+  },
+);
+
+export const updateTaskStatus = asyncHandler<AuthRequest>(
+  async (req: AuthRequest, res: Response) => {
+    const taskId = isString(req.params.taskId);
+    const projectId = isString(req.params.projectId);
+    const userId = req.user.id;
+    const { status } = req.body;
+    await updateTaskStatusService({ taskId, projectId, userId, status });
+    return res.status(200).json(new ApiResponse(true, "Task status updated successfully", null));
+  },
+);
+
+export const updateTaskPosition = asyncHandler<AuthRequest>(
+  async (req: AuthRequest, res: Response) => {
+    const taskId = isString(req.params.taskId);
+    const projectId = isString(req.params.projectId);
+    const userId = req.user.id;
+    const { position } = req.body;
+    await updateTaskPositionService({ taskId, projectId, userId, position });
+    return res.status(200).json(new ApiResponse(true, "Task position updated successfully", null));
   },
 );
 

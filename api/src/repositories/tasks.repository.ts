@@ -63,6 +63,14 @@ export const deleteTask = async (taskId: string) => {
   return await Tasks.destroy({ where: { id: taskId } });
 };
 
+export const updateTaskStatus = async (taskId: string, status: TaskStatus) => {
+  return await Tasks.update({ status }, { where: { id: taskId } });
+};
+
+export const updateTaskPosition = async (taskId: string, position: number) => {
+  return await Tasks.update({ position }, { where: { id: taskId } });
+};
+
 export const reassignTaskToAnotherUser = async ({
   taskId,
   newUserId,

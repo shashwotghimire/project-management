@@ -9,6 +9,8 @@ import {
   getTasksSchema,
   reassignTaskSchema,
   updateTaskSchema,
+  updateTaskStatusSchema,
+  updateTaskPositionSchema,
 } from "../validations/tasks.validation";
 import {
   createTask,
@@ -18,6 +20,8 @@ import {
   getTasksInProject,
   reassignTaskToAnotherUser,
   updateTask,
+  updateTaskStatus,
+  updateTaskPosition,
 } from "../controllers/tasks.controller";
 
 const router = Router({ mergeParams: true });
@@ -47,6 +51,18 @@ router.delete(
   authMiddleware,
   validate(deleteTaskSchema),
   deleteTask,
+);
+router.patch(
+  "/:taskId/status",
+  authMiddleware,
+  validate(updateTaskStatusSchema),
+  updateTaskStatus,
+);
+router.patch(
+  "/:taskId/position",
+  authMiddleware,
+  validate(updateTaskPositionSchema),
+  updateTaskPosition,
 );
 router.patch(
   "/:taskId/reassign",

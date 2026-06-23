@@ -54,6 +54,28 @@ export const updateTaskSchema = z.object({
   ),
 });
 
+export const updateTaskStatusSchema = z.object({
+  params: z.object({
+    orgId: z.uuidv4("Invalid organization ID"),
+    projectId: z.uuidv4("Invalid project ID"),
+    taskId: z.uuidv4("Invalid task ID"),
+  }),
+  body: z.object({
+    status: z.enum(["todo", "in_progress", "completed"]),
+  }),
+});
+
+export const updateTaskPositionSchema = z.object({
+  params: z.object({
+    orgId: z.uuidv4("Invalid organization ID"),
+    projectId: z.uuidv4("Invalid project ID"),
+    taskId: z.uuidv4("Invalid task ID"),
+  }),
+  body: z.object({
+    position: z.number().int().nonnegative(),
+  }),
+});
+
 export const reassignTaskSchema = z.object({
   params: z.object({
     orgId: z.uuidv4("Invalid organization ID"),

@@ -16,6 +16,8 @@ import {
   getTasksInProject,
   reassignTaskToAnotherUser,
   updateTask,
+  updateTaskPosition,
+  updateTaskStatus,
 } from "../repositories/tasks.repository";
 import { TaskPriority, TaskStatus } from "../types/tasks";
 
@@ -240,6 +242,58 @@ export const getTasksAssignedToUserInProjectService = async ({
   }
   const tasks = await getTasksAssignedToUserInProject(userId, projectId);
   return tasks;
+};
+
+export const updateTaskStatusService = async ({
+  taskId,
+  projectId,
+  userId,
+  status,
+}: {
+  taskId: string;
+  projectId: string;
+  userId: string;
+  status: TaskStatus;
+}) => {
+  const project = await getProjectById(projectId);
+  if (!project) {
+    throw new ApiError(404, "Project with the given ID does not exist.", "Project not found");
+  }
+  const isMember = await isUserMemberOfProject(userId, projectId);
+  if (!isMember) {
+    throw new ApiError(403, "Forbidden", "Only members of the project can update tasks.");
+  }
+  const task = await getTaskById(taskId);
+  if (!task) {
+    throw new ApiError(404, "Task with the given ID does not exist.", "Task not found");
+  }
+  return await updateTaskStatus(taskId, status);
+};
+
+export const updateTaskPositionService = async ({
+  taskId,
+  projectId,
+  userId,
+  position,
+}: {
+  taskId: string;
+  projectId: string;
+  userId: string;
+  position: number;
+}) => {
+  const project = await getProjectById(projectId);
+  if (!project) {
+    throw new ApiError(404, "Project with the given ID does not exist.", "Project not found");
+  }
+  const isMember = await isUserMemberOfProject(userId, projectId);
+  if (!isMember) {
+    throw new ApiError(403, "Forbidden", "Only members of the project can update tasks.");
+  }
+  const task = await getTaskById(taskId);
+  if (!task) {
+    throw new ApiError(404, "Task with the given ID does not exist.", "Task not found");
+  }
+  return await updateTaskPosition(taskId, position);
 };
 
 export const reassignTaskToAnotherUserService = async ({
