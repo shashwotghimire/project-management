@@ -9,9 +9,11 @@ export default async function ProjectPage({
   const { id, projectId } = await params;
 
   return (
-    <div>
+    <div className="flex h-screen flex-col">
       <ProjectDetailsNavbar />
-      <ProjectDetails orgId={id} projectId={projectId} />
+      <div className="min-h-0 flex-1">
+        <ProjectDetails orgId={id} projectId={projectId} />
+      </div>
     </div>
   );
 }

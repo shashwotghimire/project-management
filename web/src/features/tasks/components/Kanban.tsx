@@ -1,7 +1,8 @@
 "use client";
 
 import { useGetProjectTasks } from "../hooks/useTasks";
-import TaskCard from "./TaskCard";
+import SortableTaskCard from "./SortableTaskCards";
+import { groupByStatus } from "@/lib/groupTasks";
 
 export default function Kanban({
   orgId,
@@ -18,8 +19,7 @@ export default function Kanban({
   ] as const;
   return (
     <div>
-      <div>Kanban board</div>
-      <div className="grid mt-8 grid-cols-3 gap-4 min-h-200">
+      <div className="grid grid-cols-3 gap-4 min-h-200">
         {columns.map((status) => (
           <div
             key={status.status}
@@ -28,8 +28,8 @@ export default function Kanban({
             <h3 className="text-sm font-semibold">{status.title}</h3>
             {data
               ?.filter((data) => data.status === status.status)
-              .map((data) => (
-                <TaskCard key={data.id} task={data} />
+              .map((data, index) => (
+                <SortableTaskCard key={data.id} task={data} index={index} />
               ))}
             {isPending && <p>Loading...</p>}
             {error && <p className="text-destructive">Failed to load tasks.</p>}

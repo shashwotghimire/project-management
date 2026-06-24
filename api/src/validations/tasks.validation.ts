@@ -62,6 +62,7 @@ export const updateTaskStatusSchema = z.object({
   }),
   body: z.object({
     status: z.enum(["todo", "in_progress", "completed"]),
+    position: z.number().int().nonnegative(),
   }),
 });
 

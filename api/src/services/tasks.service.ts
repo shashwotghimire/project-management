@@ -249,11 +249,13 @@ export const updateTaskStatusService = async ({
   projectId,
   userId,
   status,
+  position,
 }: {
   taskId: string;
   projectId: string;
   userId: string;
   status: TaskStatus;
+  position: number;
 }) => {
   const project = await getProjectById(projectId);
   if (!project) {
@@ -267,7 +269,7 @@ export const updateTaskStatusService = async ({
   if (!task) {
     throw new ApiError(404, "Task with the given ID does not exist.", "Task not found");
   }
-  return await updateTaskStatus(taskId, status);
+  return await updateTaskStatus(taskId, status, position);
 };
 
 export const updateTaskPositionService = async ({

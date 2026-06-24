@@ -1,3 +1,5 @@
+import { Op } from "sequelize";
+import { sequelize } from "../configs/db.config";
 import { Tasks } from "../models/tasks.model";
 import { TaskPriority, TaskStatus } from "../types/tasks";
 
@@ -10,9 +12,12 @@ export const createTask = async (data: {
   projectId: string;
   status: TaskStatus;
   priority: TaskPriority;
-  position?: number;
   dueDate?: string;
 }) => {
+  const count = await Tasks.count({
+    where: { projectId: data.projectId, status: data.status ?? "todo" },
+  });
+
   return await Tasks.create({
     title: data.title,
     description: data.description,
@@ -22,7 +27,7 @@ export const createTask = async (data: {
     createdBy: data.assignedBy,
     assignedBy: data.assignedBy,
     assignedTo: data.assignedTo,
-    position: data.position,
+    position: count,
     dueDate: data.dueDate,
   });
 };
@@ -63,12 +68,64 @@ export const deleteTask = async (taskId: string) => {
   return await Tasks.destroy({ where: { id: taskId } });
 };
 
-export const updateTaskStatus = async (taskId: string, status: TaskStatus) => {
-  return await Tasks.update({ status }, { where: { id: taskId } });
+export const updateTaskStatus = async (
+  taskId: string,
+  status: TaskStatus,
+  position: number,
+) => {
+  const task = await Tasks.findByPk(taskId);
+  const oldStatus = task?.status;
+  const oldPosition = task?.position;
+  await sequelize.transaction(async (t) => {
+    await Tasks.decrement("position", {
+      by: 1,
+      where: {
+        projectId: task?.projectId,
+        status: oldStatus,
+        position: { [Op.gt]: oldPosition },
+      },
+      transaction: t,
+    });
+    await Tasks.increment("position", {
+      by: 1,
+      where: {
+        projectId: task?.projectId,
+        status,
+        position: { [Op.gt]: position },
+      },
+      transaction: t,
+    });
+    await task?.update({ position, status }, { transaction: t });
+  });
 };
 
 export const updateTaskPosition = async (taskId: string, position: number) => {
-  return await Tasks.update({ position }, { where: { id: taskId } });
+  const task = await Tasks.findByPk(taskId);
+  const oldPosition = task?.position;
+  await sequelize.transaction(async (t) => {
+    if (position > oldPosition!) {
+      await Tasks.decrement("position", {
+        by: 1,
+        where: {
+          projectId: task?.projectId,
+          status: task?.status,
+          position: { [Op.gt]: oldPosition, [Op.lte]: position },
+        },
+        transaction: t,
+      });
+    } else {
+      await Tasks.increment("position", {
+        by: 1,
+        where: {
+          projectId: task?.projectId,
+          status: task?.status,
+          position: { [Op.lt]: oldPosition, [Op.gte]: position },
+        },
+        transaction: t,
+      });
+    }
+    await task?.update({ position }, { transaction: t });
+  });
 };
 
 export const reassignTaskToAnotherUser = async ({

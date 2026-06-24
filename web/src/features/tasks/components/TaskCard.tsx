@@ -13,7 +13,7 @@ const STATUS_STYLES: Record<TaskStatus, { label: string; className: string }> =
       className:
         "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
     },
-    done: {
+    completed: {
       label: "Done",
       className:
         "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",

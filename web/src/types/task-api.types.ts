@@ -23,3 +23,30 @@ export interface GetProjectTasksResponse {
   message: string;
   data: Task[];
 }
+
+export interface UpdateTaskStatusRequest {
+  orgId: string;
+  projectId: string;
+  taskId: string;
+  status: TaskStatus;
+  position: number;
+}
+
+export interface UpdateTaskPositionRequest {
+  orgId: string;
+  projectId: string;
+  taskId: string;
+  position: number;
+}
+
+export interface UpdateTaskStatusResponse {
+  success: boolean;
+  message: string;
+  data: null;
+}
+
+export interface UpdateTaskPositionResponse {
+  success: boolean;
+  message: string;
+  data: null;
+}

@@ -124,8 +124,8 @@ export const updateTaskStatus = asyncHandler<AuthRequest>(
     const taskId = isString(req.params.taskId);
     const projectId = isString(req.params.projectId);
     const userId = req.user.id;
-    const { status } = req.body;
-    await updateTaskStatusService({ taskId, projectId, userId, status });
+    const { status, position } = req.body;
+    await updateTaskStatusService({ taskId, projectId, userId, status, position });
     return res.status(200).json(new ApiResponse(true, "Task status updated successfully", null));
   },
 );

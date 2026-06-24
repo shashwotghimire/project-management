@@ -1,0 +1,1 @@
+{"version":3,"file":"nodemailer.config.js","sourceRoot":"","sources":["../../src/configs/nodemailer.config.ts"],"names":[],"mappings":";;;;;;AAAA,4DAAoC;AACpC,yBAAuB;AAEV,QAAA,gBAAgB,GAAG,oBAAU,CAAC,eAAe,CAAC;IACzD,IAAI,EAAE,iBAAiB;IACvB,MAAM,EAAE,IAAI;IACZ,IAAI,EAAE,GAAG;IACT,IAAI,EAAE;QACJ,IAAI,EAAE,QAAQ;QACd,IAAI,EAAE,OAAO,CAAC,GAAG,CAAC,UAAU;KAC7B;CACF,CAAC,CAAC"}

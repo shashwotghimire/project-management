@@ -1,0 +1,13 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const app_1 = __importDefault(require("./app"));
+require("dotenv/config");
+const db_config_1 = require("./configs/db.config");
+const PORT = process.env.PORT;
+(0, db_config_1.connectDb)().then(() => {
+    app_1.default.listen(PORT, () => console.log(`server running on port ${PORT}`));
+});
+//# sourceMappingURL=server.js.map
