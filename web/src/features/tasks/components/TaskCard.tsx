@@ -1,6 +1,7 @@
 import { Task, TaskPriority, TaskStatus } from "@/types/task-api.types";
 import { Card, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { CalendarDays } from "lucide-react";
+import Link from "next/link";
 
 const STATUS_STYLES: Record<TaskStatus, { label: string; className: string }> =
   {
@@ -56,7 +57,7 @@ function Badge({
   );
 }
 
-export default function TaskCard({ task }: { task: Task }) {
+export default function TaskCard({ task, href }: { task: Task; href?: string }) {
   const status = STATUS_STYLES[task.status];
   const priority = PRIORITY_STYLES[task.priority];
 
@@ -72,7 +73,13 @@ export default function TaskCard({ task }: { task: Task }) {
     <Card className="hover:ring-primary/30 cursor-pointer transition-shadow hover:shadow-md rounded-none">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium leading-snug">
-          {task.title}
+          {href ? (
+            <Link href={href} className="hover:underline">
+              {task.title}
+            </Link>
+          ) : (
+            task.title
+          )}
         </CardTitle>
         {task.description && (
           <p className="text-xs text-muted-foreground line-clamp-2 mt-1">

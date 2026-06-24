@@ -18,10 +18,29 @@ export interface Task {
   updatedAt: string;
 }
 
+export type TasksByStatus = {
+  todo: Task[];
+  in_progress: Task[];
+  completed: Task[];
+};
+
+export interface PaginatedTasks {
+  tasks: Task[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 export interface GetProjectTasksResponse {
   success: boolean;
   message: string;
-  data: Task[];
+  data: PaginatedTasks;
+}
+
+export interface GetTaskByIdResponse {
+  success: boolean;
+  message: string;
+  data: Task;
 }
 
 export interface UpdateTaskStatusRequest {
@@ -50,3 +69,9 @@ export interface UpdateTaskPositionResponse {
   message: string;
   data: null;
 }
+
+export const columns = [
+  { title: "To Do", status: "todo" },
+  { title: "In Progress", status: "in_progress" },
+  { title: "Completed", status: "completed" },
+] as const;

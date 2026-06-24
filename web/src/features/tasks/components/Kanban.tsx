@@ -1,8 +1,10 @@
 "use client";
-
-import { useGetProjectTasks } from "../hooks/useTasks";
-import SortableTaskCard from "./SortableTaskCards";
-import { groupByStatus } from "@/lib/groupTasks";
+import { useCallback } from "react";
+import { DndContext, DragOverlay } from "@dnd-kit/core";
+import { columns } from "@/types/task-api.types";
+import { useKanbanDnd } from "../hooks/useKanbanDnd";
+import KanbanColumn from "./KanbanColumn";
+import TaskCard from "./TaskCard";
 
 export default function Kanban({
   orgId,
@@ -11,31 +13,48 @@ export default function Kanban({
   orgId: string;
   projectId: string;
 }) {
-  const { data, isPending, error } = useGetProjectTasks(orgId, projectId);
-  const columns = [
-    { title: "To Do", status: "todo" },
-    { title: "In Progress", status: "in_progress" },
-    { title: "Completed", status: "completed" },
-  ] as const;
+  const {
+    tasksByStatus,
+    activeTask,
+    isPending,
+    error,
+    sensors,
+    collisionDetection,
+    handleDragStart,
+    handleDragOver,
+    handleDragEnd,
+  } = useKanbanDnd(orgId, projectId);
+
+  const getTaskHref = useCallback(
+    (taskId: string) =>
+      `/organization/${orgId}/projects/${projectId}/tasks/${taskId}`,
+    [orgId, projectId],
+  );
+
   return (
-    <div>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={collisionDetection}
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
+    >
       <div className="grid grid-cols-3 gap-4 min-h-200">
-        {columns.map((status) => (
-          <div
-            key={status.status}
-            className="bg-muted rounded p-4 flex flex-col gap-2"
-          >
-            <h3 className="text-sm font-semibold">{status.title}</h3>
-            {data
-              ?.filter((data) => data.status === status.status)
-              .map((data, index) => (
-                <SortableTaskCard key={data.id} task={data} index={index} />
-              ))}
-            {isPending && <p>Loading...</p>}
-            {error && <p className="text-destructive">Failed to load tasks.</p>}
-          </div>
+        {columns.map((col) => (
+          <KanbanColumn
+            key={col.status}
+            status={col.status}
+            title={col.title}
+            tasks={tasksByStatus[col.status]}
+            isPending={isPending}
+            error={error}
+            getTaskHref={getTaskHref}
+          />
         ))}
       </div>
-    </div>
+      <DragOverlay>
+        {activeTask ? <TaskCard task={activeTask} /> : null}
+      </DragOverlay>
+    </DndContext>
   );
 }

@@ -76,9 +76,13 @@ export const createTaskService = async (data: {
 export const getTasksInProjectService = async ({
   projectId,
   userId,
+  page,
+  limit,
 }: {
   projectId: string;
   userId: string;
+  page: number;
+  limit: number;
 }) => {
   const project = await getProjectById(projectId);
   if (!project) {
@@ -96,7 +100,7 @@ export const getTasksInProjectService = async ({
       "Only members of the project can view the tasks.",
     );
   }
-  return await getTasksInProject(projectId);
+  return await getTasksInProject(projectId, page, limit);
 };
 
 export const getTaskByIdService = async ({

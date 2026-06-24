@@ -55,10 +55,12 @@ export const getTasksInProject = asyncHandler<AuthRequest>(
   async (req: AuthRequest, res: Response) => {
     const projectId = isString(req.params.projectId);
     const userId = req.user.id;
-    const tasks = await getTasksInProjectService({ projectId, userId });
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 20;
+    const result = await getTasksInProjectService({ projectId, userId, page, limit });
     return res
       .status(200)
-      .json(new ApiResponse(true, "Tasks fetched successfully", tasks));
+      .json(new ApiResponse(true, "Tasks fetched successfully", result));
   },
 );
 

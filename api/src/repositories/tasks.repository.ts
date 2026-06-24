@@ -32,8 +32,19 @@ export const createTask = async (data: {
   });
 };
 
-export const getTasksInProject = async (projectId: string) => {
-  return await Tasks.findAll({ where: { projectId } });
+export const getTasksInProject = async (
+  projectId: string,
+  page: number = 1,
+  limit: number = 20,
+) => {
+  const offset = (page - 1) * limit;
+  const { rows, count } = await Tasks.findAndCountAll({
+    where: { projectId },
+    limit,
+    offset,
+    order: [["position", "ASC"]],
+  });
+  return { tasks: rows, total: count, page, limit };
 };
 
 export const getTaskById = async (taskId: string) => {

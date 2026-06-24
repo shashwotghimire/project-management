@@ -1,6 +1,8 @@
 import api from "@/lib/axios";
 import {
   GetProjectTasksResponse,
+  GetTaskByIdResponse,
+  PaginatedTasks,
   Task,
   UpdateTaskPositionRequest,
   UpdateTaskPositionResponse,
@@ -11,9 +13,23 @@ import {
 export const getProjectTasksService = async (
   orgId: string,
   projectId: string,
-): Promise<GetProjectTasksResponse["data"]> => {
+  page: number = 1,
+  limit: number = 20,
+): Promise<PaginatedTasks> => {
   const response = await api.get<GetProjectTasksResponse>(
     `/organizations/${orgId}/projects/${projectId}/tasks`,
+    { params: { page, limit } },
+  );
+  return response.data.data;
+};
+
+export const getTaskByIdService = async (
+  orgId: string,
+  projectId: string,
+  taskId: string,
+): Promise<Task> => {
+  const response = await api.get<GetTaskByIdResponse>(
+    `/organizations/${orgId}/projects/${projectId}/tasks/${taskId}`,
   );
   return response.data.data;
 };

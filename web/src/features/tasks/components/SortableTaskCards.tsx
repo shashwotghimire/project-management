@@ -1,23 +1,22 @@
 import { Task } from "@/types/task-api.types";
-import { useSortable } from "@dnd-kit/react/sortable";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import TaskCard from "./TaskCard";
 
-export default function SortableTaskCard({
-  task,
-  index,
-}: {
-  task: Task;
-  index: number;
-}) {
-  const { ref, isDragging } = useSortable({
+export default function SortableTaskCard({ task, href }: { task: Task; href?: string }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
-    index,
-    group: "kanban",
   });
 
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0 : 1,
+  };
+
   return (
-    <div ref={ref} style={{ opacity: isDragging ? 0.5 : 1 }}>
-      <TaskCard task={task} />
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <TaskCard task={task} href={href} />
     </div>
   );
 }
