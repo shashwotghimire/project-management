@@ -163,11 +163,11 @@ export const getAllMembersOfOrg = async (orgId: string) => {
     include: [
       {
         model: User,
-        attributes: ["id", "username", "email"],
+        attributes: ["id", "username", "email", "gravatarUrl"],
       },
     ],
     attributes: {
-      exclude: ["id", "createdAt", "updatedAt", "userId", "orgId"],
+      exclude: ["id", "updatedAt", "userId", "orgId"],
     },
   });
 };
