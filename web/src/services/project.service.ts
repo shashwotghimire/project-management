@@ -49,3 +49,10 @@ export const getProjectMembersService = async (
   );
   return response.data.data;
 };
+
+export const addMemberToProjectService = async (
+  projectId: string,
+  userId: string,
+): Promise<void> => {
+  await api.post(`/projects/${projectId}/members`, { userId });
+};

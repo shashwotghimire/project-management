@@ -1,4 +1,5 @@
 import {
+  addMemberToProjectService,
   createProjectService,
   getProjectByIdService,
   getProjectMembersService,
@@ -8,7 +9,11 @@ import {
   CreateProjectRequest,
   GetUsersProjectsParams,
 } from "@/types/project-api.types";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 export const useCreateProject = (orgId: string) => {
   const queryClient = useQueryClient();
@@ -49,5 +54,18 @@ export const useGetProjectMembers = (orgId: string, projectId: string) => {
   return useQuery({
     queryKey: ["project-members", orgId, projectId],
     queryFn: () => getProjectMembersService(orgId, projectId),
+  });
+};
+
+export const useAddMemberToProject = (orgId: string, projectId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: string) =>
+      addMemberToProjectService(projectId, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["project-members", orgId, projectId],
+      });
+    },
   });
 };

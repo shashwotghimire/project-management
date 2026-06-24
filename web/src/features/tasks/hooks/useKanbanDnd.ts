@@ -22,6 +22,11 @@ import {
   useUpdateTaskStatus,
 } from "./useTasks";
 
+export const toColumnId = (status: TaskStatus) => `col-${status}`;
+export const fromColumnId = (id: string): TaskStatus =>
+  id.replace(/^col-/, "") as TaskStatus;
+const isColumnId = (id: string) => id.startsWith("col-");
+
 export function useKanbanDnd(orgId: string, projectId: string) {
   const { data, isPending, error } = useGetProjectTasks(orgId, projectId, 1, 100);
   const { mutate: updateStatus } = useUpdateTaskStatus(orgId, projectId);
@@ -32,10 +37,14 @@ export function useKanbanDnd(orgId: string, projectId: string) {
     in_progress: [],
     completed: [],
   });
+  const [columnOrder, setColumnOrder] = useState<TaskStatus[]>([
+    "todo",
+    "in_progress",
+    "completed",
+  ]);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
-  const [originContainer, setOriginContainer] = useState<TaskStatus | null>(
-    null,
-  );
+  const [activeColumnId, setActiveColumnId] = useState<TaskStatus | null>(null);
+  const [originContainer, setOriginContainer] = useState<TaskStatus | null>(null);
   const skipNextSync = useRef(false);
 
   useEffect(() => {
@@ -52,6 +61,16 @@ export function useKanbanDnd(orgId: string, projectId: string) {
 
   const collisionDetection: CollisionDetection = useCallback(
     (args) => {
+      // If dragging a column, use closest corners among column droppables only
+      if (isColumnId(args.active.id as string)) {
+        return closestCorners({
+          ...args,
+          droppableContainers: args.droppableContainers.filter((c) =>
+            isColumnId(c.id as string),
+          ),
+        });
+      }
+
       const pointerCollisions = pointerWithin(args);
       const collisions =
         pointerCollisions.length > 0 ? pointerCollisions : rectIntersection(args);
@@ -92,20 +111,27 @@ export function useKanbanDnd(orgId: string, projectId: string) {
   );
 
   const handleDragStart = (event: DragStartEvent) => {
+    const id = event.active.id as string;
+    if (isColumnId(id)) {
+      setActiveColumnId(fromColumnId(id));
+      return;
+    }
     const task = (Object.values(tasksByStatus) as Task[][])
       .flat()
-      .find((t) => t.id === event.active.id);
+      .find((t) => t.id === id);
     setActiveTask(task ?? null);
-    setOriginContainer(findContainer(event.active.id as string) ?? null);
+    setOriginContainer(findContainer(id) ?? null);
   };
 
   const handleDragOver = (event: DragOverEvent) => {
     const { active, over } = event;
-    if (!over) return;
+    if (!over || isColumnId(active.id as string)) return;
 
     const activeContainer = findContainer(active.id as string);
-    const overContainer =
-      findContainer(over.id as string) ?? (over.id as TaskStatus);
+    const rawOverId = isColumnId(over.id as string)
+      ? fromColumnId(over.id as string)
+      : (over.id as string);
+    const overContainer = findContainer(rawOverId) ?? (rawOverId as TaskStatus);
 
     if (!activeContainer || !overContainer || activeContainer === overContainer)
       return;
@@ -131,6 +157,18 @@ export function useKanbanDnd(orgId: string, projectId: string) {
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+
+    // Column reorder
+    if (isColumnId(active.id as string)) {
+      setActiveColumnId(null);
+      if (over && isColumnId(over.id as string) && active.id !== over.id) {
+        const oldIndex = columnOrder.indexOf(fromColumnId(active.id as string));
+        const newIndex = columnOrder.indexOf(fromColumnId(over.id as string));
+        setColumnOrder((prev) => arrayMove(prev, oldIndex, newIndex));
+      }
+      return;
+    }
+
     setActiveTask(null);
     setOriginContainer(null);
     if (!over) return;
@@ -177,7 +215,9 @@ export function useKanbanDnd(orgId: string, projectId: string) {
 
   return {
     tasksByStatus,
+    columnOrder,
     activeTask,
+    activeColumnId,
     isPending,
     error,
     sensors,

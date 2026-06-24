@@ -1,4 +1,7 @@
-import { getOrganizationByIdService } from "@/services/organization.service";
+import {
+  getOrgMembersService,
+  getOrganizationByIdService,
+} from "@/services/organization.service";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetOrganizationById = (orgId: string) => {
@@ -8,5 +11,13 @@ export const useGetOrganizationById = (orgId: string) => {
       const response = await getOrganizationByIdService(orgId);
       return response;
     },
+  });
+};
+
+export const useGetOrgMembers = (orgId: string) => {
+  return useQuery({
+    queryKey: ["org-members", orgId],
+    queryFn: () => getOrgMembersService(orgId),
+    enabled: !!orgId,
   });
 };

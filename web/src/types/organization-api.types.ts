@@ -59,3 +59,18 @@ export interface OrganizationByIdResponse {
   message: string;
   data: Organization;
 }
+
+export interface OrgMember {
+  userRoleInOrg: OrgMemberRole;
+  User: {
+    id: string;
+    username: string;
+    email: string;
+  };
+}
+
+export interface GetOrgMembersResponse {
+  success: boolean;
+  message: string;
+  data: OrgMember[];
+}

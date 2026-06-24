@@ -1,13 +1,19 @@
 import {
+  createTaskService,
+  deleteTaskService,
   getProjectTasksService,
   getTaskByIdService,
   updateTaskPositionService,
+  updateTaskService,
   updateTaskStatusService,
 } from "@/services/tasks.service";
 import {
+  CreateTaskRequest,
+  DeleteTaskRequest,
   PaginatedTasks,
   Task,
   UpdateTaskPositionRequest,
+  UpdateTaskRequest,
   UpdateTaskStatusRequest,
 } from "@/types/task-api.types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -108,6 +114,36 @@ export const useUpdateTaskPosition = (orgId: string, projectId: string) => {
       }
     },
     onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", orgId, projectId], exact: false });
+    },
+  });
+};
+
+export const useCreateTask = (orgId: string, projectId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation<Task, Error, CreateTaskRequest>({
+    mutationFn: createTaskService,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", orgId, projectId], exact: false });
+    },
+  });
+};
+
+export const useUpdateTask = (orgId: string, projectId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation<Task, Error, UpdateTaskRequest>({
+    mutationFn: updateTaskService,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", orgId, projectId], exact: false });
+    },
+  });
+};
+
+export const useDeleteTask = (orgId: string, projectId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, DeleteTaskRequest>({
+    mutationFn: deleteTaskService,
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks", orgId, projectId], exact: false });
     },
   });

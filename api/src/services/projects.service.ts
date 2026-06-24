@@ -1,5 +1,5 @@
 import { ApiError } from "../helpers/ApiError";
-import { getOrgByAdminId } from "../repositories/organizations.repository";
+import { getOrgByAdminId, userMemberOfOrg } from "../repositories/organizations.repository";
 import {
   addMemberToProject,
   createProject,
@@ -180,5 +180,15 @@ export const addMemberToProjectService = async ({
       "Only project admins can add members to projects",
     );
   }
+
+  const isOrgMember = await userMemberOfOrg(userId, project.organizationId);
+  if (!isOrgMember) {
+    throw new ApiError(
+      400,
+      "User is not a member of this organization",
+      "User is not a member of this organization",
+    );
+  }
+
   return await addMemberToProject({ userId, projectId, assignedBy });
 };

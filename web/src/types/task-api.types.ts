@@ -70,6 +70,49 @@ export interface UpdateTaskPositionResponse {
   data: null;
 }
 
+export interface UpdateTaskRequest {
+  orgId: string;
+  projectId: string;
+  taskId: string;
+  title?: string;
+  description?: string;
+  priority?: TaskPriority;
+}
+
+export interface UpdateTaskResponse {
+  success: boolean;
+  message: string;
+  data: Task;
+}
+
+export interface DeleteTaskRequest {
+  orgId: string;
+  projectId: string;
+  taskId: string;
+}
+
+export interface DeleteTaskResponse {
+  success: boolean;
+  message: string;
+  data: null;
+}
+
+export interface CreateTaskRequest {
+  orgId: string;
+  projectId: string;
+  title: string;
+  description?: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  assignedTo: string;
+}
+
+export interface CreateTaskResponse {
+  success: boolean;
+  message: string;
+  data: Task;
+}
+
 export const columns = [
   { title: "To Do", status: "todo" },
   { title: "In Progress", status: "in_progress" },

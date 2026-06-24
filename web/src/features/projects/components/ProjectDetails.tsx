@@ -3,6 +3,7 @@
 import { useGetProjectById } from "../hooks/useProject";
 import ProjectStatusBadge from "./ProjectStatusBadge";
 import MemberAvatars from "./MemberAvatars";
+import AddMembers from "./AddMembers";
 import Kanban from "@/features/tasks/components/Kanban";
 import TaskList from "@/features/tasks/components/TaskList";
 import GroupChat from "./GroupChat";
@@ -45,20 +46,25 @@ export default function ProjectDetails({
     <div className="flex h-full flex-col">
       {/* Fixed header */}
       <div className="shrink-0 space-y-3 px-6 py-4">
-        <div className="flex items-center gap-3">
-          {project.logoUrl && (
-            <Image
-              src={project.logoUrl}
-              alt={project.name}
-              className="h-10 w-10 rounded-md object-cover"
-              width={40}
-              height={40}
-            />
-          )}
-          <h1 className="text-2xl font-semibold">{project.name}</h1>
-          <ProjectStatusBadge status={project.status} />
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-3">
+              {project.logoUrl && (
+                <Image
+                  src={project.logoUrl}
+                  alt={project.name}
+                  className="h-10 w-10 rounded-md object-cover"
+                  width={40}
+                  height={40}
+                />
+              )}
+              <h1 className="text-2xl font-semibold">{project.name}</h1>
+              <ProjectStatusBadge status={project.status} />
+            </div>
+            <MemberAvatars orgId={orgId} projectId={projectId} />
+          </div>
+          <AddMembers orgId={orgId} projectId={projectId} />
         </div>
-        <MemberAvatars orgId={orgId} projectId={projectId} />
       </div>
 
       {/* Tabs fill remaining height */}

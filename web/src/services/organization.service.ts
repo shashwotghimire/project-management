@@ -1,6 +1,7 @@
 import api from "@/lib/axios";
 import {
   CreateOrganizationResponse,
+  GetOrgMembersResponse,
   GetUsersOrganizationsResponse,
   OrganizationByIdResponse,
 } from "@/types/organization-api.types";
@@ -33,6 +34,15 @@ export const createOrganizationService = async (
 export const getOrganizationByIdService = async (orgId: string) => {
   const response = await api.get<OrganizationByIdResponse>(
     `/organizations/${orgId}`,
+  );
+  return response.data.data;
+};
+
+export const getOrgMembersService = async (
+  orgId: string,
+): Promise<GetOrgMembersResponse["data"]> => {
+  const response = await api.get<GetOrgMembersResponse>(
+    `/organizations/${orgId}/members`,
   );
   return response.data.data;
 };
