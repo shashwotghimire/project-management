@@ -57,7 +57,12 @@ export const getTasksInProject = asyncHandler<AuthRequest>(
     const userId = req.user.id;
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 20;
-    const result = await getTasksInProjectService({ projectId, userId, page, limit });
+    const result = await getTasksInProjectService({
+      projectId,
+      userId,
+      page,
+      limit,
+    });
     return res
       .status(200)
       .json(new ApiResponse(true, "Tasks fetched successfully", result));
@@ -127,8 +132,16 @@ export const updateTaskStatus = asyncHandler<AuthRequest>(
     const projectId = isString(req.params.projectId);
     const userId = req.user.id;
     const { status, position } = req.body;
-    await updateTaskStatusService({ taskId, projectId, userId, status, position });
-    return res.status(200).json(new ApiResponse(true, "Task status updated successfully", null));
+    await updateTaskStatusService({
+      taskId,
+      projectId,
+      userId,
+      status,
+      position,
+    });
+    return res
+      .status(200)
+      .json(new ApiResponse(true, "Task status updated successfully", null));
   },
 );
 
@@ -139,7 +152,9 @@ export const updateTaskPosition = asyncHandler<AuthRequest>(
     const userId = req.user.id;
     const { position } = req.body;
     await updateTaskPositionService({ taskId, projectId, userId, position });
-    return res.status(200).json(new ApiResponse(true, "Task position updated successfully", null));
+    return res
+      .status(200)
+      .json(new ApiResponse(true, "Task position updated successfully", null));
   },
 );
 
@@ -161,3 +176,4 @@ export const reassignTaskToAnotherUser = asyncHandler<AuthRequest>(
       .json(new ApiResponse(true, "Task reassigned successfully", null));
   },
 );
+

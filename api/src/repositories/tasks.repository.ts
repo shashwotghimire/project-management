@@ -2,6 +2,7 @@ import { Op } from "sequelize";
 import { sequelize } from "../configs/db.config";
 import { Tasks } from "../models/tasks.model";
 import { TaskPriority, TaskStatus } from "../types/tasks";
+import { User } from "../models/users.model";
 
 export const createTask = async (data: {
   title: string;
@@ -150,4 +151,29 @@ export const reassignTaskToAnotherUser = async ({
     { assignedTo: newUserId },
     { where: { id: taskId } },
   );
+};
+
+export const getAssignedToTaskUserDetails = async ({
+  projectId,
+  taskId,
+  userId,
+}: {
+  projectId: string;
+  taskId: string;
+  userId: string;
+}) => {
+  const user = await Tasks.findOne({
+    where: {
+      id: taskId,
+      projectId,
+      assignedTo: userId,
+    },
+    attributes: [],
+    include: {
+      model: User,
+      as: "assignee",
+      // attributes: ["id", "username", "email", "gravatarUrl"],
+    },
+  });
+  return user;
 };

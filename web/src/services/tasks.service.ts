@@ -8,6 +8,7 @@ import {
   GetTaskByIdResponse,
   PaginatedTasks,
   Task,
+  TaskByIdData,
   UpdateTaskPositionRequest,
   UpdateTaskPositionResponse,
   UpdateTaskRequest,
@@ -33,7 +34,7 @@ export const getTaskByIdService = async (
   orgId: string,
   projectId: string,
   taskId: string,
-): Promise<Task> => {
+): Promise<TaskByIdData> => {
   const response = await api.get<GetTaskByIdResponse>(
     `/organizations/${orgId}/projects/${projectId}/tasks/${taskId}`,
   );

@@ -1,8 +1,9 @@
 "use client";
 
 import { useGetTaskById } from "../hooks/useTasks";
-import { CalendarDays, ArrowLeft, Clock, CheckCircle2 } from "lucide-react";
+import { CalendarDays, ArrowLeft, Clock, CheckCircle2, User } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { TaskStatus, TaskPriority } from "@/types/task-api.types";
 
 const STATUS_LABELS: Record<TaskStatus, string> = {
@@ -38,7 +39,9 @@ export default function TaskDetails({
   projectId: string;
   taskId: string;
 }) {
-  const { data: task, isPending, isError } = useGetTaskById(orgId, projectId, taskId);
+  const { data, isPending, isError } = useGetTaskById(orgId, projectId, taskId);
+  const task = data?.task;
+  const assignee = data?.assignedTaskUserDetails?.assignee ?? null;
 
   if (isPending) {
     return (
@@ -49,7 +52,7 @@ export default function TaskDetails({
     );
   }
 
-  if (isError || !task) {
+  if (isError || !data || !task) {
     return (
       <div className="text-sm text-destructive">Failed to load task.</div>
     );
@@ -77,20 +80,45 @@ export default function TaskDetails({
 
       <div className="flex-1 px-6">
         <div className="max-w-3xl space-y-4">
-          <div className="space-y-2">
-            <h1 className="text-2xl font-semibold tracking-tight">{task.title}</h1>
-            <div className="flex items-center gap-2">
-              <span
-                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[task.status]}`}
-              >
-                {STATUS_LABELS[task.status]}
-              </span>
-              <span
-                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${PRIORITY_STYLES[task.priority]}`}
-              >
-                {PRIORITY_LABELS[task.priority]} Priority
-              </span>
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-2">
+              <h1 className="text-2xl font-semibold tracking-tight">{task.title}</h1>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[task.status]}`}
+                >
+                  {STATUS_LABELS[task.status]}
+                </span>
+                <span
+                  className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${PRIORITY_STYLES[task.priority]}`}
+                >
+                  {PRIORITY_LABELS[task.priority]} Priority
+                </span>
+              </div>
             </div>
+
+            {assignee && (
+              <div className="flex shrink-0 items-center gap-3 text-right">
+                <div className="text-right">
+                  <p className="text-xs text-muted-foreground mb-0.5">Assigned to</p>
+                  <p className="text-sm font-medium">{assignee.username}</p>
+                  <p className="text-xs text-muted-foreground">{assignee.email}</p>
+                </div>
+                {assignee.gravatarUrl ? (
+                  <Image
+                    src={assignee.gravatarUrl}
+                    alt={assignee.username}
+                    width={40}
+                    height={40}
+                    className="rounded-full"
+                  />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="rounded-xl border bg-card shadow-sm p-6 space-y-5">
@@ -101,12 +129,13 @@ export default function TaskDetails({
             )}
 
             <div className="grid grid-cols-2 gap-4 pt-2">
-              {dueDate && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CalendarDays className="h-4 w-4 shrink-0" />
-                  <span>Due {dueDate}</span>
+              <div className="space-y-0.5">
+                <p className="text-xs text-muted-foreground">Due date</p>
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <CalendarDays className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  {dueDate && <span>{dueDate}</span>}
                 </div>
-              )}
+              </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Clock className="h-4 w-4 shrink-0" />
                 <span>

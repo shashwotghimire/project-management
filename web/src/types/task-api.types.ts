@@ -37,10 +37,26 @@ export interface GetProjectTasksResponse {
   data: PaginatedTasks;
 }
 
+export interface TaskAssignee {
+  id: string;
+  username: string;
+  email: string;
+  gravatarUrl: string | null;
+  role: string;
+  createdAt: string;
+}
+
+export interface TaskByIdData {
+  task: Task;
+  assignedTaskUserDetails: {
+    assignee: TaskAssignee;
+  } | null;
+}
+
 export interface GetTaskByIdResponse {
   success: boolean;
   message: string;
-  data: Task;
+  data: TaskByIdData;
 }
 
 export interface UpdateTaskStatusRequest {

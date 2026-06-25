@@ -12,6 +12,7 @@ import {
   DeleteTaskRequest,
   PaginatedTasks,
   Task,
+  TaskByIdData,
   UpdateTaskPositionRequest,
   UpdateTaskRequest,
   UpdateTaskStatusRequest,
@@ -35,7 +36,7 @@ export const useGetTaskById = (
   projectId: string,
   taskId: string,
 ) => {
-  return useQuery({
+  return useQuery<TaskByIdData>({
     queryKey: ["task", orgId, projectId, taskId],
     queryFn: () => getTaskByIdService(orgId, projectId, taskId),
   });

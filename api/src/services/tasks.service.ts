@@ -10,6 +10,7 @@ import {
 import {
   createTask,
   deleteTask,
+  getAssignedToTaskUserDetails,
   getTaskById,
   getTasksAssignedToUser,
   getTasksAssignedToUserInProject,
@@ -136,7 +137,12 @@ export const getTaskByIdService = async ({
       "Task not found",
     );
   }
-  return task;
+  const assignedTaskUserDetails = await getAssignedToTaskUserDetails({
+    projectId: task.projectId,
+    taskId: task.id,
+    userId: task.assignedTo,
+  });
+  return { task, assignedTaskUserDetails };
 };
 
 export const getTasksAssignedToUserService = async ({
@@ -168,11 +174,19 @@ export const deleteTaskService = async ({
 }) => {
   const project = await getProjectById(projectId);
   if (!project) {
-    throw new ApiError(404, "Project with the given ID does not exist.", "Project not found");
+    throw new ApiError(
+      404,
+      "Project with the given ID does not exist.",
+      "Project not found",
+    );
   }
   const isMember = await isUserMemberOfProject(userId, projectId);
   if (!isMember) {
-    throw new ApiError(403, "Forbidden", "Only members of the project can delete tasks.");
+    throw new ApiError(
+      403,
+      "Forbidden",
+      "Only members of the project can delete tasks.",
+    );
   }
   const isOrgAdmin = await getOrgByAdminId(userId, project.organizationId);
   if (!isOrgAdmin) {
@@ -180,7 +194,11 @@ export const deleteTaskService = async ({
   }
   const task = await getTaskById(taskId);
   if (!task) {
-    throw new ApiError(404, "Task with the given ID does not exist.", "Task not found");
+    throw new ApiError(
+      404,
+      "Task with the given ID does not exist.",
+      "Task not found",
+    );
   }
   return await deleteTask(taskId);
 };
@@ -204,11 +222,19 @@ export const updateTaskService = async ({
 }) => {
   const project = await getProjectById(projectId);
   if (!project) {
-    throw new ApiError(404, "Project with the given ID does not exist.", "Project not found");
+    throw new ApiError(
+      404,
+      "Project with the given ID does not exist.",
+      "Project not found",
+    );
   }
   const isMember = await isUserMemberOfProject(userId, projectId);
   if (!isMember) {
-    throw new ApiError(403, "Forbidden", "Only members of the project can update tasks.");
+    throw new ApiError(
+      403,
+      "Forbidden",
+      "Only members of the project can update tasks.",
+    );
   }
   const isOrgAdmin = await getOrgByAdminId(userId, project.organizationId);
   if (!isOrgAdmin) {
@@ -216,7 +242,11 @@ export const updateTaskService = async ({
   }
   const task = await getTaskById(taskId);
   if (!task) {
-    throw new ApiError(404, "Task with the given ID does not exist.", "Task not found");
+    throw new ApiError(
+      404,
+      "Task with the given ID does not exist.",
+      "Task not found",
+    );
   }
   return await updateTask(taskId, data);
 };
@@ -263,15 +293,27 @@ export const updateTaskStatusService = async ({
 }) => {
   const project = await getProjectById(projectId);
   if (!project) {
-    throw new ApiError(404, "Project with the given ID does not exist.", "Project not found");
+    throw new ApiError(
+      404,
+      "Project with the given ID does not exist.",
+      "Project not found",
+    );
   }
   const isMember = await isUserMemberOfProject(userId, projectId);
   if (!isMember) {
-    throw new ApiError(403, "Forbidden", "Only members of the project can update tasks.");
+    throw new ApiError(
+      403,
+      "Forbidden",
+      "Only members of the project can update tasks.",
+    );
   }
   const task = await getTaskById(taskId);
   if (!task) {
-    throw new ApiError(404, "Task with the given ID does not exist.", "Task not found");
+    throw new ApiError(
+      404,
+      "Task with the given ID does not exist.",
+      "Task not found",
+    );
   }
   return await updateTaskStatus(taskId, status, position);
 };
@@ -289,15 +331,27 @@ export const updateTaskPositionService = async ({
 }) => {
   const project = await getProjectById(projectId);
   if (!project) {
-    throw new ApiError(404, "Project with the given ID does not exist.", "Project not found");
+    throw new ApiError(
+      404,
+      "Project with the given ID does not exist.",
+      "Project not found",
+    );
   }
   const isMember = await isUserMemberOfProject(userId, projectId);
   if (!isMember) {
-    throw new ApiError(403, "Forbidden", "Only members of the project can update tasks.");
+    throw new ApiError(
+      403,
+      "Forbidden",
+      "Only members of the project can update tasks.",
+    );
   }
   const task = await getTaskById(taskId);
   if (!task) {
-    throw new ApiError(404, "Task with the given ID does not exist.", "Task not found");
+    throw new ApiError(
+      404,
+      "Task with the given ID does not exist.",
+      "Task not found",
+    );
   }
   return await updateTaskPosition(taskId, position);
 };
