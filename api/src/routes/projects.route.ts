@@ -8,6 +8,7 @@ import {
   getProjectByIdSchema,
   getProjectMembersSchema,
   getUserProjectsSchema,
+  removeProjectMemberSchema,
   updateProjectSchema,
 } from "../validations/projects.validation";
 import {
@@ -17,6 +18,7 @@ import {
   getProjectById,
   getProjectMembers,
   getUserProjects,
+  removeProjectMember,
   updateProject,
 } from "../controllers/projects.controller";
 
@@ -63,6 +65,13 @@ router.post(
   authMiddleware,
   validate(addMemberToProjectSchema),
   addMemberToProject,
+);
+
+router.delete(
+  "/:projectId/members/:userId",
+  authMiddleware,
+  validate(removeProjectMemberSchema),
+  removeProjectMember,
 );
 
 export default router;

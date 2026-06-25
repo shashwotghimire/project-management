@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addMemberToProjectService = exports.getProjectByIdService = exports.getProjectMembersService = exports.deleteProjectService = exports.getUserProjectsService = exports.updateProjectService = exports.createProjectService = void 0;
+exports.addMemberToProjectService = exports.removeProjectMemberService = exports.getProjectByIdService = exports.getProjectMembersService = exports.deleteProjectService = exports.getUserProjectsService = exports.updateProjectService = exports.createProjectService = void 0;
 const ApiError_1 = require("../helpers/ApiError");
 const organizations_repository_1 = require("../repositories/organizations.repository");
 const projects_repository_1 = require("../repositories/projects.repository");
@@ -77,6 +77,25 @@ const getProjectByIdService = async ({ projectId, userId, }) => {
     return project;
 };
 exports.getProjectByIdService = getProjectByIdService;
+const removeProjectMemberService = async ({ projectId, targetUserId, requesterId, }) => {
+    const project = await (0, projects_repository_1.getProjectById)(projectId);
+    if (!project) {
+        throw new ApiError_1.ApiError(404, "Project not found", "Project not found");
+    }
+    const isAdmin = await (0, projects_repository_1.isUserAdminOfProject)(requesterId, projectId);
+    if (!isAdmin) {
+        throw new ApiError_1.ApiError(403, "Only project admins can remove members", "Only project admins can remove members");
+    }
+    const isMember = await (0, projects_repository_1.isUserMemberOfProject)(targetUserId, projectId);
+    if (!isMember) {
+        throw new ApiError_1.ApiError(404, "User is not a member of this project", "User is not a member of this project");
+    }
+    if (targetUserId === requesterId) {
+        throw new ApiError_1.ApiError(400, "You cannot remove yourself from the project", "You cannot remove yourself from the project");
+    }
+    await (0, projects_repository_1.removeProjectMember)(targetUserId, projectId);
+};
+exports.removeProjectMemberService = removeProjectMemberService;
 const addMemberToProjectService = async ({ userId, projectId, assignedBy, }) => {
     const project = await (0, projects_repository_1.getProjectById)(projectId);
     if (!project) {
@@ -85,6 +104,10 @@ const addMemberToProjectService = async ({ userId, projectId, assignedBy, }) => 
     const isAdmin = await (0, projects_repository_1.isUserAdminOfProject)(assignedBy, projectId);
     if (!isAdmin) {
         throw new ApiError_1.ApiError(403, "Only project admins can add members to projects", "Only project admins can add members to projects");
+    }
+    const isOrgMember = await (0, organizations_repository_1.userMemberOfOrg)(userId, project.organizationId);
+    if (!isOrgMember) {
+        throw new ApiError_1.ApiError(400, "User is not a member of this organization", "User is not a member of this organization");
     }
     return await (0, projects_repository_1.addMemberToProject)({ userId, projectId, assignedBy });
 };

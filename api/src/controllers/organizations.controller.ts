@@ -7,6 +7,7 @@ import {
   getAllMembersOfOrgService,
   getOrgByIdService,
   getUsersOrganizationsService,
+  removeOrgMemberService,
   updateOrganizationService,
 } from "../services/organizations.service";
 import { ApiResponse } from "../helpers/ApiResponse";
@@ -99,6 +100,20 @@ export const getOrgById = asyncHandler<AuthRequest>(
     return res
       .status(200)
       .json(new ApiResponse(true, "Organization fetched successfully", org));
+  },
+);
+
+export const removeOrgMember = asyncHandler<AuthRequest>(
+  async (req: AuthRequest, res: Response) => {
+    const orgId = isString(req.params.orgId);
+    const targetUserId = isString(req.params.userId);
+    const requesterId = req.user.id;
+
+    await removeOrgMemberService({ orgId, targetUserId, requesterId });
+
+    return res
+      .status(200)
+      .json(new ApiResponse(true, "Member removed from organization successfully", null));
   },
 );
 

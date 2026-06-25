@@ -36,6 +36,11 @@ export declare const getProjectByIdService: ({ projectId, userId, }: {
     projectId: string;
     userId: string;
 }) => Promise<import("../models/projects.model").Project>;
+export declare const removeProjectMemberService: ({ projectId, targetUserId, requesterId, }: {
+    projectId: string;
+    targetUserId: string;
+    requesterId: string;
+}) => Promise<void>;
 export declare const addMemberToProjectService: ({ userId, projectId, assignedBy, }: {
     userId: string;
     projectId: string;

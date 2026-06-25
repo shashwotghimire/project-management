@@ -54,4 +54,10 @@ export declare const addMemberToProjectSchema: z.ZodObject<{
         userId: z.ZodUUID;
     }, z.core.$strip>;
 }, z.core.$strip>;
+export declare const removeProjectMemberSchema: z.ZodObject<{
+    params: z.ZodObject<{
+        projectId: z.ZodUUID;
+        userId: z.ZodUUID;
+    }, z.core.$strip>;
+}, z.core.$strip>;
 //# sourceMappingURL=projects.validation.d.ts.map

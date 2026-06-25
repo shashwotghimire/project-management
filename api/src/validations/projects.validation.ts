@@ -61,3 +61,10 @@ export const addMemberToProjectSchema = z.object({
     userId: z.uuidv4("Invalid user ID"),
   }),
 });
+
+export const removeProjectMemberSchema = z.object({
+  params: z.object({
+    projectId: z.uuidv4("Invalid project ID"),
+    userId: z.uuidv4("Invalid user ID"),
+  }),
+});

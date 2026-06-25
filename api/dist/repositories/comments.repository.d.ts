@@ -6,7 +6,16 @@ export declare const createComment: (data: {
     organizationId: string;
     authorId: string;
 }) => Promise<Comments>;
-export declare const getCommentsByTask: (taskId: string) => Promise<Comments[]>;
+export declare const getCommentsByTask: (taskId: string, { page, limit }: {
+    page: number;
+    limit: number;
+}) => Promise<{
+    total: number;
+    totalPages: number;
+    page: number;
+    limit: number;
+    comments: Comments[];
+}>;
 export declare const getCommentById: (commentId: string) => Promise<Comments | null>;
 export declare const updateComment: (commentId: string, data: {
     content: string;

@@ -31,5 +31,6 @@ export declare function addMemberToProject(data: {
     projectId: string;
     assignedBy: string;
 }): Promise<ProjectMembers>;
+export declare function removeProjectMember(userId: string, projectId: string): Promise<number>;
 export declare function getProjectMembers(projectId: string): Promise<ProjectMembers[]>;
 //# sourceMappingURL=projects.repository.d.ts.map

@@ -16,7 +16,7 @@ import {
 import ReassignTaskDialog from "./ReassignTaskDialog";
 import { DatePicker } from "./DatePicker";
 import { format } from "date-fns";
-import TaskComments from "./TaskComments";
+import TaskComments from "@/features/comments/components/TaskComments";
 import TaskLogs from "./TaskLogs";
 import Link from "next/link";
 import Image from "next/image";
@@ -350,7 +350,7 @@ export default function TaskDetails({
         </div>{/* end task content scroll area */}
 
         {/* ── COMMENTS ── */}
-        <TaskComments />
+        <TaskComments orgId={orgId} projectId={projectId} taskId={taskId} />
 
         </div>{/* end left col */}
 

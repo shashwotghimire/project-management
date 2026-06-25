@@ -4,6 +4,10 @@ export declare const getTasksSchema: z.ZodObject<{
         orgId: z.ZodUUID;
         projectId: z.ZodUUID;
     }, z.core.$strip>;
+    query: z.ZodObject<{
+        page: z.ZodDefault<z.ZodOptional<z.ZodCoercedNumber<unknown>>>;
+        limit: z.ZodDefault<z.ZodOptional<z.ZodCoercedNumber<unknown>>>;
+    }, z.core.$strip>;
 }, z.core.$strip>;
 export declare const getTasksAssignedToUserSchema: z.ZodObject<{
     params: z.ZodObject<{
@@ -64,6 +68,7 @@ export declare const updateTaskStatusSchema: z.ZodObject<{
             in_progress: "in_progress";
             completed: "completed";
         }>;
+        position: z.ZodNumber;
     }, z.core.$strip>;
 }, z.core.$strip>;
 export declare const updateTaskPositionSchema: z.ZodObject<{

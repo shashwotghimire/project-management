@@ -35,5 +35,10 @@ export declare const deleteOrganizationService: ({ orgId, adminId, }: {
     adminId: string;
 }) => Promise<void>;
 export declare const getOrgByIdService: (orgId: string, userId: string) => Promise<import("../models/organizations.model").Organization>;
+export declare const removeOrgMemberService: ({ orgId, targetUserId, requesterId, }: {
+    orgId: string;
+    targetUserId: string;
+    requesterId: string;
+}) => Promise<void>;
 export declare const getAllMembersOfOrgService: (orgId: string, userId: string) => Promise<import("../models/organizations-members.model").OrganizationsMember[]>;
 //# sourceMappingURL=organizations.service.d.ts.map

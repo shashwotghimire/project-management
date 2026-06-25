@@ -16,3 +16,9 @@ export interface GetOrgMembersResponse {
   message: string;
   data: OrgMember[];
 }
+
+export interface RemoveOrgMemberResponse {
+  success: boolean;
+  message: string;
+  data: null;
+}

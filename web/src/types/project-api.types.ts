@@ -78,3 +78,9 @@ export interface GetProjectByIdResponse {
   message: string;
   data: Project;
 }
+
+export interface RemoveProjectMemberResponse {
+  success: boolean;
+  message: string;
+  data: null;
+}

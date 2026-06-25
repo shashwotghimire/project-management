@@ -9,3 +9,10 @@ export const getOrgMembersService = async (
   );
   return response.data.data;
 };
+
+export const removeOrgMemberService = async (
+  orgId: string,
+  userId: string,
+): Promise<void> => {
+  await api.delete(`/organizations/${orgId}/members/${userId}`);
+};

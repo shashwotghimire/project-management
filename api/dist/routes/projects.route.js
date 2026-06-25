@@ -13,5 +13,6 @@ router.patch("/:projectId", auth_middleware_1.authMiddleware, (0, validation_mid
 router.delete("/:projectId", auth_middleware_1.authMiddleware, (0, validation_middleware_1.validate)(projects_validation_1.deleteProjectSchema), projects_controller_1.deleteProject);
 router.get("/:projectId/members", auth_middleware_1.authMiddleware, (0, validation_middleware_1.validate)(projects_validation_1.getProjectMembersSchema), projects_controller_1.getProjectMembers);
 router.post("/:projectId/members", auth_middleware_1.authMiddleware, (0, validation_middleware_1.validate)(projects_validation_1.addMemberToProjectSchema), projects_controller_1.addMemberToProject);
+router.delete("/:projectId/members/:userId", auth_middleware_1.authMiddleware, (0, validation_middleware_1.validate)(projects_validation_1.removeProjectMemberSchema), projects_controller_1.removeProjectMember);
 exports.default = router;
 //# sourceMappingURL=projects.route.js.map

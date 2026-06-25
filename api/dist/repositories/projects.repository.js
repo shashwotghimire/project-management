@@ -8,6 +8,7 @@ exports.getProjectsByUserId = getProjectsByUserId;
 exports.deleteProject = deleteProject;
 exports.updateProject = updateProject;
 exports.addMemberToProject = addMemberToProject;
+exports.removeProjectMember = removeProjectMember;
 exports.getProjectMembers = getProjectMembers;
 const sequelize_1 = require("sequelize");
 const projects_model_1 = require("../models/projects.model");
@@ -91,6 +92,9 @@ async function updateProject(projectId, data) {
 }
 async function addMemberToProject(data) {
     return project_members_model_1.ProjectMembers.create(data);
+}
+async function removeProjectMember(userId, projectId) {
+    return project_members_model_1.ProjectMembers.destroy({ where: { userId, projectId } });
 }
 async function getProjectMembers(projectId) {
     return project_members_model_1.ProjectMembers.findAll({

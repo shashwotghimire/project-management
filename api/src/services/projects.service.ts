@@ -9,6 +9,7 @@ import {
   getProjectsByUserId,
   isUserAdminOfProject,
   isUserMemberOfProject,
+  removeProjectMember,
   updateProject,
 } from "../repositories/projects.repository";
 
@@ -156,6 +157,49 @@ export const getProjectByIdService = async ({
   }
 
   return project;
+};
+
+export const removeProjectMemberService = async ({
+  projectId,
+  targetUserId,
+  requesterId,
+}: {
+  projectId: string;
+  targetUserId: string;
+  requesterId: string;
+}) => {
+  const project = await getProjectById(projectId);
+  if (!project) {
+    throw new ApiError(404, "Project not found", "Project not found");
+  }
+
+  const isAdmin = await isUserAdminOfProject(requesterId, projectId);
+  if (!isAdmin) {
+    throw new ApiError(
+      403,
+      "Only project admins can remove members",
+      "Only project admins can remove members",
+    );
+  }
+
+  const isMember = await isUserMemberOfProject(targetUserId, projectId);
+  if (!isMember) {
+    throw new ApiError(
+      404,
+      "User is not a member of this project",
+      "User is not a member of this project",
+    );
+  }
+
+  if (targetUserId === requesterId) {
+    throw new ApiError(
+      400,
+      "You cannot remove yourself from the project",
+      "You cannot remove yourself from the project",
+    );
+  }
+
+  await removeProjectMember(targetUserId, projectId);
 };
 
 export const addMemberToProjectService = async ({

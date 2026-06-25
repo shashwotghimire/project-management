@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addMemberToProject = exports.getProjectMembers = exports.deleteProject = exports.updateProject = exports.getUserProjects = exports.getProjectById = exports.createProject = void 0;
+exports.addMemberToProject = exports.removeProjectMember = exports.getProjectMembers = exports.deleteProject = exports.updateProject = exports.getUserProjects = exports.getProjectById = exports.createProject = void 0;
 const asyncHandler_1 = __importDefault(require("../helpers/asyncHandler"));
 const ApiResponse_1 = require("../helpers/ApiResponse");
 const projects_service_1 = require("../services/projects.service");
@@ -76,6 +76,15 @@ exports.getProjectMembers = (0, asyncHandler_1.default)(async (req, res) => {
     return res
         .status(200)
         .json(new ApiResponse_1.ApiResponse(true, "Project members fetched successfully", members));
+});
+exports.removeProjectMember = (0, asyncHandler_1.default)(async (req, res) => {
+    const projectId = (0, check_string_helper_1.isString)(req.params.projectId);
+    const targetUserId = (0, check_string_helper_1.isString)(req.params.userId);
+    const requesterId = req.user.id;
+    await (0, projects_service_1.removeProjectMemberService)({ projectId, targetUserId, requesterId });
+    return res
+        .status(200)
+        .json(new ApiResponse_1.ApiResponse(true, "Member removed from project successfully", null));
 });
 exports.addMemberToProject = (0, asyncHandler_1.default)(async (req, res) => {
     const projectId = (0, check_string_helper_1.isString)(req.params.projectId);

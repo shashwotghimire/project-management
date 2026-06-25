@@ -29,10 +29,14 @@ exports.getCommentsByTask = (0, asyncHandler_1.default)(async (req, res) => {
     const taskId = (0, check_string_helper_1.isString)(req.params.taskId);
     const projectId = (0, check_string_helper_1.isString)(req.params.projectId);
     const userId = req.user.id;
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 20;
     const comments = await (0, comments_service_1.getCommentsByTaskService)({
         taskId,
         projectId,
         userId,
+        page,
+        limit,
     });
     return res
         .status(200)

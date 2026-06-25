@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllMembersOfOrg = exports.getOrgById = exports.deleteOrganization = exports.updateOrganization = exports.getUsersOrganizations = exports.createOrganizaiton = void 0;
+exports.getAllMembersOfOrg = exports.removeOrgMember = exports.getOrgById = exports.deleteOrganization = exports.updateOrganization = exports.getUsersOrganizations = exports.createOrganizaiton = void 0;
 const asyncHandler_1 = __importDefault(require("../helpers/asyncHandler"));
 const organizations_service_1 = require("../services/organizations.service");
 const ApiResponse_1 = require("../helpers/ApiResponse");
@@ -76,6 +76,15 @@ exports.getOrgById = (0, asyncHandler_1.default)(async (req, res) => {
     return res
         .status(200)
         .json(new ApiResponse_1.ApiResponse(true, "Organization fetched successfully", org));
+});
+exports.removeOrgMember = (0, asyncHandler_1.default)(async (req, res) => {
+    const orgId = (0, check_string_helper_1.isString)(req.params.orgId);
+    const targetUserId = (0, check_string_helper_1.isString)(req.params.userId);
+    const requesterId = req.user.id;
+    await (0, organizations_service_1.removeOrgMemberService)({ orgId, targetUserId, requesterId });
+    return res
+        .status(200)
+        .json(new ApiResponse_1.ApiResponse(true, "Member removed from organization successfully", null));
 });
 exports.getAllMembersOfOrg = (0, asyncHandler_1.default)(async (req, res) => {
     const orgId = req.params.orgId;

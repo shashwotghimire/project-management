@@ -47,10 +47,14 @@ export const getCommentsByTaskService = async ({
   taskId,
   projectId,
   userId,
+  page,
+  limit,
 }: {
   taskId: string;
   projectId: string;
   userId: string;
+  page: number;
+  limit: number;
 }) => {
   const task = await getTaskById(taskId);
   if (!task) {
@@ -75,7 +79,7 @@ export const getCommentsByTaskService = async ({
       "Only project members can view comments.",
     );
   }
-  return await getCommentsByTask(taskId);
+  return await getCommentsByTask(taskId, { page, limit });
 };
 
 export const updateCommentService = async ({

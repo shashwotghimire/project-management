@@ -14,6 +14,7 @@ router.get("/:orgId", auth_middleware_1.authMiddleware, (0, validation_middlewar
 router.patch("/:orgId", auth_middleware_1.authMiddleware, (0, validation_middleware_1.validate)(organizations_validation_1.updateOrganizationSchema), organizations_controller_1.updateOrganization);
 router.delete("/:orgId", auth_middleware_1.authMiddleware, (0, validation_middleware_1.validate)(organizations_validation_1.deleteOrganizationSchema), organizations_controller_1.deleteOrganization);
 router.get("/:orgId/members", auth_middleware_1.authMiddleware, (0, validation_middleware_1.validate)(organizations_validation_1.getAllMembersOfOrgSchema), organizations_controller_1.getAllMembersOfOrg);
+router.delete("/:orgId/members/:userId", auth_middleware_1.authMiddleware, (0, validation_middleware_1.validate)(organizations_validation_1.removeOrgMemberSchema), organizations_controller_1.removeOrgMember);
 router.get("/:orgId/my-tasks", auth_middleware_1.authMiddleware, (0, validation_middleware_1.validate)(tasks_validation_1.getTasksAssignedToUserSchema), tasks_controller_1.getTasksAssignedToUser);
 exports.default = router;
 //# sourceMappingURL=organizations.route.js.map

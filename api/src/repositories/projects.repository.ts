@@ -119,6 +119,13 @@ export async function addMemberToProject(data: {
   return ProjectMembers.create(data);
 }
 
+export async function removeProjectMember(
+  userId: string,
+  projectId: string,
+): Promise<number> {
+  return ProjectMembers.destroy({ where: { userId, projectId } });
+}
+
 export async function getProjectMembers(projectId: string) {
   return ProjectMembers.findAll({
     where: { projectId },

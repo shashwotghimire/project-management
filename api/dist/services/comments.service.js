@@ -21,7 +21,7 @@ const createCommentService = async (data) => {
     return await (0, comments_repository_1.createComment)(data);
 };
 exports.createCommentService = createCommentService;
-const getCommentsByTaskService = async ({ taskId, projectId, userId, }) => {
+const getCommentsByTaskService = async ({ taskId, projectId, userId, page, limit, }) => {
     const task = await (0, tasks_repository_1.getTaskById)(taskId);
     if (!task) {
         throw new ApiError_1.ApiError(404, "Task with the given ID does not exist.", "Task not found");
@@ -33,7 +33,7 @@ const getCommentsByTaskService = async ({ taskId, projectId, userId, }) => {
     if (!isMember) {
         throw new ApiError_1.ApiError(403, "Forbidden", "Only project members can view comments.");
     }
-    return await (0, comments_repository_1.getCommentsByTask)(taskId);
+    return await (0, comments_repository_1.getCommentsByTask)(taskId, { page, limit });
 };
 exports.getCommentsByTaskService = getCommentsByTaskService;
 const updateCommentService = async ({ commentId, userId, content, }) => {

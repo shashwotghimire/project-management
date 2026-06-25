@@ -4,6 +4,7 @@ import {
   getProjectByIdService,
   getProjectMembersService,
   getUsersProjectsService,
+  removeProjectMemberService,
 } from "@/services/project.service";
 import {
   CreateProjectRequest,
@@ -54,6 +55,19 @@ export const useGetProjectMembers = (orgId: string, projectId: string) => {
   return useQuery({
     queryKey: ["project-members", orgId, projectId],
     queryFn: () => getProjectMembersService(orgId, projectId),
+  });
+};
+
+export const useRemoveProjectMember = (orgId: string, projectId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: string) =>
+      removeProjectMemberService(projectId, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["project-members", orgId, projectId],
+      });
+    },
   });
 };
 

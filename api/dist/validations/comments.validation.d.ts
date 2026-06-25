@@ -15,6 +15,10 @@ export declare const getCommentsByTaskSchema: z.ZodObject<{
         projectId: z.ZodUUID;
         taskId: z.ZodUUID;
     }, z.core.$strip>;
+    query: z.ZodObject<{
+        page: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
+        limit: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
+    }, z.core.$strip>;
 }, z.core.$strip>;
 export declare const updateCommentSchema: z.ZodObject<{
     params: z.ZodObject<{

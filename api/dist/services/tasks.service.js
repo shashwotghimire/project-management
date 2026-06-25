@@ -25,7 +25,7 @@ const createTaskService = async (data) => {
     return await (0, tasks_repository_1.createTask)(data);
 };
 exports.createTaskService = createTaskService;
-const getTasksInProjectService = async ({ projectId, userId, }) => {
+const getTasksInProjectService = async ({ projectId, userId, page, limit, }) => {
     const project = await (0, projects_repository_1.getProjectById)(projectId);
     if (!project) {
         throw new ApiError_1.ApiError(404, "Project with the given ID does not exist.", "Project not found");
@@ -34,7 +34,7 @@ const getTasksInProjectService = async ({ projectId, userId, }) => {
     if (!isMember) {
         throw new ApiError_1.ApiError(403, "Forbidden", "Only members of the project can view the tasks.");
     }
-    return await (0, tasks_repository_1.getTasksInProject)(projectId);
+    return await (0, tasks_repository_1.getTasksInProject)(projectId, page, limit);
 };
 exports.getTasksInProjectService = getTasksInProjectService;
 const getTaskByIdService = async ({ userId, taskId, projectId, }) => {
@@ -50,7 +50,12 @@ const getTaskByIdService = async ({ userId, taskId, projectId, }) => {
     if (!task) {
         throw new ApiError_1.ApiError(404, "Task with the given ID does not exist.", "Task not found");
     }
-    return task;
+    const assignedTaskUserDetails = await (0, tasks_repository_1.getAssignedToTaskUserDetails)({
+        projectId: task.projectId,
+        taskId: task.id,
+        userId: task.assignedTo,
+    });
+    return { task, assignedTaskUserDetails };
 };
 exports.getTaskByIdService = getTaskByIdService;
 const getTasksAssignedToUserService = async ({ userId, orgId, }) => {
@@ -114,7 +119,7 @@ const getTasksAssignedToUserInProjectService = async ({ userId, projectId, }) =>
     return tasks;
 };
 exports.getTasksAssignedToUserInProjectService = getTasksAssignedToUserInProjectService;
-const updateTaskStatusService = async ({ taskId, projectId, userId, status, }) => {
+const updateTaskStatusService = async ({ taskId, projectId, userId, status, position, }) => {
     const project = await (0, projects_repository_1.getProjectById)(projectId);
     if (!project) {
         throw new ApiError_1.ApiError(404, "Project with the given ID does not exist.", "Project not found");
@@ -127,7 +132,7 @@ const updateTaskStatusService = async ({ taskId, projectId, userId, status, }) =
     if (!task) {
         throw new ApiError_1.ApiError(404, "Task with the given ID does not exist.", "Task not found");
     }
-    return await (0, tasks_repository_1.updateTaskStatus)(taskId, status);
+    return await (0, tasks_repository_1.updateTaskStatus)(taskId, status, position);
 };
 exports.updateTaskStatusService = updateTaskStatusService;
 const updateTaskPositionService = async ({ taskId, projectId, userId, position, }) => {

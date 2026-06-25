@@ -5,6 +5,7 @@ import {
   getAllMembersOfOrg,
   getOrgById,
   getUsersOrganizations,
+  removeOrgMember,
   updateOrganization,
 } from "../controllers/organizations.controller";
 import { getTasksAssignedToUser } from "../controllers/tasks.controller";
@@ -16,6 +17,7 @@ import {
   getAllMembersOfOrgSchema,
   getOrgByIdSchema,
   getUsersOrganizationsSchema,
+  removeOrgMemberSchema,
   updateOrganizationSchema,
 } from "../validations/organizations.validation";
 import { getTasksAssignedToUserSchema } from "../validations/tasks.validation";
@@ -57,6 +59,13 @@ router.get(
   authMiddleware,
   validate(getAllMembersOfOrgSchema),
   getAllMembersOfOrg,
+);
+
+router.delete(
+  "/:orgId/members/:userId",
+  authMiddleware,
+  validate(removeOrgMemberSchema),
+  removeOrgMember,
 );
 
 router.get(

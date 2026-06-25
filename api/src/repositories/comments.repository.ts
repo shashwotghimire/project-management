@@ -1,4 +1,5 @@
 import { Comments } from "../models/comments.model";
+import { User } from "../models/users.model";
 
 export const createComment = async (data: {
   content: string;
@@ -10,8 +11,19 @@ export const createComment = async (data: {
   return await Comments.create(data);
 };
 
-export const getCommentsByTask = async (taskId: string) => {
-  return await Comments.findAll({ where: { taskId } });
+export const getCommentsByTask = async (
+  taskId: string,
+  { page, limit }: { page: number; limit: number },
+) => {
+  const offset = (page - 1) * limit;
+  const { count, rows } = await Comments.findAndCountAll({
+    where: { taskId },
+    include: [{ model: User, as: "author", attributes: ["id", "username", "email", "gravatarUrl"] }],
+    limit,
+    offset,
+    order: [["createdAt", "DESC"]],
+  });
+  return { total: count, totalPages: Math.ceil(count / limit), page, limit, comments: rows };
 };
 
 export const getCommentById = async (commentId: string) => {

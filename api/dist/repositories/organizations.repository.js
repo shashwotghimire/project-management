@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllMembersOfOrg = exports.userMemberOfOrg = exports.deleteOrganization = exports.updateOrganization = exports.getOrgByAdminId = exports.getOrgById = exports.joinAnOrganization = exports.getUsersOrganizations = exports.createOrganization = void 0;
+exports.getAllMembersOfOrg = exports.removeOrgMember = exports.userMemberOfOrg = exports.deleteOrganization = exports.updateOrganization = exports.getOrgByAdminId = exports.getOrgById = exports.joinAnOrganization = exports.getUsersOrganizations = exports.createOrganization = void 0;
 const sequelize_1 = require("sequelize");
 const db_config_1 = require("../configs/db.config");
 const organizations_members_model_1 = require("../models/organizations-members.model");
@@ -115,17 +115,21 @@ const userMemberOfOrg = async (userId, orgId) => {
     return !!membership;
 };
 exports.userMemberOfOrg = userMemberOfOrg;
+const removeOrgMember = async (userId, orgId) => {
+    return organizations_members_model_1.OrganizationsMember.destroy({ where: { userId, orgId } });
+};
+exports.removeOrgMember = removeOrgMember;
 const getAllMembersOfOrg = async (orgId) => {
     return organizations_members_model_1.OrganizationsMember.findAll({
         where: { orgId },
         include: [
             {
                 model: users_model_1.User,
-                attributes: ["id", "username", "email"],
+                attributes: ["id", "username", "email", "gravatarUrl"],
             },
         ],
         attributes: {
-            exclude: ["id", "createdAt", "updatedAt", "userId", "orgId"],
+            exclude: ["id", "updatedAt", "userId", "orgId"],
         },
     });
 };

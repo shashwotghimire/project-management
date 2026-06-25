@@ -7,6 +7,7 @@ import AddMembers from "./AddMembers";
 import Kanban from "@/features/tasks/components/Kanban";
 import TaskList from "@/features/tasks/components/TaskList";
 import GroupChat from "./GroupChat";
+import ProjectMembersTable from "./ProjectMembersTable";
 import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -74,6 +75,7 @@ export default function ProjectDetails({
             <TabsTrigger value="kanban" className="rounded-full px-4 text-sm data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">Kanban</TabsTrigger>
             <TabsTrigger value="tasks" className="rounded-full px-4 text-sm data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">All Tasks</TabsTrigger>
             <TabsTrigger value="chat" className="rounded-full px-4 text-sm data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">Group Chat</TabsTrigger>
+            <TabsTrigger value="members" className="rounded-full px-4 text-sm data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">Members</TabsTrigger>
           </TabsList>
         </div>
         <TabsContent value="kanban" className="mt-0 flex-1 overflow-auto p-6">
@@ -84,6 +86,9 @@ export default function ProjectDetails({
         </TabsContent>
         <TabsContent value="chat" className="mt-0 flex-1 overflow-auto p-6">
           <GroupChat />
+        </TabsContent>
+        <TabsContent value="members" className="mt-0 flex-1 overflow-auto p-6">
+          <ProjectMembersTable orgId={orgId} projectId={projectId} />
         </TabsContent>
       </Tabs>
     </div>

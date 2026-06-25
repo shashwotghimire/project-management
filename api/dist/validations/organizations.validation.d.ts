@@ -37,4 +37,10 @@ export declare const getAllMembersOfOrgSchema: z.ZodObject<{
         orgId: z.ZodUUID;
     }, z.core.$strip>;
 }, z.core.$strip>;
+export declare const removeOrgMemberSchema: z.ZodObject<{
+    params: z.ZodObject<{
+        orgId: z.ZodUUID;
+        userId: z.ZodUUID;
+    }, z.core.$strip>;
+}, z.core.$strip>;
 //# sourceMappingURL=organizations.validation.d.ts.map

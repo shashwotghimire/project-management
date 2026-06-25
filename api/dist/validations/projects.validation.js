@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addMemberToProjectSchema = exports.getProjectMembersSchema = exports.getProjectByIdSchema = exports.getUserProjectsSchema = exports.updateProjectSchema = exports.deleteProjectSchema = exports.createProjectSchema = void 0;
+exports.removeProjectMemberSchema = exports.addMemberToProjectSchema = exports.getProjectMembersSchema = exports.getProjectByIdSchema = exports.getUserProjectsSchema = exports.updateProjectSchema = exports.deleteProjectSchema = exports.createProjectSchema = void 0;
 const zod_1 = __importDefault(require("zod"));
 exports.createProjectSchema = zod_1.default.object({
     params: zod_1.default.object({
@@ -57,6 +57,12 @@ exports.addMemberToProjectSchema = zod_1.default.object({
         projectId: zod_1.default.uuidv4("Invalid project ID"),
     }),
     body: zod_1.default.object({
+        userId: zod_1.default.uuidv4("Invalid user ID"),
+    }),
+});
+exports.removeProjectMemberSchema = zod_1.default.object({
+    params: zod_1.default.object({
+        projectId: zod_1.default.uuidv4("Invalid project ID"),
         userId: zod_1.default.uuidv4("Invalid user ID"),
     }),
 });

@@ -38,10 +38,17 @@ exports.createTask = (0, asyncHandler_1.default)(async (req, res) => {
 exports.getTasksInProject = (0, asyncHandler_1.default)(async (req, res) => {
     const projectId = (0, check_string_helper_1.isString)(req.params.projectId);
     const userId = req.user.id;
-    const tasks = await (0, tasks_service_1.getTasksInProjectService)({ projectId, userId });
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 20;
+    const result = await (0, tasks_service_1.getTasksInProjectService)({
+        projectId,
+        userId,
+        page,
+        limit,
+    });
     return res
         .status(200)
-        .json(new ApiResponse_1.ApiResponse(true, "Tasks fetched successfully", tasks));
+        .json(new ApiResponse_1.ApiResponse(true, "Tasks fetched successfully", result));
 });
 exports.getTaskById = (0, asyncHandler_1.default)(async (req, res) => {
     const taskId = (0, check_string_helper_1.isString)(req.params.taskId);
@@ -91,9 +98,17 @@ exports.updateTaskStatus = (0, asyncHandler_1.default)(async (req, res) => {
     const taskId = (0, check_string_helper_1.isString)(req.params.taskId);
     const projectId = (0, check_string_helper_1.isString)(req.params.projectId);
     const userId = req.user.id;
-    const { status } = req.body;
-    await (0, tasks_service_1.updateTaskStatusService)({ taskId, projectId, userId, status });
-    return res.status(200).json(new ApiResponse_1.ApiResponse(true, "Task status updated successfully", null));
+    const { status, position } = req.body;
+    await (0, tasks_service_1.updateTaskStatusService)({
+        taskId,
+        projectId,
+        userId,
+        status,
+        position,
+    });
+    return res
+        .status(200)
+        .json(new ApiResponse_1.ApiResponse(true, "Task status updated successfully", null));
 });
 exports.updateTaskPosition = (0, asyncHandler_1.default)(async (req, res) => {
     const taskId = (0, check_string_helper_1.isString)(req.params.taskId);
@@ -101,7 +116,9 @@ exports.updateTaskPosition = (0, asyncHandler_1.default)(async (req, res) => {
     const userId = req.user.id;
     const { position } = req.body;
     await (0, tasks_service_1.updateTaskPositionService)({ taskId, projectId, userId, position });
-    return res.status(200).json(new ApiResponse_1.ApiResponse(true, "Task position updated successfully", null));
+    return res
+        .status(200)
+        .json(new ApiResponse_1.ApiResponse(true, "Task position updated successfully", null));
 });
 exports.reassignTaskToAnotherUser = (0, asyncHandler_1.default)(async (req, res) => {
     const taskId = (0, check_string_helper_1.isString)(req.params.taskId);

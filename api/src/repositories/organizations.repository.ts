@@ -157,6 +157,13 @@ export const userMemberOfOrg = async (userId: string, orgId: string) => {
   return !!membership;
 };
 
+export const removeOrgMember = async (
+  userId: string,
+  orgId: string,
+): Promise<number> => {
+  return OrganizationsMember.destroy({ where: { userId, orgId } });
+};
+
 export const getAllMembersOfOrg = async (orgId: string) => {
   return OrganizationsMember.findAll({
     where: { orgId },

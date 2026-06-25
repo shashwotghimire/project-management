@@ -9,6 +9,7 @@ import {
   getProjectByIdService,
   getProjectMembersService,
   getUserProjectsService,
+  removeProjectMemberService,
   updateProjectService,
 } from "../services/projects.service";
 import { isString } from "../helpers/check-string.helper";
@@ -119,6 +120,20 @@ export const getProjectMembers = asyncHandler<AuthRequest>(
       .json(
         new ApiResponse(true, "Project members fetched successfully", members),
       );
+  },
+);
+
+export const removeProjectMember = asyncHandler<AuthRequest>(
+  async (req: AuthRequest, res: Response) => {
+    const projectId = isString(req.params.projectId);
+    const targetUserId = isString(req.params.userId);
+    const requesterId = req.user.id;
+
+    await removeProjectMemberService({ projectId, targetUserId, requesterId });
+
+    return res
+      .status(200)
+      .json(new ApiResponse(true, "Member removed from project successfully", null));
   },
 );
 

@@ -56,3 +56,10 @@ export const addMemberToProjectService = async (
 ): Promise<void> => {
   await api.post(`/projects/${projectId}/members`, { userId });
 };
+
+export const removeProjectMemberService = async (
+  projectId: string,
+  userId: string,
+): Promise<void> => {
+  await api.delete(`/projects/${projectId}/members/${userId}`);
+};

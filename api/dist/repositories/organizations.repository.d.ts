@@ -40,5 +40,6 @@ export declare const updateOrganization: ({ orgId, name, logoUrl, description, w
 }) => Promise<Organization | null>;
 export declare const deleteOrganization: (orgId: string, userId: string) => Promise<true | null>;
 export declare const userMemberOfOrg: (userId: string, orgId: string) => Promise<boolean>;
+export declare const removeOrgMember: (userId: string, orgId: string) => Promise<number>;
 export declare const getAllMembersOfOrg: (orgId: string) => Promise<OrganizationsMember[]>;
 //# sourceMappingURL=organizations.repository.d.ts.map

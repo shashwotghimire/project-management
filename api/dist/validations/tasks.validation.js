@@ -10,6 +10,10 @@ exports.getTasksSchema = zod_1.default.object({
         orgId: zod_1.default.uuidv4("Invalid organization ID"),
         projectId: zod_1.default.uuidv4("Invalid project ID"),
     }),
+    query: zod_1.default.object({
+        page: zod_1.default.coerce.number().int().positive().optional().default(1),
+        limit: zod_1.default.coerce.number().int().positive().max(100).optional().default(20),
+    }),
 });
 exports.getTasksAssignedToUserSchema = zod_1.default.object({
     params: zod_1.default.object({
@@ -58,6 +62,7 @@ exports.updateTaskStatusSchema = zod_1.default.object({
     }),
     body: zod_1.default.object({
         status: zod_1.default.enum(["todo", "in_progress", "completed"]),
+        position: zod_1.default.number().int().nonnegative(),
     }),
 });
 exports.updateTaskPositionSchema = zod_1.default.object({

@@ -37,10 +37,15 @@ export const getCommentsByTask = asyncHandler<AuthRequest>(
     const projectId = isString(req.params.projectId);
     const userId = req.user.id;
 
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 20;
+
     const comments = await getCommentsByTaskService({
       taskId,
       projectId,
       userId,
+      page,
+      limit,
     });
     return res
       .status(200)

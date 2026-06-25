@@ -13,18 +13,22 @@ const commentParams = zod_1.default.object({
 exports.createCommentSchema = zod_1.default.object({
     params: commentParams,
     body: zod_1.default.object({
-        content: zod_1.default.string().min(1, "Content is required"),
+        content: zod_1.default.string().min(1, "Content is required").max(115, "Comment cannot exceed 115 characters"),
     }),
 });
 exports.getCommentsByTaskSchema = zod_1.default.object({
     params: commentParams,
+    query: zod_1.default.object({
+        page: zod_1.default.coerce.number().int().min(1).default(1),
+        limit: zod_1.default.coerce.number().int().min(1).max(100).default(20),
+    }),
 });
 exports.updateCommentSchema = zod_1.default.object({
     params: commentParams.extend({
         commentId: zod_1.default.uuidv4("Invalid comment ID"),
     }),
     body: zod_1.default.object({
-        content: zod_1.default.string().min(1, "Content is required"),
+        content: zod_1.default.string().min(1, "Content is required").max(115, "Comment cannot exceed 115 characters"),
     }),
 });
 exports.deleteCommentSchema = zod_1.default.object({

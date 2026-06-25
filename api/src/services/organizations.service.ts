@@ -6,6 +6,7 @@ import {
   getOrgByAdminId,
   getOrgById,
   getUsersOrganizations,
+  removeOrgMember,
   updateOrganization,
   userMemberOfOrg,
 } from "../repositories/organizations.repository";
@@ -112,6 +113,44 @@ export const getOrgByIdService = async (orgId: string, userId: string) => {
     throw new ApiError(404, "Organization not found", "Organization not found");
   }
   return org;
+};
+
+export const removeOrgMemberService = async ({
+  orgId,
+  targetUserId,
+  requesterId,
+}: {
+  orgId: string;
+  targetUserId: string;
+  requesterId: string;
+}) => {
+  const org = await getOrgByAdminId(requesterId, orgId);
+  if (!org) {
+    throw new ApiError(
+      403,
+      "Only organization admins can remove members",
+      "Only organization admins can remove members",
+    );
+  }
+
+  const isMember = await userMemberOfOrg(targetUserId, orgId);
+  if (!isMember) {
+    throw new ApiError(
+      404,
+      "User is not a member of this organization",
+      "User is not a member of this organization",
+    );
+  }
+
+  if (targetUserId === requesterId) {
+    throw new ApiError(
+      400,
+      "You cannot remove yourself from the organization",
+      "You cannot remove yourself from the organization",
+    );
+  }
+
+  await removeOrgMember(targetUserId, orgId);
 };
 
 export const getAllMembersOfOrgService = async (
