@@ -1,4 +1,4 @@
-import { OrganizationNavbar } from "@/features/organization/components/OrganizationNavbar";
+import { ProjectDetailsNavbar } from "@/features/projects/components/ProjectDetailsNavbar";
 import { MembersTable } from "@/features/members/components/MembersTable";
 
 export default async function MembersPage({
@@ -10,7 +10,7 @@ export default async function MembersPage({
 
   return (
     <div>
-      <OrganizationNavbar />
+      <ProjectDetailsNavbar />
       <div>Organization members</div>
       <MembersTable orgId={id} />
     </div>

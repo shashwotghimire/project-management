@@ -1,7 +1,11 @@
+import Calendar from "@/features/calendar/components/Calendar";
+import { ProjectDetailsNavbar } from "@/features/projects/components/ProjectDetailsNavbar";
+
 export default function CalendarPage() {
   return (
     <div>
-      <div>Your calendar</div>
+      <ProjectDetailsNavbar />
+      <Calendar />
     </div>
   );
 }
