@@ -1,3 +1,0 @@
-export declare const createInvitation: import("express").RequestHandler<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
-export declare const respondToInvitation: import("express").RequestHandler<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
-//# sourceMappingURL=invitation.controller.d.ts.map
