@@ -3,6 +3,7 @@ import {
   deleteTaskService,
   getProjectTasksService,
   getTaskByIdService,
+  reassignTaskService,
   updateTaskPositionService,
   updateTaskService,
   updateTaskStatusService,
@@ -11,6 +12,7 @@ import {
   CreateTaskRequest,
   DeleteTaskRequest,
   PaginatedTasks,
+  ReassignTaskRequest,
   Task,
   TaskByIdData,
   UpdateTaskPositionRequest,
@@ -134,8 +136,45 @@ export const useUpdateTask = (orgId: string, projectId: string) => {
   const queryClient = useQueryClient();
   return useMutation<Task, Error, UpdateTaskRequest>({
     mutationFn: updateTaskService,
-    onSuccess: () => {
+    onSuccess: (updatedTask, variables) => {
+      const fallbackTaskPatch = {
+        ...(variables.title !== undefined ? { title: variables.title } : {}),
+        ...(variables.description !== undefined ? { description: variables.description } : {}),
+        ...(variables.priority !== undefined ? { priority: variables.priority } : {}),
+        ...(variables.dueDate !== undefined ? { dueDate: variables.dueDate } : {}),
+      };
+      const taskPatch = updatedTask && "id" in updatedTask ? updatedTask : fallbackTaskPatch;
+
+      queryClient.setQueryData<TaskByIdData>(
+        ["task", orgId, projectId, variables.taskId],
+        (old) =>
+          old
+            ? {
+                ...old,
+                task: {
+                  ...old.task,
+                  ...taskPatch,
+                  id: old.task.id,
+                },
+              }
+            : old,
+      );
+
+      queryClient.setQueriesData<PaginatedTasks>(
+        { queryKey: ["tasks", orgId, projectId], exact: false },
+        (old) =>
+          old
+            ? {
+                ...old,
+                tasks: old.tasks.map((task) =>
+                  task.id === variables.taskId ? { ...task, ...taskPatch, id: task.id } : task,
+                ),
+              }
+            : old,
+      );
+
       queryClient.invalidateQueries({ queryKey: ["tasks", orgId, projectId], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["task", orgId, projectId, variables.taskId] });
     },
   });
 };
@@ -146,6 +185,17 @@ export const useDeleteTask = (orgId: string, projectId: string) => {
     mutationFn: deleteTaskService,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks", orgId, projectId], exact: false });
+    },
+  });
+};
+
+export const useReassignTask = (orgId: string, projectId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, ReassignTaskRequest>({
+    mutationFn: reassignTaskService,
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", orgId, projectId], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["task", orgId, projectId, variables.taskId] });
     },
   });
 };

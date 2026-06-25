@@ -11,7 +11,7 @@ export default async function TaskPage({
   return (
     <div className="flex h-screen flex-col">
       <ProjectDetailsNavbar />
-      <div className="min-h-0 flex-1 overflow-auto p-6">
+      <div className="min-h-0 flex-1 overflow-hidden">
         <TaskDetails orgId={id} projectId={projectId} taskId={taskId} />
       </div>
     </div>

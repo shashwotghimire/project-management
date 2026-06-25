@@ -93,6 +93,7 @@ export interface UpdateTaskRequest {
   title?: string;
   description?: string;
   priority?: TaskPriority;
+  dueDate?: string;
 }
 
 export interface UpdateTaskResponse {
@@ -127,6 +128,19 @@ export interface CreateTaskResponse {
   success: boolean;
   message: string;
   data: Task;
+}
+
+export interface ReassignTaskRequest {
+  orgId: string;
+  projectId: string;
+  taskId: string;
+  newUserId: string;
+}
+
+export interface ReassignTaskResponse {
+  success: boolean;
+  message: string;
+  data: null;
 }
 
 export const columns = [

@@ -73,7 +73,8 @@ export const updateTask = async (
     dueDate?: string;
   },
 ) => {
-  return await Tasks.update(data, { where: { id: taskId } });
+  await Tasks.update(data, { where: { id: taskId } });
+  return await Tasks.findByPk(taskId);
 };
 
 export const deleteTask = async (taskId: string) => {

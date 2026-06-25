@@ -7,6 +7,8 @@ import {
   GetProjectTasksResponse,
   GetTaskByIdResponse,
   PaginatedTasks,
+  ReassignTaskRequest,
+  ReassignTaskResponse,
   Task,
   TaskByIdData,
   UpdateTaskPositionRequest,
@@ -75,10 +77,11 @@ export const updateTaskService = async ({
   title,
   description,
   priority,
+  dueDate,
 }: UpdateTaskRequest): Promise<Task> => {
   const response = await api.patch<UpdateTaskResponse>(
     `/organizations/${orgId}/projects/${projectId}/tasks/${taskId}`,
-    { title, description, priority },
+    { title, description, priority, dueDate },
   );
   return response.data.data;
 };
@@ -107,4 +110,16 @@ export const createTaskService = async ({
     { title, description, status, priority, assignedTo },
   );
   return response.data.data;
+};
+
+export const reassignTaskService = async ({
+  orgId,
+  projectId,
+  taskId,
+  newUserId,
+}: ReassignTaskRequest): Promise<void> => {
+  await api.patch<ReassignTaskResponse>(
+    `/organizations/${orgId}/projects/${projectId}/tasks/${taskId}/reassign`,
+    { newUserId },
+  );
 };
