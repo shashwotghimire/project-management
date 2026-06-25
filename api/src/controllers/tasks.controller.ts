@@ -8,6 +8,7 @@ import {
   getTasksAssignedToUserInProjectService,
   getTasksAssignedToUserService,
   getTasksInProjectService,
+  getUserTasksForCalendarService,
   reassignTaskToAnotherUserService,
   updateTaskService,
   updateTaskStatusService,
@@ -177,3 +178,13 @@ export const reassignTaskToAnotherUser = asyncHandler<AuthRequest>(
   },
 );
 
+export const getUserTasksForCalendar = asyncHandler<AuthRequest>(
+  async (req: AuthRequest, res: Response) => {
+    const userId = req.user.id;
+    const orgId = isString(req.params.orgId);
+    const tasks = await getUserTasksForCalendarService({ userId, orgId });
+    return res
+      .status(200)
+      .json(new ApiResponse(true, "Tasks fetched successfully", tasks));
+  },
+);

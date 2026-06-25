@@ -23,7 +23,7 @@ export class Tasks extends Model<
   declare status: CreationOptional<TaskStatus>;
   declare priority: CreationOptional<TaskPriority>;
   declare position: CreationOptional<number>;
-  declare dueDate: CreationOptional<string>;
+  declare dueDate: CreationOptional<string | null>;
   declare completedAt: CreationOptional<string>;
 }
 

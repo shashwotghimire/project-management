@@ -8,7 +8,7 @@ import {
   removeOrgMember,
   updateOrganization,
 } from "../controllers/organizations.controller";
-import { getTasksAssignedToUser } from "../controllers/tasks.controller";
+import { getTasksAssignedToUser, getUserTasksForCalendar } from "../controllers/tasks.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { validate } from "../middlewares/validation.middleware";
 import {
@@ -20,7 +20,7 @@ import {
   removeOrgMemberSchema,
   updateOrganizationSchema,
 } from "../validations/organizations.validation";
-import { getTasksAssignedToUserSchema } from "../validations/tasks.validation";
+import { getTasksAssignedToUserSchema, getUserTasksForCalendarSchema } from "../validations/tasks.validation";
 
 const router = Router();
 
@@ -73,6 +73,13 @@ router.get(
   authMiddleware,
   validate(getTasksAssignedToUserSchema),
   getTasksAssignedToUser,
+);
+
+router.get(
+  "/:orgId/calendar-tasks",
+  authMiddleware,
+  validate(getUserTasksForCalendarSchema),
+  getUserTasksForCalendar,
 );
 
 export default router;

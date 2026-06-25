@@ -17,6 +17,12 @@ export const getTasksAssignedToUserSchema = z.object({
   }),
 });
 
+export const getUserTasksForCalendarSchema = z.object({
+  params: z.object({
+    orgId: z.uuidv4("Invalid organization ID"),
+  }),
+});
+
 export const getTasksAssignedToUserInProjectSchema = z.object({
   params: z.object({
     orgId: z.uuidv4("Invalid organization ID"),

@@ -3,6 +3,9 @@ import { sequelize } from "../configs/db.config";
 import { Tasks } from "../models/tasks.model";
 import { TaskPriority, TaskStatus } from "../types/tasks";
 import { User } from "../models/users.model";
+import { Organization } from "../models/organizations.model";
+import { Project } from "../models/projects.model";
+import { ProjectMembers } from "../models/project-members.model";
 
 export const createTask = async (data: {
   title: string;
@@ -177,4 +180,36 @@ export const getAssignedToTaskUserDetails = async ({
     },
   });
   return user;
+};
+
+export const getUserTasksForCalendar = async ({
+  userId,
+  orgId,
+}: {
+  userId: string;
+  orgId: string;
+}) => {
+  return await Tasks.findAll({
+    where: {
+      assignedTo: userId,
+      dueDate: { [Op.ne]: null },
+    },
+    include: [
+      {
+        model: Project,
+        as: "project",
+        where: { organizationId: orgId },
+        required: true,
+        attributes: ["id", "name"],
+        include: [
+          {
+            model: ProjectMembers,
+            where: { userId },
+            attributes: [],
+            required: true,
+          },
+        ],
+      },
+    ],
+  });
 };
