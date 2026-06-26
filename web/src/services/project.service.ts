@@ -51,15 +51,17 @@ export const getProjectMembersService = async (
 };
 
 export const addMemberToProjectService = async (
+  orgId: string,
   projectId: string,
   userId: string,
 ): Promise<void> => {
-  await api.post(`/projects/${projectId}/members`, { userId });
+  await api.post(`/organizations/${orgId}/projects/${projectId}/members`, { userId });
 };
 
 export const removeProjectMemberService = async (
+  orgId: string,
   projectId: string,
   userId: string,
 ): Promise<void> => {
-  await api.delete(`/projects/${projectId}/members/${userId}`);
+  await api.delete(`/organizations/${orgId}/projects/${projectId}/members/${userId}`);
 };

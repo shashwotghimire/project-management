@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import ReassignTaskDialog from "./ReassignTaskDialog";
 import { DatePicker } from "./DatePicker";
-import { format } from "date-fns";
 import TaskComments from "@/features/comments/components/TaskComments";
 import TaskLogs from "./TaskLogs";
 import Link from "next/link";
@@ -116,7 +115,7 @@ export default function TaskDetails({
         title: editTitle.trim(),
         description: editDescription.trim() || undefined,
         priority: editPriority,
-        dueDate: editDueDate ? format(editDueDate, "yyyy-MM-dd") : undefined,
+        dueDate: editDueDate ? editDueDate.toISOString() : undefined,
       },
       { onSuccess: () => setEditOpen(false) },
     );

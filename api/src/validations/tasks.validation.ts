@@ -57,7 +57,7 @@ export const updateTaskSchema = z.object({
     description: z.string().optional(),
     status: z.enum(["todo", "in_progress", "completed"]).optional(),
     priority: z.enum(["low", "medium", "high"]).optional(),
-    dueDate: z.iso.date("Invalid date format").optional(),
+    dueDate: z.iso.datetime({ offset: true, message: "Invalid datetime format" }).optional(),
   }).refine(
     (b) => Object.values(b).some((v) => v !== undefined),
     { message: "At least one field must be provided" },
@@ -109,6 +109,6 @@ export const createTaskSchema = z.object({
     assignedTo: z.uuidv4("Invalid user ID"),
     status: z.enum(["todo", "in_progress", "completed"]).optional(),
     priority: z.enum(["low", "medium", "high"]).optional(),
-    dueDate: z.iso.date("Invalid date format").optional(),
+    dueDate: z.iso.datetime({ offset: true, message: "Invalid datetime format" }).optional(),
   }),
 });

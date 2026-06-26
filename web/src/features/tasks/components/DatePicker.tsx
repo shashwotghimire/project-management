@@ -48,6 +48,22 @@ interface DatePickerProps {
 }
 
 export function DatePicker({ value, onChange, placeholder = "Pick a date" }: DatePickerProps) {
+  const timeString = value ? format(value, "HH:mm") : "00:00";
+
+  const handleDateSelect = (date: Date | undefined) => {
+    if (!date) { onChange(undefined); return; }
+    const [hours, minutes] = timeString.split(":").map(Number);
+    date.setHours(hours, minutes, 0, 0);
+    onChange(new Date(date));
+  };
+
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const [hours, minutes] = e.target.value.split(":").map(Number);
+    const base = value ? new Date(value) : new Date();
+    base.setHours(hours, minutes, 0, 0);
+    onChange(new Date(base));
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -55,16 +71,24 @@ export function DatePicker({ value, onChange, placeholder = "Pick a date" }: Dat
           variant="outline"
           className="w-full justify-start font-normal text-sm"
         >
-          {value ? format(value, "PPP") : <span className="text-muted-foreground">{placeholder}</span>}
+          {value ? format(value, "PPP p") : <span className="text-muted-foreground">{placeholder}</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="single"
           selected={value}
-          onSelect={onChange}
+          onSelect={handleDateSelect}
           defaultMonth={value}
         />
+        <div className="border-t p-3">
+          <input
+            type="time"
+            value={timeString}
+            onChange={handleTimeChange}
+            className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm"
+          />
+        </div>
       </PopoverContent>
     </Popover>
   );

@@ -62,7 +62,7 @@ export const useRemoveProjectMember = (orgId: string, projectId: string) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (userId: string) =>
-      removeProjectMemberService(projectId, userId),
+      removeProjectMemberService(orgId, projectId, userId),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["project-members", orgId, projectId],
@@ -75,7 +75,7 @@ export const useAddMemberToProject = (orgId: string, projectId: string) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (userId: string) =>
-      addMemberToProjectService(projectId, userId),
+      addMemberToProjectService(orgId, projectId, userId),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["project-members", orgId, projectId],

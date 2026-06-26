@@ -75,7 +75,7 @@ Tasks.init(
       allowNull: true,
     },
     dueDate: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.DATE,
       allowNull: true,
     },
     completedAt: {

@@ -30,7 +30,7 @@ export default function CreateTaskForm({ orgId, projectId, status }: CreateTaskF
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<TaskPriority>("medium");
   const { data: user } = useGetUserProfile();
-  const { mutate: createTask, isPending } = useCreateTask(orgId, projectId);
+  const { mutate: createTask, isPending, error } = useCreateTask(orgId, projectId);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -123,6 +123,9 @@ export default function CreateTaskForm({ orgId, projectId, status }: CreateTaskF
               ))}
             </div>
 
+            {error && (
+              <p className="text-xs text-red-500">{error.message}</p>
+            )}
             <button
               type="submit"
               disabled={!title.trim() || isPending}

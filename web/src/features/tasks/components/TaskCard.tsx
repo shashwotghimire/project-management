@@ -1,6 +1,8 @@
 import { Task, TaskPriority, TaskStatus } from "@/types/task-api.types";
+import { OrgMemberUser } from "@/types/members-api.types";
 import { Card, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, User } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 const STATUS_STYLES: Record<TaskStatus, { label: string; className: string }> =
@@ -57,7 +59,15 @@ function Badge({
   );
 }
 
-export default function TaskCard({ task, href }: { task: Task; href?: string }) {
+export default function TaskCard({
+  task,
+  assignee,
+  href,
+}: {
+  task: Task;
+  assignee?: OrgMemberUser;
+  href?: string;
+}) {
   const status = STATUS_STYLES[task.status];
   const priority = PRIORITY_STYLES[task.priority];
 
@@ -91,12 +101,30 @@ export default function TaskCard({ task, href }: { task: Task; href?: string }) 
         <div className="flex items-center gap-2">
           <Badge label={status.label} className={status.className} />
           <Badge label={priority.label} className={priority.className} />
+          {dueDate && (
+            <span className="flex items-center gap-1 text-xs text-muted-foreground">
+              <CalendarDays className="h-3 w-3" />
+              {dueDate}
+            </span>
+          )}
         </div>
-        {dueDate && (
-          <span className="flex items-center gap-1 text-xs text-muted-foreground">
-            <CalendarDays className="h-3 w-3" />
-            {dueDate}
-          </span>
+        {assignee && (
+          <div className="flex items-center gap-1.5 shrink-0">
+            {assignee.gravatarUrl ? (
+              <Image
+                src={assignee.gravatarUrl}
+                alt={assignee.username}
+                width={20}
+                height={20}
+                className="rounded-full"
+              />
+            ) : (
+              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-muted">
+                <User className="h-3 w-3 text-muted-foreground" />
+              </div>
+            )}
+            <span className="text-xs text-muted-foreground">{assignee.username}</span>
+          </div>
         )}
       </CardFooter>
     </Card>

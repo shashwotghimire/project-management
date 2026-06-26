@@ -21,6 +21,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useState } from "react";
 import { useGetProjectMembers, useRemoveProjectMember } from "../hooks/useProject";
 
 interface ProjectMembersTableProps {
@@ -29,6 +30,7 @@ interface ProjectMembersTableProps {
 }
 
 export default function ProjectMembersTable({ orgId, projectId }: ProjectMembersTableProps) {
+  const [removeError, setRemoveError] = useState<string | null>(null);
   const { data, isPending, error } = useGetProjectMembers(orgId, projectId);
   const { mutate: removeMember, isPending: isRemoving } = useRemoveProjectMember(orgId, projectId);
 
@@ -36,6 +38,12 @@ export default function ProjectMembersTable({ orgId, projectId }: ProjectMembers
   if (error) return <div className="p-4 text-sm text-destructive">Failed to load members.</div>;
 
   return (
+    <div className="flex flex-col gap-3">
+      {removeError && (
+        <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {removeError}
+        </div>
+      )}
     <Table>
       <TableCaption>Project members</TableCaption>
       <TableHeader>
@@ -89,7 +97,15 @@ export default function ProjectMembersTable({ orgId, projectId }: ProjectMembers
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction
                       variant="destructive"
-                      onClick={() => removeMember(member.userId)}
+                      onClick={() => {
+                        setRemoveError(null);
+                        removeMember(member.userId, {
+                          onError: () =>
+                            setRemoveError(
+                              `Failed to remove ${member.member.username}. Please try again.`,
+                            ),
+                        });
+                      }}
                     >
                       Remove
                     </AlertDialogAction>
@@ -101,5 +117,6 @@ export default function ProjectMembersTable({ orgId, projectId }: ProjectMembers
         ))}
       </TableBody>
     </Table>
+    </div>
   );
 }

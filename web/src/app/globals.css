@@ -218,3 +218,26 @@
 .fc .fc-button-group .fc-button:last-child {
   border-radius: 0 var(--radius) var(--radius) 0 !important;
 }
+
+.fc-event-title {
+  white-space: normal !important;
+  overflow: visible !important;
+}
+
+.fc-event {
+  height: auto !important;
+}
+
+.fc-timegrid-event-harness {
+  overflow: visible !important;
+}
+
+.fc-timegrid-event {
+  overflow: visible !important;
+  height: auto !important;
+  min-height: 1.5em;
+}
+
+.fc-timegrid-event .fc-event-main {
+  overflow: visible !important;
+}
