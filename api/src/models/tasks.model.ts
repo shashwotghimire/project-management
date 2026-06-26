@@ -17,7 +17,7 @@ export class Tasks extends Model<
   declare title: string;
   declare description: CreationOptional<string>;
   declare createdBy: ForeignKey<string>;
-  declare assignedTo: ForeignKey<string>;
+  declare assignedTo: ForeignKey<string> | null;
   declare assignedBy: ForeignKey<string>;
   declare projectId: ForeignKey<string>;
   declare status: CreationOptional<TaskStatus>;
@@ -54,7 +54,7 @@ Tasks.init(
     },
     assignedTo: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: true,
       references: { model: "users", key: "id" },
     },
     assignedBy: {

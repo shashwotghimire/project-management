@@ -55,7 +55,7 @@ export default function CreateTaskForm({ orgId, projectId, status }: CreateTaskF
         description: description.trim() || undefined,
         status,
         priority,
-        assignedTo: user.id,
+        assignedTo: undefined,
       },
       {
         onSuccess: () => {

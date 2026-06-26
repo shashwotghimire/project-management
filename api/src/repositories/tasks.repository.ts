@@ -10,7 +10,7 @@ import { ProjectMembers } from "../models/project-members.model";
 export const createTask = async (data: {
   title: string;
   description: string;
-  assignedTo: string;
+  assignedTo?: string;
   assignedBy: string;
   createdBy: string;
   projectId: string;
