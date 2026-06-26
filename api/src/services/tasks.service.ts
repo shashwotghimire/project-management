@@ -26,7 +26,7 @@ import { TaskPriority, TaskStatus } from "../types/tasks";
 export const createTaskService = async (data: {
   title: string;
   description: string;
-  assignedTo: string;
+  assignedTo?: string;
   assignedBy: string;
   createdBy: string;
   projectId: string;
@@ -42,13 +42,15 @@ export const createTaskService = async (data: {
       "Project not found",
     );
   }
-  const isMember = await isUserMemberOfProject(data.assignedTo, data.projectId);
-  if (!isMember) {
-    throw new ApiError(
-      400,
-      "The user you are trying to assign the task to is not a member of the project.",
-      "User not a member of project",
-    );
+  if (data.assignedTo) {
+    const isMember = await isUserMemberOfProject(data.assignedTo, data.projectId);
+    if (!isMember) {
+      throw new ApiError(
+        400,
+        "The user you are trying to assign the task to is not a member of the project.",
+        "User not a member of project",
+      );
+    }
   }
   const creatorIsMember = await isUserMemberOfProject(
     data.createdBy,

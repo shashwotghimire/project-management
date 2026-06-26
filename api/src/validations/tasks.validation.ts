@@ -106,7 +106,7 @@ export const createTaskSchema = z.object({
   body: z.object({
     title: z.string().min(1, "Title is required"),
     description: z.string().optional(),
-    assignedTo: z.uuidv4("Invalid user ID"),
+    assignedTo: z.uuidv4("Invalid user ID").optional(),
     status: z.enum(["todo", "in_progress", "completed"]).optional(),
     priority: z.enum(["low", "medium", "high"]).optional(),
     dueDate: z.iso.datetime({ offset: true, message: "Invalid datetime format" }).optional(),

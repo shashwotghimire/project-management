@@ -121,7 +121,7 @@ export interface CreateTaskRequest {
   description?: string;
   status: TaskStatus;
   priority: TaskPriority;
-  assignedTo: string;
+  assignedTo?: string;
 }
 
 export interface CreateTaskResponse {
