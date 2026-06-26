@@ -5,6 +5,7 @@ import { useGetProjectTasks } from "../hooks/useTasks";
 import { useGetOrgMembers } from "@/features/members/hooks/useMembers";
 import TaskCard from "./TaskCard";
 import { ChevronLeft, ChevronRight, ListTodo } from "lucide-react";
+import { QueryError } from "@/components/QueryError";
 
 const PAGE_SIZE = 10;
 
@@ -70,7 +71,7 @@ export default function TaskList({
           ))}
         </div>
       ) : isError ? (
-        <p className="mt-4 text-sm text-destructive">Failed to load tasks.</p>
+        <QueryError message="Failed to load tasks." className="mt-4 p-0" />
       ) : !data?.tasks.length ? (
         <p className="mt-4 text-sm text-muted-foreground">No tasks yet.</p>
       ) : (

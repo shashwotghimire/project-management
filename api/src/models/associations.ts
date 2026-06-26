@@ -1,4 +1,5 @@
 import { Comments } from "./comments.model";
+import { Invitations } from "./invitation.model";
 import { OrganizationsMember } from "./organizations-members.model";
 import { Organization } from "./organizations.model";
 import { ProjectMembers } from "./project-members.model";
@@ -74,6 +75,9 @@ Comments.belongsTo(Project, { foreignKey: "projectId" });
 
 Tasks.hasMany(Comments, { foreignKey: "taskId" });
 Comments.belongsTo(Tasks, { foreignKey: "taskId" });
+
+Invitations.belongsTo(Organization, { foreignKey: "organizationId", as: "organization" });
+Invitations.belongsTo(User, { foreignKey: "invitedBy", as: "inviter" });
 
 Comments.belongsTo(User, { foreignKey: "authorId", as: "author" });
 User.hasMany(Comments, { foreignKey: "authorId", as: "comments" });

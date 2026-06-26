@@ -3,6 +3,7 @@
 import { useGetUserProfile } from "@/features/auth/hooks/useAuth";
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Spinner } from "@/components/Spinner";
 
 const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
   const { data, isLoading, error } = useGetUserProfile();
@@ -13,11 +14,7 @@ const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
     }
   }, [data, isLoading, error]);
   if (isLoading) {
-    return (
-      <div className="text-2xl flex justify-center items-center">
-        Loading...
-      </div>
-    );
+    return <Spinner fullPage />;
   }
   return <>{children}</>;
 };

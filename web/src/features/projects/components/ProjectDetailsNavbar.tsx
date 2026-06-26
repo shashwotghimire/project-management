@@ -5,8 +5,9 @@ import { useGetOrganizationById } from "@/features/organization/hooks/useOrganiz
 import { useParams } from "next/navigation";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ReactNode } from "react";
 
-export function ProjectDetailsNavbar() {
+export function ProjectDetailsNavbar({ actions }: { actions?: ReactNode }) {
   const params = useParams<{ id: string }>();
   const orgId = params?.id ?? "";
   const { data: org } = useGetOrganizationById(orgId);
@@ -19,6 +20,7 @@ export function ProjectDetailsNavbar() {
       </div>
 
       <div className="flex items-center gap-2">
+        {actions}
         <Button variant="ghost" size="icon" className="text-muted-foreground">
           <Bell className="size-4" />
         </Button>

@@ -3,6 +3,7 @@ import {
   createInvitation,
   existingPendingInvitation,
   getInvitationByToken,
+  getInvitationDetailsByToken,
   updateInvitationStatus,
 } from "../repositories/invitation.repository";
 import {
@@ -17,6 +18,14 @@ import {
   findUserByEmail,
   findUserById,
 } from "../repositories/users.repository";
+
+export const getInvitationDetailsService = async (token: string) => {
+  const invitation = await getInvitationDetailsByToken(token);
+  if (!invitation) {
+    throw new ApiError(404, "Invitation not found", "Invitation not found");
+  }
+  return invitation;
+};
 
 export const createInvitationService = async ({
   email,
@@ -55,10 +64,11 @@ export const createInvitationService = async ({
     );
   }
   const invitationToken = createInvitationToken();
+  const inviteUrl = `${process.env.FRONTEND_ORIGIN}/invite?token=${invitationToken}`;
   sendEmail(
     email,
     `You're invited to join ${org.name}`,
-    invitationEmailTemplate(org.name, user.username, invitationToken),
+    invitationEmailTemplate(org.name, user.username, inviteUrl),
   );
   return await createInvitation({
     email,

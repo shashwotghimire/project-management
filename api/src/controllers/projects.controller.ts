@@ -6,6 +6,7 @@ import {
   addMemberToProjectService,
   createProjectService,
   deleteProjectService,
+  getDashboardProjectsService,
   getProjectByIdService,
   getProjectMembersService,
   getUserProjectsService,
@@ -72,6 +73,19 @@ export const getUserProjects = asyncHandler<AuthRequest>(
     return res
       .status(200)
       .json(new ApiResponse(true, "Projects fetched successfully", projects));
+  },
+);
+
+export const getDashboardProjects = asyncHandler<AuthRequest>(
+  async (req: AuthRequest, res: Response) => {
+    const organizationId = isString(req.params.orgId);
+    const userId = req.user.id;
+
+    const projects = await getDashboardProjectsService({ userId, organizationId });
+
+    return res
+      .status(200)
+      .json(new ApiResponse(true, "Dashboard projects fetched successfully", projects));
   },
 );
 

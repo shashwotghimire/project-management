@@ -1,6 +1,7 @@
 import { PublicRoutes } from "@/components/PublicRoutes";
 import { AuthGraphicsLogin } from "@/features/auth/components/AuthGraphics";
 import { LoginForm } from "@/features/auth/components/LoginForm";
+import { Suspense } from "react";
 
 function LoginPage() {
   return (
@@ -10,7 +11,9 @@ function LoginPage() {
           <AuthGraphicsLogin />
         </div>
         <div className="w-full md:w-1/2">
-          <LoginForm />
+          <Suspense>
+            <LoginForm />
+          </Suspense>
         </div>
       </div>
     </PublicRoutes>

@@ -1,5 +1,6 @@
 import { ProjectDetailsNavbar } from "@/features/projects/components/ProjectDetailsNavbar";
 import { MembersTable } from "@/features/members/components/MembersTable";
+import { InviteMemberDialog } from "@/features/members/components/InviteMemberDialog";
 
 export default async function MembersPage({
   params,
@@ -10,9 +11,10 @@ export default async function MembersPage({
 
   return (
     <div>
-      <ProjectDetailsNavbar />
-      <div>Organization members</div>
-      <MembersTable orgId={id} />
+      <ProjectDetailsNavbar actions={<InviteMemberDialog orgId={id} />} />
+      <div className="p-6">
+        <MembersTable orgId={id} />
+      </div>
     </div>
   );
 }

@@ -3,7 +3,6 @@
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -22,30 +21,32 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useGetOrgMembers, useRemoveOrgMember } from "../hooks/useMembers";
+import { Spinner } from "@/components/Spinner";
+import { QueryError } from "@/components/QueryError";
 
 export function MembersTable({ orgId }: { orgId: string }) {
   const { data, isPending, error } = useGetOrgMembers(orgId);
   const { mutate: removeMember, isPending: isRemoving } = useRemoveOrgMember(orgId);
 
-  if (isPending) return <div className="p-4 text-sm text-muted-foreground">Loading members...</div>;
-  if (error) return <div className="p-4 text-sm text-destructive">Failed to load members.</div>;
+  if (isPending) return <Spinner fullPage />;
+  if (error) return <QueryError message="Failed to load members." />;
 
   return (
+    <div className="rounded-lg border p-6">
     <Table>
-      <TableCaption>Organization members</TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead>Member</TableHead>
-          <TableHead>Email</TableHead>
-          <TableHead>Role</TableHead>
-          <TableHead>Joined</TableHead>
-          <TableHead className="w-24">Actions</TableHead>
+          <TableHead className="py-4">Member</TableHead>
+          <TableHead className="py-4">Email</TableHead>
+          <TableHead className="py-4">Role</TableHead>
+          <TableHead className="py-4">Joined</TableHead>
+          <TableHead className="w-24 py-4">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {data?.map((member) => (
           <TableRow key={member.User.id}>
-            <TableCell>
+            <TableCell className="py-4">
               <div className="flex items-center gap-2">
                 <img
                   src={member.User.gravatarUrl}
@@ -55,16 +56,16 @@ export function MembersTable({ orgId }: { orgId: string }) {
                 <span className="font-medium">{member.User.username}</span>
               </div>
             </TableCell>
-            <TableCell>{member.User.email}</TableCell>
-            <TableCell className="capitalize">{member.userRoleInOrg}</TableCell>
-            <TableCell>
+            <TableCell className="py-4">{member.User.email}</TableCell>
+            <TableCell className="capitalize py-4">{member.userRoleInOrg}</TableCell>
+            <TableCell className="py-4">
               {new Date(member.createdAt).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "short",
                 day: "numeric",
               })}
             </TableCell>
-            <TableCell>
+            <TableCell className="py-4">
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" size="sm" disabled={isRemoving}>
@@ -98,5 +99,6 @@ export function MembersTable({ orgId }: { orgId: string }) {
         ))}
       </TableBody>
     </Table>
+    </div>
   );
 }

@@ -11,24 +11,34 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import CreateOrgModal from "./CreateOrgModal";
+import { Spinner } from "@/components/Spinner";
+import { QueryError } from "@/components/QueryError";
 
 const OnboardingCard = () => {
   const [token, setToken] = React.useState("");
   const router = useRouter();
   const { data, error, isLoading } = useGetUsersOrganizations();
+  const resolvedToken = React.useMemo(() => {
+    try {
+      const url = new URL(token);
+      return url.searchParams.get("token") ?? token;
+    } catch {
+      return token;
+    }
+  }, [token]);
+
   const {
-    data: acceptInvitationData,
     mutate: acceptInvitationMutate,
     error: acceptInvitationError,
     isPending: acceptInvitationPending,
-  } = useAcceptInvitation(token);
+  } = useAcceptInvitation(resolvedToken);
 
   if (isLoading) {
-    return <div>Loading organizations...</div>;
+    return <Spinner fullPage />;
   }
 
   if (error) {
-    return <div>Error loading organizations: {error.message}</div>;
+    return <QueryError message={`Error loading organizations: ${error.message}`} />;
   }
 
   const handleJoinOrganization = () => {

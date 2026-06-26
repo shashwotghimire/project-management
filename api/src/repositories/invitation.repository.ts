@@ -23,6 +23,16 @@ export const getInvitationByToken = async (token: string) => {
   });
 };
 
+export const getInvitationDetailsByToken = async (token: string) => {
+  return Invitations.findOne({
+    where: { token },
+    include: [
+      { association: "organization", attributes: ["id", "name"] },
+      { association: "inviter", attributes: ["id", "username"] },
+    ],
+  });
+};
+
 export const createInvitation = async ({
   email,
   organizationId,

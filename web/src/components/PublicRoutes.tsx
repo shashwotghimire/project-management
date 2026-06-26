@@ -3,6 +3,7 @@
 import { useGetUserProfile } from "@/features/auth/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { Spinner } from "@/components/Spinner";
 
 export const PublicRoutes = ({ children }: { children: React.ReactNode }) => {
   const { data, isLoading, error } = useGetUserProfile();
@@ -13,7 +14,7 @@ export const PublicRoutes = ({ children }: { children: React.ReactNode }) => {
     }
   }, [data, isLoading, error]);
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Spinner fullPage />;
   }
   return <>{children}</>;
 };

@@ -7,10 +7,13 @@ import {
 } from "../validations/invitation.validation";
 import {
   createInvitation,
+  getInvitationDetails,
   respondToInvitation,
 } from "../controllers/invitation.controller";
 
 const router = Router();
+
+router.get("/details", getInvitationDetails);
 
 router.post(
   "/",

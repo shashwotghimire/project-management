@@ -1,33 +1,35 @@
 "use client";
 
-import { useGetDashboardProjects } from "../hooks/useProject";
+import { useGetDashboardProjects, useGetUsersProjects } from "../hooks/useProject";
 import { Card, CardContent } from "@/components/ui/card";
-import { FolderOpen } from "lucide-react";
+import { ArrowRight, FolderOpen } from "lucide-react";
 import ProjectCardItem from "./ProjectCardItem";
 import ProjectCardSkeleton from "./ProjectCardSkeleton";
 import Link from "next/link";
+import { QueryError } from "@/components/QueryError";
 
 export default function ProjectsCard({ orgId }: { orgId: string }) {
   const { data, isLoading, error } = useGetDashboardProjects(orgId);
-  const projectMembers = data?.data ?? [];
-  const total = data?.total ?? 0;
+  const { data: allProjects } = useGetUsersProjects(orgId, { limit: 1 });
+  const projectMembers = data ?? [];
+  const total = allProjects?.total ?? 0;
 
   if (error) {
-    return (
-      <p className="text-sm text-destructive">
-        Failed to load projects. Please try again.
-      </p>
-    );
+    return <QueryError message="Failed to load projects. Please try again." />;
   }
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Projects</h2>
+        <h2 className="text-lg font-semibold">Recent Projects</h2>
         {!isLoading && (
-          <span className="text-sm text-muted-foreground">
-            {total} {total === 1 ? "project" : "projects"}
-          </span>
+          <Link
+            href={`/organization/${orgId}/projects`}
+            className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <span>{total} {total === 1 ? "project" : "projects"}</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         )}
       </div>
 

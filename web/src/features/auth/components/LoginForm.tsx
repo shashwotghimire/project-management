@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useLogin } from "../hooks/useAuth";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Card,
   CardDescription,
@@ -17,12 +17,15 @@ export const LoginForm = () => {
   const [password, setPassword] = useState("");
   const { mutate, error, isPending } = useLogin();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect");
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     mutate(
       { email, password },
       {
         onSuccess: (data) => {
+          if (redirect) return router.push(redirect);
           data.user.role === "superadmin"
             ? router.push("/admin")
             : router.push("/onboarding");

@@ -100,6 +100,24 @@ export async function getProjectsByUserId(
   };
 }
 
+export async function getDashboardProjects(
+  userId: string,
+  organizationId: string,
+) {
+  return ProjectMembers.findAll({
+    where: { userId },
+    include: [
+      {
+        model: Project,
+        where: { organizationId },
+        required: true,
+      },
+    ],
+    order: [[{ model: Project, as: "Project" }, "updatedAt", "DESC"]],
+    limit: 3,
+  });
+}
+
 export async function deleteProject(projectId: string): Promise<void> {
   await Project.destroy({ where: { id: projectId } });
 }

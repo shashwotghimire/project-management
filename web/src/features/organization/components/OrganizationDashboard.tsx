@@ -10,9 +10,7 @@ function OrganizationDashboard({ organizationId }: { organizationId: string }) {
     error,
   } = useGetOrganizationById(organizationId);
   return (
-    <div>
-      OrganizationDashboard
-      <div>hello</div>
+    <div className="p-6 space-y-6">
       <ProjectsCard orgId={organizationId} />
     </div>
   );

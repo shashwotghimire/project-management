@@ -5,6 +5,7 @@ import {
   addMemberToProjectSchema,
   createProjectSchema,
   deleteProjectSchema,
+  getDashboardProjectsSchema,
   getProjectByIdSchema,
   getProjectMembersSchema,
   getUserProjectsSchema,
@@ -15,6 +16,7 @@ import {
   addMemberToProject,
   createProject,
   deleteProject,
+  getDashboardProjects,
   getProjectById,
   getProjectMembers,
   getUserProjects,
@@ -29,6 +31,13 @@ router.get(
   authMiddleware,
   validate(getUserProjectsSchema),
   getUserProjects,
+);
+
+router.get(
+  "/dashboard",
+  authMiddleware,
+  validate(getDashboardProjectsSchema),
+  getDashboardProjects,
 );
 router.post("/", authMiddleware, validate(createProjectSchema), createProject);
 

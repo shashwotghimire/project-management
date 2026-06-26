@@ -4,6 +4,7 @@ import {
   addMemberToProject,
   createProject,
   deleteProject,
+  getDashboardProjects,
   getProjectById,
   getProjectMembers,
   getProjectsByUserId,
@@ -93,6 +94,16 @@ export const getUserProjectsService = async ({
     limit,
     search,
   });
+};
+
+export const getDashboardProjectsService = async ({
+  userId,
+  organizationId,
+}: {
+  userId: string;
+  organizationId: string;
+}) => {
+  return await getDashboardProjects(userId, organizationId);
 };
 
 export const deleteProjectService = async ({

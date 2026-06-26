@@ -25,8 +25,8 @@ export const updateProjectSchema = z.object({
       .string()
       .min(3, "Project name must be at least 3 characters")
       .optional(),
-    logoUrl: z.url("Invalid URL format").optional(),
-    status: z.enum(["active", "archived"]).optional(),
+    logoUrl: z.url("Invalid URL format").nullable().optional(),
+    status: z.enum(["active", "inactive", "archived"]).optional(),
   }),
 });
 
@@ -38,6 +38,12 @@ export const getUserProjectsSchema = z.object({
     page: z.coerce.number().int().min(1).default(1),
     limit: z.coerce.number().int().min(1).max(100).default(10),
     search: z.string().optional(),
+  }),
+});
+
+export const getDashboardProjectsSchema = z.object({
+  params: z.object({
+    orgId: z.uuidv4("Invalid organization ID"),
   }),
 });
 

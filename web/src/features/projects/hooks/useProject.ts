@@ -1,14 +1,17 @@
 import {
   addMemberToProjectService,
   createProjectService,
+  getDashboardProjectsService,
   getProjectByIdService,
   getProjectMembersService,
   getUsersProjectsService,
   removeProjectMemberService,
+  updateProjectService,
 } from "@/services/project.service";
 import {
   CreateProjectRequest,
   GetUsersProjectsParams,
+  UpdateProjectRequest,
 } from "@/types/project-api.types";
 import {
   useMutation,
@@ -23,6 +26,7 @@ export const useCreateProject = (orgId: string) => {
       createProjectService(orgId, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects", orgId] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-projects", orgId] });
     },
   });
 };
@@ -39,8 +43,8 @@ export const useGetUsersProjects = (
 
 export const useGetDashboardProjects = (orgId: string) => {
   return useQuery({
-    queryKey: ["projects", orgId, { limit: 3 }],
-    queryFn: () => getUsersProjectsService(orgId, { limit: 3 }),
+    queryKey: ["dashboard-projects", orgId],
+    queryFn: () => getDashboardProjectsService(orgId),
   });
 };
 
@@ -80,6 +84,19 @@ export const useAddMemberToProject = (orgId: string, projectId: string) => {
       queryClient.invalidateQueries({
         queryKey: ["project-members", orgId, projectId],
       });
+    },
+  });
+};
+
+export const useUpdateProject = (orgId: string, projectId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: UpdateProjectRequest) =>
+      updateProjectService(orgId, projectId, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["project", orgId, projectId] });
+      queryClient.invalidateQueries({ queryKey: ["projects", orgId] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-projects", orgId] });
     },
   });
 };

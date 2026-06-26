@@ -11,8 +11,9 @@ export default async function ProjectsPage({
   return (
     <div>
       <OrganizationNavbar />
-      <div>Your projects</div>
-      <ProjectsTable orgId={id} />
+      <div className="p-6">
+        <ProjectsTable orgId={id} />
+      </div>
     </div>
   );
 }

@@ -2,10 +2,13 @@ import api from "@/lib/axios";
 import {
   CreateProjectRequest,
   CreateProjectResponse,
+  GetDashboardProjectsResponse,
   GetProjectByIdResponse,
   GetProjectMembersResponse,
   GetUsersProjectsParams,
   GetUsersProjectsResponse,
+  UpdateProjectRequest,
+  UpdateProjectResponse,
 } from "@/types/project-api.types";
 
 export const getUsersProjectsService = async (
@@ -15,6 +18,15 @@ export const getUsersProjectsService = async (
   const response = await api.get<GetUsersProjectsResponse>(
     `/organizations/${orgId}/projects`,
     { params },
+  );
+  return response.data.data;
+};
+
+export const getDashboardProjectsService = async (
+  orgId: string,
+): Promise<GetDashboardProjectsResponse["data"]> => {
+  const response = await api.get<GetDashboardProjectsResponse>(
+    `/organizations/${orgId}/projects/dashboard`,
   );
   return response.data.data;
 };
@@ -64,4 +76,16 @@ export const removeProjectMemberService = async (
   userId: string,
 ): Promise<void> => {
   await api.delete(`/organizations/${orgId}/projects/${projectId}/members/${userId}`);
+};
+
+export const updateProjectService = async (
+  orgId: string,
+  projectId: string,
+  body: UpdateProjectRequest,
+): Promise<UpdateProjectResponse["data"]> => {
+  const response = await api.patch<UpdateProjectResponse>(
+    `/organizations/${orgId}/projects/${projectId}`,
+    body,
+  );
+  return response.data.data;
 };

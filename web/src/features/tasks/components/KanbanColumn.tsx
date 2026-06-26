@@ -11,6 +11,8 @@ import SortableTaskCard from "./SortableTaskCards";
 import { GripVertical } from "lucide-react";
 import { toColumnId } from "../hooks/useKanbanDnd";
 import CreateTaskForm from "./CreateTaskForm";
+import { Spinner } from "@/components/Spinner";
+import { QueryError } from "@/components/QueryError";
 
 interface KanbanColumnProps {
   status: TaskStatus;
@@ -73,8 +75,8 @@ export default function KanbanColumn({
           <CreateTaskForm orgId={orgId} projectId={projectId} status={status} />
         )}
       </div>
-      {isPending && <p>Loading...</p>}
-      {error && <p className="text-destructive">Failed to load tasks.</p>}
+      {isPending && <Spinner className="mx-auto" />}
+      {error && <QueryError message="Failed to load tasks." className="p-0" />}
       <SortableContext
         items={tasks.map((t) => t.id)}
         strategy={verticalListSortingStrategy}

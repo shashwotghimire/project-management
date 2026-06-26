@@ -3,7 +3,6 @@
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -23,6 +22,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
 import { useGetProjectMembers, useRemoveProjectMember } from "../hooks/useProject";
+import { Spinner } from "@/components/Spinner";
+import { QueryError } from "@/components/QueryError";
 
 interface ProjectMembersTableProps {
   orgId: string;
@@ -34,30 +35,29 @@ export default function ProjectMembersTable({ orgId, projectId }: ProjectMembers
   const { data, isPending, error } = useGetProjectMembers(orgId, projectId);
   const { mutate: removeMember, isPending: isRemoving } = useRemoveProjectMember(orgId, projectId);
 
-  if (isPending) return <div className="p-4 text-sm text-muted-foreground">Loading members...</div>;
-  if (error) return <div className="p-4 text-sm text-destructive">Failed to load members.</div>;
+  if (isPending) return <Spinner fullPage />;
+  if (error) return <QueryError message="Failed to load members." />;
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 rounded-lg border p-6">
       {removeError && (
         <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {removeError}
         </div>
       )}
     <Table>
-      <TableCaption>Project members</TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead>Member</TableHead>
-          <TableHead>Email</TableHead>
-          <TableHead>Added</TableHead>
-          <TableHead className="w-24">Actions</TableHead>
+          <TableHead className="py-4">Member</TableHead>
+          <TableHead className="py-4">Email</TableHead>
+          <TableHead className="py-4">Added</TableHead>
+          <TableHead className="w-24 py-4">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {data?.map((member) => (
           <TableRow key={member.userId}>
-            <TableCell>
+            <TableCell className="py-4">
               <div className="flex items-center gap-2">
                 <img
                   src={member.member.gravatarUrl}
@@ -67,15 +67,15 @@ export default function ProjectMembersTable({ orgId, projectId }: ProjectMembers
                 <span className="font-medium">{member.member.username}</span>
               </div>
             </TableCell>
-            <TableCell>{member.member.email}</TableCell>
-            <TableCell>
+            <TableCell className="py-4">{member.member.email}</TableCell>
+            <TableCell className="py-4">
               {new Date(member.createdAt).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "short",
                 day: "numeric",
               })}
             </TableCell>
-            <TableCell>
+            <TableCell className="py-4">
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" size="sm" disabled={isRemoving}>

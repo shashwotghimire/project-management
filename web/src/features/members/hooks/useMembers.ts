@@ -1,4 +1,5 @@
 import { getOrgMembersService, removeOrgMemberService } from "@/services/members.service";
+import { sendInvitationService } from "@/services/invitation.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useGetOrgMembers = (orgId: string) => {
@@ -15,5 +16,11 @@ export const useRemoveOrgMember = (orgId: string) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["org-members", orgId] });
     },
+  });
+};
+
+export const useInviteMember = () => {
+  return useMutation({
+    mutationFn: sendInvitationService,
   });
 };

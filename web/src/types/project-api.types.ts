@@ -79,8 +79,26 @@ export interface GetProjectByIdResponse {
   data: Project;
 }
 
+export interface GetDashboardProjectsResponse {
+  success: boolean;
+  message: string;
+  data: ProjectMember[];
+}
+
 export interface RemoveProjectMemberResponse {
   success: boolean;
   message: string;
   data: null;
+}
+
+export interface UpdateProjectRequest {
+  name?: string;
+  logoUrl?: string | null;
+  status?: ProjectStatus;
+}
+
+export interface UpdateProjectResponse {
+  success: boolean;
+  message: string;
+  data: Project;
 }

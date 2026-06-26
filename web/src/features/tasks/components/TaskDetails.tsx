@@ -21,6 +21,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { TaskStatus, TaskPriority } from "@/types/task-api.types";
 import { cn } from "@/lib/utils";
+import { Spinner } from "@/components/Spinner";
+import { QueryError } from "@/components/QueryError";
 
 const STATUS_LABELS: Record<TaskStatus, string> = {
   todo: "To Do",
@@ -122,21 +124,11 @@ export default function TaskDetails({
   };
 
   if (isPending) {
-    return (
-      <div className="h-full animate-pulse p-8 space-y-4">
-        <div className="h-4 w-24 rounded bg-muted" />
-        <div className="h-7 w-1/3 rounded bg-muted" />
-        <div className="flex gap-2">
-          <div className="h-5 w-16 rounded-full bg-muted" />
-          <div className="h-5 w-20 rounded-full bg-muted" />
-        </div>
-        <div className="h-40 rounded-xl bg-muted" />
-      </div>
-    );
+    return <Spinner fullPage />;
   }
 
   if (isError || !data || !task) {
-    return <div className="p-8 text-sm text-destructive">Failed to load task.</div>;
+    return <QueryError message="Failed to load task." className="p-8" />;
   }
 
   const dueDate = task.dueDate
