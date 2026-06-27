@@ -28,11 +28,11 @@ export const createTask = async (data: {
     projectId: data.projectId,
     priority: data.priority,
     status: data.status,
-    createdBy: data.assignedBy,
+    createdBy: data.createdBy,
     assignedBy: data.assignedBy,
-    assignedTo: data.assignedTo,
+    assignedTo: data.assignedTo ?? null,
     position: count,
-    dueDate: data.dueDate,
+    dueDate: data.dueDate ?? null,
   });
 };
 
