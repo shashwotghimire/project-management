@@ -1,3 +1,4 @@
 DS_STORE
 .env
 .DS_STORE
+api/migrate.sh
