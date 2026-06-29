@@ -2,6 +2,7 @@ export function invitationEmailTemplate(
   orgName: string,
   inviterName: string,
   inviteUrl: string,
+  inviterAvatarUrl?: string,
 ): string {
   return `
 <!DOCTYPE html>
@@ -24,6 +25,7 @@ export function invitationEmailTemplate(
           <tr>
             <td style="padding:40px;">
               <h2 style="margin:0 0 16px;color:#111827;font-size:20px;">You've been invited to join ${orgName}</h2>
+              ${inviterAvatarUrl ? `<p style="margin:0 0 16px;"><img src="${inviterAvatarUrl}" alt="${inviterName}" width="48" height="48" style="border-radius:50%;vertical-align:middle;margin-right:10px;"/><strong style="vertical-align:middle;">${inviterName}</strong></p>` : ""}
               <p style="margin:0 0 32px;color:#374151;font-size:15px;line-height:1.6;">
                 <strong>${inviterName}</strong> has invited you to join <strong>${orgName}</strong> on Project Management.
                 Click the button below to accept the invitation.
@@ -113,6 +115,148 @@ export function verifyEmailTemplate(username: string, verificationUrl: string): 
               <p style="margin:0;color:#9ca3af;font-size:12px;">
                 &copy; ${new Date().getFullYear()} Project Management. All rights reserved.
               </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+}
+
+export function taskAssignedEmailTemplate(
+  username: string,
+  taskTitle: string,
+  projectName: string,
+  assignedByName: string,
+  assignedByAvatarUrl?: string,
+): string {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>New task assigned to you</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f4f5;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+          <tr>
+            <td style="background:#4f46e5;padding:32px 40px;">
+              <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;">Project Management</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:40px;">
+              <h2 style="margin:0 0 16px;color:#111827;font-size:20px;">You've been assigned a new task</h2>
+              <p style="margin:0 0 12px;color:#374151;font-size:15px;line-height:1.6;">Hi ${username},</p>
+              ${assignedByAvatarUrl ? `<p style="margin:0 0 16px;"><img src="${assignedByAvatarUrl}" alt="${assignedByName}" width="48" height="48" style="border-radius:50%;vertical-align:middle;margin-right:10px;"/><strong style="vertical-align:middle;">${assignedByName}</strong></p>` : ""}
+              <p style="margin:0 0 32px;color:#374151;font-size:15px;line-height:1.6;">
+                <strong>${assignedByName}</strong> has assigned you the task <strong>${taskTitle}</strong> in project <strong>${projectName}</strong>.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px 40px;border-top:1px solid #e5e7eb;">
+              <p style="margin:0;color:#9ca3af;font-size:12px;">&copy; ${new Date().getFullYear()} Project Management. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+}
+
+export function addedToProjectEmailTemplate(
+  username: string,
+  projectName: string,
+  addedByName: string,
+  addedByAvatarUrl?: string,
+): string {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Added to a project</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f4f5;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+          <tr>
+            <td style="background:#4f46e5;padding:32px 40px;">
+              <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;">Project Management</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:40px;">
+              <h2 style="margin:0 0 16px;color:#111827;font-size:20px;">You've been added to a project</h2>
+              <p style="margin:0 0 12px;color:#374151;font-size:15px;line-height:1.6;">Hi ${username},</p>
+              ${addedByAvatarUrl ? `<p style="margin:0 0 16px;"><img src="${addedByAvatarUrl}" alt="${addedByName}" width="48" height="48" style="border-radius:50%;vertical-align:middle;margin-right:10px;"/><strong style="vertical-align:middle;">${addedByName}</strong></p>` : ""}
+              <p style="margin:0 0 32px;color:#374151;font-size:15px;line-height:1.6;">
+                <strong>${addedByName}</strong> has added you to the project <strong>${projectName}</strong>.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px 40px;border-top:1px solid #e5e7eb;">
+              <p style="margin:0;color:#9ca3af;font-size:12px;">&copy; ${new Date().getFullYear()} Project Management. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+}
+
+export function removedFromProjectEmailTemplate(
+  username: string,
+  projectName: string,
+): string {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Removed from a project</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f4f5;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+          <tr>
+            <td style="background:#4f46e5;padding:32px 40px;">
+              <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;">Project Management</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:40px;">
+              <h2 style="margin:0 0 16px;color:#111827;font-size:20px;">You've been removed from a project</h2>
+              <p style="margin:0 0 12px;color:#374151;font-size:15px;line-height:1.6;">Hi ${username},</p>
+              <p style="margin:0 0 32px;color:#374151;font-size:15px;line-height:1.6;">
+                You have been removed from the project <strong>${projectName}</strong>.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px 40px;border-top:1px solid #e5e7eb;">
+              <p style="margin:0;color:#9ca3af;font-size:12px;">&copy; ${new Date().getFullYear()} Project Management. All rights reserved.</p>
             </td>
           </tr>
         </table>

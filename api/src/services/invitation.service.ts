@@ -18,6 +18,7 @@ import {
   findUserByEmail,
   findUserById,
 } from "../repositories/users.repository";
+import { emailQueue } from "../queues/email.queue";
 
 export const getInvitationDetailsService = async (token: string) => {
   const invitation = await getInvitationDetailsByToken(token);
@@ -65,10 +66,21 @@ export const createInvitationService = async ({
   }
   const invitationToken = createInvitationToken();
   const inviteUrl = `${process.env.FRONTEND_ORIGIN}/invite?token=${invitationToken}`;
-  sendEmail(
-    email,
-    `You're invited to join ${org.name}`,
-    invitationEmailTemplate(org.name, user.username, inviteUrl),
+  await emailQueue.add(
+    "org-invitation",
+    {
+      to: email,
+      subject: `You're invited to join ${org.name}`,
+      html: invitationEmailTemplate(org.name, user.username, inviteUrl, user.gravatarUrl ?? undefined),
+    },
+    {
+      attempts: 3,
+      backoff: {
+        type: "exponential",
+        delay: 5000,
+      },
+      removeOnComplete: true,
+    },
   );
   return await createInvitation({
     email,

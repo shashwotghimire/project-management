@@ -13,6 +13,7 @@ import { verifyEmailTemplate } from "../utils/email-template.utils";
 import { sendEmail } from "./email.service";
 import { generateGravatarUrl } from "./gravatar.service";
 import redis from "../configs/redis-client.config";
+import { emailQueue } from "../queues/email.queue";
 
 export const registerService = async (data: {
   username: string;
@@ -34,13 +35,30 @@ export const registerService = async (data: {
     emailVerificationToken,
     gravatarUrl,
   });
-  sendEmail(
-    user.email,
-    "Verify your email",
-    verifyEmailTemplate(user.username, emailVerificationToken),
-  ).catch((error) => {
-    console.error("Failed to send verification email:", error);
-  });
+  // sendEmail(
+  //   user.email,
+  //   "Verify your email",
+  //   verifyEmailTemplate(user.username, emailVerificationToken),
+  // ).catch((error) => {
+  //   console.error("Failed to send verification email:", error);
+  // });
+  await emailQueue.add(
+    "verify-email",
+    {
+      to: user.email,
+      subject: "Verify your email",
+      html: verifyEmailTemplate(user.username, emailVerificationToken),
+    },
+    {
+      attempts: 3,
+      backoff: {
+        type: "exponential",
+        delay: 5000,
+      },
+      removeOnComplete: true,
+      removeOnFail: false,
+    },
+  );
   return "User registered successfully. Verify your email to log in.";
 };
 

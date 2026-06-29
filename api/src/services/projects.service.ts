@@ -1,5 +1,11 @@
 import redis from "../configs/redis-client.config";
 import { ApiError } from "../helpers/ApiError";
+import { emailQueue } from "../queues/email.queue";
+import { findUserById } from "../repositories/users.repository";
+import {
+  addedToProjectEmailTemplate,
+  removedFromProjectEmailTemplate,
+} from "../utils/email-template.utils";
 import {
   getOrgByAdminId,
   userMemberOfOrg,
@@ -262,6 +268,19 @@ export const removeProjectMemberService = async ({
   const dashboardKeys = await redis.keys(`dashboard:${project.organizationId}:*`);
   const toDelete = [`project:${projectId}:members`, ...keys, ...dashboardKeys];
   await redis.del(...toDelete);
+
+  const removedUser = await findUserById(targetUserId);
+  if (removedUser) {
+    await emailQueue.add(
+      "project-member-removed",
+      {
+        to: removedUser.email,
+        subject: `You've been removed from project: ${project.name}`,
+        html: removedFromProjectEmailTemplate(removedUser.username, project.name),
+      },
+      { attempts: 3, backoff: { type: "exponential", delay: 5000 } },
+    );
+  }
 };
 
 export const addMemberToProjectService = async ({
@@ -302,6 +321,20 @@ export const addMemberToProjectService = async ({
   const dashboardKeys = await redis.keys(`dashboard:${project.organizationId}:*`);
   const toDelete = [`project:${projectId}:members`, ...keys, ...dashboardKeys];
   await redis.del(...toDelete);
+
+  const addedUser = await findUserById(userId);
+  const adder = await findUserById(assignedBy);
+  if (addedUser && adder) {
+    await emailQueue.add(
+      "project-member-added",
+      {
+        to: addedUser.email,
+        subject: `You've been added to project: ${project.name}`,
+        html: addedToProjectEmailTemplate(addedUser.username, project.name, adder.username, adder.gravatarUrl ?? undefined),
+      },
+      { attempts: 3, backoff: { type: "exponential", delay: 5000 } },
+    );
+  }
 
   return result;
 };

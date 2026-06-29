@@ -176,7 +176,7 @@ export const getAssignedToTaskUserDetails = async ({
     include: {
       model: User,
       as: "assignee",
-      // attributes: ["id", "username", "email", "gravatarUrl"],
+      attributes: ["id", "username", "email", "gravatarUrl"],
     },
   });
   return user;

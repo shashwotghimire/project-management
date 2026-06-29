@@ -22,6 +22,9 @@ import {
   updateTaskPosition,
   updateTaskStatus,
 } from "../repositories/tasks.repository";
+import { findUserById } from "../repositories/users.repository";
+import { emailQueue } from "../queues/email.queue";
+import { taskAssignedEmailTemplate } from "../utils/email-template.utils";
 import { TaskPriority, TaskStatus } from "../types/tasks";
 
 export const createTaskService = async (data: {
@@ -82,6 +85,20 @@ export const createTaskService = async (data: {
   if (data.assignedTo) {
     await redis.del(`tasks:user:${data.assignedTo}`);
     await redis.del(`tasks:${data.projectId}:user:${data.assignedTo}`);
+
+    const assignee = await findUserById(data.assignedTo);
+    const assigner = await findUserById(data.assignedBy);
+    if (assignee && assigner) {
+      await emailQueue.add(
+        "task-assigned",
+        {
+          to: assignee.email,
+          subject: `You've been assigned a new task: ${data.title}`,
+          html: taskAssignedEmailTemplate(assignee.username, data.title, project.name, assigner.username, assigner.gravatarUrl ?? undefined),
+        },
+        { attempts: 3, backoff: { type: "exponential", delay: 5000 } },
+      );
+    }
   }
 
   return task;
@@ -503,6 +520,20 @@ export const reassignTaskToAnotherUserService = async ({
   if (task.assignedTo) toDelete.push(`tasks:user:${task.assignedTo}`);
   toDelete.push(`tasks:user:${newUserId}`);
   if (toDelete.length) await redis.del(...toDelete);
+
+  const newAssignee = await findUserById(newUserId);
+  const assigner = await findUserById(userId);
+  if (newAssignee && assigner) {
+    await emailQueue.add(
+      "task-assigned",
+      {
+        to: newAssignee.email,
+        subject: `You've been assigned a task: ${task.title}`,
+        html: taskAssignedEmailTemplate(newAssignee.username, task.title, project.name, assigner.username, assigner.gravatarUrl ?? undefined),
+      },
+      { attempts: 3, backoff: { type: "exponential", delay: 5000 } },
+    );
+  }
 
   return result;
 };
