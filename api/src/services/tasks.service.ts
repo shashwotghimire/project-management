@@ -1,3 +1,4 @@
+import redis from "../configs/redis-client.config";
 import { ApiError } from "../helpers/ApiError";
 import {
   getOrgByAdminId,
@@ -74,7 +75,16 @@ export const createTaskService = async (data: {
       "Only members who are admins can create tasks.",
     );
   }
-  return await createTask(data);
+  const task = await createTask(data);
+
+  const keys = await redis.keys(`tasks:${data.projectId}:*`);
+  if (keys.length) await redis.del(...keys);
+  if (data.assignedTo) {
+    await redis.del(`tasks:user:${data.assignedTo}`);
+    await redis.del(`tasks:${data.projectId}:user:${data.assignedTo}`);
+  }
+
+  return task;
 };
 
 export const getTasksInProjectService = async ({
@@ -104,7 +114,13 @@ export const getTasksInProjectService = async ({
       "Only members of the project can view the tasks.",
     );
   }
-  return await getTasksInProject(projectId, page, limit);
+  const key = `tasks:${projectId}:p${page}:l${limit}`;
+  const cached = await redis.get(key);
+  if (cached) return JSON.parse(cached);
+
+  const result = await getTasksInProject(projectId, page, limit);
+  await redis.set(key, JSON.stringify(result), "EX", 300);
+  return result;
 };
 
 export const getTaskByIdService = async ({
@@ -132,6 +148,10 @@ export const getTaskByIdService = async ({
       "Only members of the project can view the tasks.",
     );
   }
+  const key = `task:${taskId}`;
+  const cached = await redis.get(key);
+  if (cached) return JSON.parse(cached);
+
   const task = await getTaskById(taskId);
   if (!task) {
     throw new ApiError(
@@ -145,7 +165,9 @@ export const getTaskByIdService = async ({
     taskId: task.id,
     userId: task.assignedTo,
   });
-  return { task, assignedTaskUserDetails };
+  const result = { task, assignedTaskUserDetails };
+  await redis.set(key, JSON.stringify(result), "EX", 300);
+  return result;
 };
 
 export const getTasksAssignedToUserService = async ({
@@ -163,7 +185,13 @@ export const getTasksAssignedToUserService = async ({
       "Only members of the organization can view the tasks assigned to them.",
     );
   }
-  return await getTasksAssignedToUser(userId);
+  const key = `tasks:user:${userId}`;
+  const cached = await redis.get(key);
+  if (cached) return JSON.parse(cached);
+
+  const tasks = await getTasksAssignedToUser(userId);
+  await redis.set(key, JSON.stringify(tasks), "EX", 300);
+  return tasks;
 };
 
 export const deleteTaskService = async ({
@@ -203,7 +231,16 @@ export const deleteTaskService = async ({
       "Task not found",
     );
   }
-  return await deleteTask(taskId);
+  const result = await deleteTask(taskId);
+
+  const keys = await redis.keys(`tasks:${projectId}:*`);
+  const toDelete = [`task:${taskId}`, ...keys];
+  if (task.assignedTo) {
+    toDelete.push(`tasks:user:${task.assignedTo}`);
+  }
+  if (toDelete.length) await redis.del(...toDelete);
+
+  return result;
 };
 
 export const updateTaskService = async ({
@@ -251,7 +288,14 @@ export const updateTaskService = async ({
       "Task not found",
     );
   }
-  return await updateTask(taskId, data);
+  const updated = await updateTask(taskId, data);
+
+  const keys = await redis.keys(`tasks:${projectId}:*`);
+  const toDelete = [`task:${taskId}`, ...keys];
+  if (task.assignedTo) toDelete.push(`tasks:user:${task.assignedTo}`);
+  if (toDelete.length) await redis.del(...toDelete);
+
+  return updated;
 };
 
 export const getTasksAssignedToUserInProjectService = async ({
@@ -277,7 +321,12 @@ export const getTasksAssignedToUserInProjectService = async ({
       "Only members of the project can view the tasks assigned to them.",
     );
   }
+  const key = `tasks:${projectId}:user:${userId}`;
+  const cached = await redis.get(key);
+  if (cached) return JSON.parse(cached);
+
   const tasks = await getTasksAssignedToUserInProject(userId, projectId);
+  await redis.set(key, JSON.stringify(tasks), "EX", 300);
   return tasks;
 };
 
@@ -318,7 +367,12 @@ export const updateTaskStatusService = async ({
       "Task not found",
     );
   }
-  return await updateTaskStatus(taskId, status, position);
+  await updateTaskStatus(taskId, status, position);
+
+  const keys = await redis.keys(`tasks:${projectId}:*`);
+  const toDelete = [`task:${taskId}`, ...keys];
+  if (task.assignedTo) toDelete.push(`tasks:user:${task.assignedTo}`);
+  if (toDelete.length) await redis.del(...toDelete);
 };
 
 export const updateTaskPositionService = async ({
@@ -356,7 +410,11 @@ export const updateTaskPositionService = async ({
       "Task not found",
     );
   }
-  return await updateTaskPosition(taskId, position);
+  await updateTaskPosition(taskId, position);
+
+  const keys = await redis.keys(`tasks:${projectId}:*`);
+  const toDelete = [`task:${taskId}`, ...keys];
+  if (toDelete.length) await redis.del(...toDelete);
 };
 
 export const getUserTasksForCalendarService = async ({
@@ -374,7 +432,13 @@ export const getUserTasksForCalendarService = async ({
       "Only members of the organization can view their calendar tasks.",
     );
   }
-  return await getUserTasksForCalendar({ userId, orgId });
+  const key = `tasks:calendar:${orgId}:${userId}`;
+  const cached = await redis.get(key);
+  if (cached) return JSON.parse(cached);
+
+  const tasks = await getUserTasksForCalendar({ userId, orgId });
+  await redis.set(key, JSON.stringify(tasks), "EX", 300);
+  return tasks;
 };
 
 export const reassignTaskToAnotherUserService = async ({
@@ -431,5 +495,14 @@ export const reassignTaskToAnotherUserService = async ({
       "User not a member of project",
     );
   }
-  return await reassignTaskToAnotherUser({ taskId, newUserId });
+  const result = await reassignTaskToAnotherUser({ taskId, newUserId });
+
+  const keys = await redis.keys(`tasks:${projectId}:*`);
+  const toDelete = [`task:${taskId}`, ...keys];
+  // invalidate both old and new assignee's user-level caches
+  if (task.assignedTo) toDelete.push(`tasks:user:${task.assignedTo}`);
+  toDelete.push(`tasks:user:${newUserId}`);
+  if (toDelete.length) await redis.del(...toDelete);
+
+  return result;
 };

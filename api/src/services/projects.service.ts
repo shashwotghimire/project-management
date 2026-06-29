@@ -1,5 +1,9 @@
+import redis from "../configs/redis-client.config";
 import { ApiError } from "../helpers/ApiError";
-import { getOrgByAdminId, userMemberOfOrg } from "../repositories/organizations.repository";
+import {
+  getOrgByAdminId,
+  userMemberOfOrg,
+} from "../repositories/organizations.repository";
 import {
   addMemberToProject,
   createProject,
@@ -34,12 +38,19 @@ export const createProjectService = async ({
     );
   }
 
-  return await createProject({
+  const project = await createProject({
     name,
     organizationId,
     createdBy,
     ...(logoUrl && { logoUrl }),
   });
+
+  const keys = await redis.keys(`projects:${organizationId}:*`);
+  const dashboardKeys = await redis.keys(`dashboard:${organizationId}:*`);
+  const toDelete = [...keys, ...dashboardKeys];
+  if (toDelete.length) await redis.del(...toDelete);
+
+  return project;
 };
 
 export const updateProjectService = async ({
@@ -69,11 +80,18 @@ export const updateProjectService = async ({
     );
   }
 
-  return await updateProject(projectId, {
+  const updated = await updateProject(projectId, {
     ...(name && { name }),
     ...(logoUrl && { logoUrl }),
     ...(status && { status }),
   });
+
+  const keys = await redis.keys(`projects:${project.organizationId}:*`);
+  const dashboardKeys = await redis.keys(`dashboard:${project.organizationId}:*`);
+  const toDelete = [`project:${projectId}`, ...keys, ...dashboardKeys];
+  await redis.del(...toDelete);
+
+  return updated;
 };
 
 export const getUserProjectsService = async ({
@@ -89,11 +107,18 @@ export const getUserProjectsService = async ({
   limit: number;
   search?: string;
 }) => {
-  return await getProjectsByUserId(userId, organizationId, {
+  const key = `projects:${organizationId}:${userId}:p${page}:l${limit}:q${search}`;
+  const cached = await redis.get(key);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+  const projects = await getProjectsByUserId(userId, organizationId, {
     page,
     limit,
     search,
   });
+  await redis.set(key, JSON.stringify(projects), "EX", 300);
+  return projects;
 };
 
 export const getDashboardProjectsService = async ({
@@ -103,7 +128,14 @@ export const getDashboardProjectsService = async ({
   userId: string;
   organizationId: string;
 }) => {
-  return await getDashboardProjects(userId, organizationId);
+  const key = `dashboard:${organizationId}:${userId}`;
+  const cached = await redis.get(key);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+  const projects = await getDashboardProjects(userId, organizationId);
+  await redis.set(key, JSON.stringify(projects), "EX", 300);
+  return projects;
 };
 
 export const deleteProjectService = async ({
@@ -128,6 +160,11 @@ export const deleteProjectService = async ({
   }
 
   await deleteProject(projectId);
+
+  const keys = await redis.keys(`projects:${project.organizationId}:*`);
+  const dashboardKeys = await redis.keys(`dashboard:${project.organizationId}:*`);
+  const toDelete = [`project:${projectId}`, `project:${projectId}:members`, ...keys, ...dashboardKeys];
+  await redis.del(...toDelete);
 };
 
 export const getProjectMembersService = async ({
@@ -137,17 +174,22 @@ export const getProjectMembersService = async ({
   projectId: string;
   userId: string;
 }) => {
-  const project = await getProjectById(projectId);
-  if (!project) {
-    throw new ApiError(404, "Project not found", "Project not found");
-  }
-
   const isMember = await isUserMemberOfProject(userId, projectId);
   if (!isMember) {
     throw new ApiError(403, "Access denied", "Access denied");
   }
-
-  return await getProjectMembers(projectId);
+  const project = await getProjectById(projectId);
+  if (!project) {
+    throw new ApiError(404, "Project not found", "Project not found");
+  }
+  const key = `project:${projectId}:members`;
+  const cached = await redis.get(key);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+  const members = await getProjectMembers(projectId);
+  await redis.set(key, JSON.stringify(members), "EX", 300);
+  return members;
 };
 
 export const getProjectByIdService = async ({
@@ -157,16 +199,20 @@ export const getProjectByIdService = async ({
   projectId: string;
   userId: string;
 }) => {
-  const project = await getProjectById(projectId);
-  if (!project) {
-    throw new ApiError(404, "Project not found", "Project not found");
-  }
-
   const isMember = await isUserMemberOfProject(userId, projectId);
   if (!isMember) {
     throw new ApiError(403, "Access denied", "Access denied");
   }
-
+  const key = `project:${projectId}`;
+  const cached = await redis.get(key);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+  const project = await getProjectById(projectId);
+  if (!project) {
+    throw new ApiError(404, "Project not found", "Project not found");
+  }
+  await redis.set(key, JSON.stringify(project), "EX", 300);
   return project;
 };
 
@@ -211,6 +257,11 @@ export const removeProjectMemberService = async ({
   }
 
   await removeProjectMember(targetUserId, projectId);
+
+  const keys = await redis.keys(`projects:${project.organizationId}:*`);
+  const dashboardKeys = await redis.keys(`dashboard:${project.organizationId}:*`);
+  const toDelete = [`project:${projectId}:members`, ...keys, ...dashboardKeys];
+  await redis.del(...toDelete);
 };
 
 export const addMemberToProjectService = async ({
@@ -245,5 +296,12 @@ export const addMemberToProjectService = async ({
     );
   }
 
-  return await addMemberToProject({ userId, projectId, assignedBy });
+  const result = await addMemberToProject({ userId, projectId, assignedBy });
+
+  const keys = await redis.keys(`projects:${project.organizationId}:*`);
+  const dashboardKeys = await redis.keys(`dashboard:${project.organizationId}:*`);
+  const toDelete = [`project:${projectId}:members`, ...keys, ...dashboardKeys];
+  await redis.del(...toDelete);
+
+  return result;
 };
