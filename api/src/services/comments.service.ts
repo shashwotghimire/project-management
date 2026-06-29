@@ -1,7 +1,10 @@
 import { ApiError } from "../helpers/ApiError";
-import { getOrgByAdminId } from "../repositories/organizations.repository";
+import { emailQueue } from "../queues/email.queue";
+import { getOrgByAdminId, getOrgById } from "../repositories/organizations.repository";
 import { isUserMemberOfProject } from "../repositories/projects.repository";
 import { getTaskById } from "../repositories/tasks.repository";
+import { findUserById } from "../repositories/users.repository";
+import { commentCreatedEmailTemplate } from "../utils/email-template.utils";
 import {
   createComment,
   deleteComment,
@@ -40,7 +43,34 @@ export const createCommentService = async (data: {
       "Only project members can comment on tasks.",
     );
   }
-  return await createComment(data);
+
+  const comment = await createComment(data);
+
+  const author = await findUserById(data.authorId);
+  const authorName = author?.username ?? "Someone";
+
+  let recipientId: string | null = null;
+  if (task.assignedTo && task.assignedTo !== data.authorId) {
+    recipientId = task.assignedTo;
+  } else if (!task.assignedTo) {
+    const org = await getOrgById(data.organizationId);
+    if (org && org.adminId !== data.authorId) {
+      recipientId = org.adminId;
+    }
+  }
+
+  if (recipientId) {
+    const recipient = await findUserById(recipientId);
+    if (recipient) {
+      await emailQueue.add("comment-created", {
+        to: recipient.email,
+        subject: `New comment on task: ${task.title}`,
+        html: commentCreatedEmailTemplate(recipient.username, authorName, task.title, data.content),
+      });
+    }
+  }
+
+  return comment;
 };
 
 export const getCommentsByTaskService = async ({

@@ -4,6 +4,7 @@ import { emailQueue } from "../queues/email.queue";
 import { findUserById } from "../repositories/users.repository";
 import {
   addedToProjectEmailTemplate,
+  projectCreatedEmailTemplate,
   removedFromProjectEmailTemplate,
 } from "../utils/email-template.utils";
 import {
@@ -55,6 +56,15 @@ export const createProjectService = async ({
   const dashboardKeys = await redis.keys(`dashboard:${organizationId}:*`);
   const toDelete = [...keys, ...dashboardKeys];
   if (toDelete.length) await redis.del(...toDelete);
+
+  const creator = await findUserById(createdBy);
+  if (creator) {
+    await emailQueue.add("project-created", {
+      to: creator.email,
+      subject: `Your project "${name}" has been created`,
+      html: projectCreatedEmailTemplate(creator.username, name, org.name),
+    });
+  }
 
   return project;
 };

@@ -13,7 +13,7 @@ import {
 } from "../repositories/organizations.repository";
 import { createInvitationToken } from "../utils/crypto.utils";
 import { sendEmail } from "./email.service";
-import { invitationEmailTemplate } from "../utils/email-template.utils";
+import { invitationEmailTemplate, inviteAcceptedEmailTemplate } from "../utils/email-template.utils";
 import {
   findUserByEmail,
   findUserById,
@@ -126,6 +126,15 @@ export const updateInvitationStatusService = async ({
       );
     }
     await joinAnOrganization({ userId: user.id, orgId: org.id });
+
+    const admin = await findUserById(org.adminId);
+    if (admin) {
+      await emailQueue.add("invite-accepted", {
+        to: admin.email,
+        subject: `${user.username} accepted your invitation to ${org.name}`,
+        html: inviteAcceptedEmailTemplate(admin.username, user.username, org.name),
+      });
+    }
   }
   return await updateInvitationStatus({ token, status });
 };

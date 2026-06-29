@@ -11,6 +11,9 @@ import {
   userMemberOfOrg,
 } from "../repositories/organizations.repository";
 import redis from "../configs/redis-client.config";
+import { emailQueue } from "../queues/email.queue";
+import { findUserById } from "../repositories/users.repository";
+import { orgCreatedEmailTemplate } from "../utils/email-template.utils";
 
 export const createOrganizationService = async ({
   name,
@@ -25,13 +28,24 @@ export const createOrganizationService = async ({
   description?: string;
   websiteUrl?: string;
 }) => {
-  return await createOrganization({
+  const org = await createOrganization({
     name,
     adminId,
     logoUrl,
     description,
     websiteUrl,
   });
+
+  const admin = await findUserById(adminId);
+  if (admin) {
+    await emailQueue.add("org-created", {
+      to: admin.email,
+      subject: `Your organization "${name}" has been created`,
+      html: orgCreatedEmailTemplate(admin.username, name),
+    });
+  }
+
+  return org;
 };
 
 export const getUsersOrganizationsService = async ({
