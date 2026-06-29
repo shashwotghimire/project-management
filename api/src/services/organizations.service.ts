@@ -10,6 +10,7 @@ import {
   updateOrganization,
   userMemberOfOrg,
 } from "../repositories/organizations.repository";
+import redis from "../configs/redis-client.config";
 
 export const createOrganizationService = async ({
   name,
@@ -108,10 +109,16 @@ export const getOrgByIdService = async (orgId: string, userId: string) => {
       "You do not have access to this organization",
     );
   }
+  const key = `org:${orgId}`;
+  const cached = await redis.get(key);
+  if (cached) {
+    return JSON.parse(cached);
+  }
   const org = await getOrgById(orgId);
   if (!org) {
     throw new ApiError(404, "Organization not found", "Organization not found");
   }
+  await redis.set(key, JSON.stringify(org), "EX", 300);
   return org;
 };
 

@@ -12,6 +12,7 @@ import { createRandomToken } from "../utils/crypto.utils";
 import { verifyEmailTemplate } from "../utils/email-template.utils";
 import { sendEmail } from "./email.service";
 import { generateGravatarUrl } from "./gravatar.service";
+import redis from "../configs/redis-client.config";
 
 export const registerService = async (data: {
   username: string;
@@ -89,9 +90,15 @@ export const loginUserService = async (data: {
 };
 
 export const getUserProfileService = async (userId: string) => {
+  const key = `user:${userId}`;
+  const cached = await redis.get(key);
+  if (cached) {
+    return JSON.parse(cached);
+  }
   const user = await findUserById(userId);
   if (!user) {
     throw new ApiError(404, "Not found", "User not found");
   }
+  await redis.set(key, JSON.stringify(user), "EX", 300);
   return user;
 };

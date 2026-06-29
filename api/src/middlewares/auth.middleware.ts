@@ -3,6 +3,7 @@ import { ApiError } from "../helpers/ApiError";
 import { verifyAccessToken } from "../helpers/jwt.helper";
 import { JwtPayload } from "jsonwebtoken";
 import { findUserById } from "../repositories/users.repository";
+import redis from "../configs/redis-client.config";
 
 interface TokenPayload extends JwtPayload {
   id: string;
@@ -31,7 +32,17 @@ export const authMiddleware = async (
       throw new ApiError(401, "Unauthorized", "Invalid or missing token");
     }
     const decoded = verifyAccessToken(token) as TokenPayload;
-    const user = await findUserById(decoded.id);
+    let user;
+    const key = `user:${decoded.id}`;
+    const cached = await redis.get(key);
+    if (cached) {
+      user = JSON.parse(cached);
+    } else {
+      user = await findUserById(decoded.id);
+      if (user) {
+        redis.set(key, JSON.stringify(user), "EX", 300);
+      }
+    }
     if (!user) {
       throw new ApiError(401, "Unauthorized", "User not found");
     }
