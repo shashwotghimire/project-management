@@ -1,6 +1,10 @@
 import { ApiError } from "../helpers/ApiError";
 import { getOrgByAdminId } from "../repositories/organizations.repository";
-import { isUserMemberOfProject } from "../repositories/projects.repository";
+import {
+  getProjectById,
+  getProjectMembers,
+  isUserMemberOfProject,
+} from "../repositories/projects.repository";
 import {
   createChannel,
   deleteChannel,
@@ -12,6 +16,9 @@ import {
   createMessage,
   getMessagesByChannel,
 } from "../repositories/messages.repository";
+import { emailQueue } from "../queues/email.queue";
+import { channelMessageEmailTemplate } from "../utils/email-template.utils";
+import { findUserById } from "../repositories/users.repository";
 
 const assertOrgAdmin = async (userId: string, orgId: string) => {
   const org = await getOrgByAdminId(userId, orgId);
@@ -78,7 +85,32 @@ export const sendMessageService = async (
   content: string,
 ) => {
   await assertProjectMember(userId, projectId);
-  return createMessage(channelId, userId, content);
+  const message = await createMessage(channelId, userId, content);
+
+  const sender = await findUserById(userId);
+  const channel = await getChannelById(channelId, projectId);
+  const project = await getProjectById(projectId);
+  const members = await getProjectMembers(projectId);
+
+  if (sender && channel && project) {
+    for (const membership of members) {
+      const member = (membership as any).member;
+      if (!member || member.id === userId) continue;
+      await emailQueue.add("channel-message", {
+        to: member.email,
+        subject: `New message in #${channel.name} — ${project.name}`,
+        html: channelMessageEmailTemplate(
+          member.username,
+          sender.username,
+          channel.name,
+          project.name,
+          content,
+        ),
+      });
+    }
+  }
+
+  return message;
 };
 
 export const getChannelService = async (

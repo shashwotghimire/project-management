@@ -1,6 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { verifyAccessToken } from "../helpers/jwt.helper";
-import { createMessage } from "../repositories/messages.repository";
+import { getChannelByIdOnly } from "../repositories/channels.repository";
+import { sendMessageService } from "../services/channels.service";
 
 export interface AuthenticatedSocket extends Socket {
   userId?: string;
@@ -35,10 +36,13 @@ export const registerSocketEvents = (io: Server) => {
 
     socket.on("sendMessage", async (channelId: string, content: string) => {
       try {
-        const message = await createMessage(channelId, socket.userId!, content);
+        const channel = await getChannelByIdOnly(channelId);
+        if (!channel) return;
+        const message = await sendMessageService(socket.userId!, channel.projectId, channelId, content);
         io.to(channelId).emit("newMessage", message);
       } catch (error) {
         console.error("Error sending message:", error);
+        socket.emit("sendError", "Failed to send message. Please try again.");
       }
     });
 

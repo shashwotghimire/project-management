@@ -1,6 +1,7 @@
 export interface MessageSender {
   id: string;
-  name: string;
+  username: string;
+  gravatarUrl: string | null;
 }
 
 export interface Message {

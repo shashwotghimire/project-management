@@ -8,14 +8,14 @@ export async function createMessage(
 ) {
   const message = await Messages.create({ channelId, senderId, content });
   return message.reload({
-    include: [{ model: User, as: "sender", attributes: ["id", "name"] }],
+    include: [{ model: User, as: "sender", attributes: ["id", "username", "gravatarUrl"] }],
   });
 }
 
 export async function getMessagesByChannel(channelId: string) {
   return Messages.findAll({
     where: { channelId },
-    include: [{ model: User, as: "sender", attributes: ["id", "name"] }],
+    include: [{ model: User, as: "sender", attributes: ["id", "username", "gravatarUrl"] }],
     order: [["createdAt", "ASC"]],
   });
 }

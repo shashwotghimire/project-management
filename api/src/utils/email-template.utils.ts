@@ -443,3 +443,49 @@ export function removedFromProjectEmailTemplate(
 </html>
   `.trim();
 }
+
+export function channelMessageEmailTemplate(
+  recipientUsername: string,
+  senderUsername: string,
+  channelName: string,
+  projectName: string,
+  content: string,
+): string {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1.0" /><title>New message</title></head>
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+      <td align="center" style="padding:40px 16px;">
+        <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.1);">
+          <tr>
+            <td style="background:#111827;padding:32px 40px;">
+              <h1 style="margin:0;color:#fff;font-size:22px;">New message in #${channelName}</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px 40px;">
+              <p style="margin:0 0 12px;color:#374151;font-size:15px;line-height:1.6;">Hi ${recipientUsername},</p>
+              <p style="margin:0 0 20px;color:#374151;font-size:15px;line-height:1.6;">
+                <strong>${senderUsername}</strong> posted a message in <strong>#${channelName}</strong> (${projectName}):
+              </p>
+              <blockquote style="margin:0 0 24px;padding:12px 16px;background:#f9fafb;border-left:4px solid #6366f1;border-radius:4px;color:#111827;font-size:15px;line-height:1.6;">
+                ${content}
+              </blockquote>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px 40px;border-top:1px solid #e5e7eb;">
+              <p style="margin:0;color:#9ca3af;font-size:12px;">&copy; ${new Date().getFullYear()} Project Management. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+}

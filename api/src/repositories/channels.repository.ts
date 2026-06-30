@@ -9,6 +9,9 @@ export const getChannelsByProject = (projectId: string) =>
 export const getChannelById = (channelId: string, projectId: string) =>
   Channel.findOne({ where: { id: channelId, projectId } });
 
+export const getChannelByIdOnly = (channelId: string) =>
+  Channel.findByPk(channelId);
+
 export const updateChannel = async (
   channelId: string,
   projectId: string,
