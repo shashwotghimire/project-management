@@ -1,5 +1,7 @@
+import { Channel } from "./channel.model";
 import { Comments } from "./comments.model";
 import { Invitations } from "./invitation.model";
+import { Messages } from "./messages.model";
 import { OrganizationsMember } from "./organizations-members.model";
 import { Organization } from "./organizations.model";
 import { ProjectMembers } from "./project-members.model";
@@ -76,8 +78,20 @@ Comments.belongsTo(Project, { foreignKey: "projectId" });
 Tasks.hasMany(Comments, { foreignKey: "taskId" });
 Comments.belongsTo(Tasks, { foreignKey: "taskId" });
 
-Invitations.belongsTo(Organization, { foreignKey: "organizationId", as: "organization" });
+Invitations.belongsTo(Organization, {
+  foreignKey: "organizationId",
+  as: "organization",
+});
 Invitations.belongsTo(User, { foreignKey: "invitedBy", as: "inviter" });
 
 Comments.belongsTo(User, { foreignKey: "authorId", as: "author" });
 User.hasMany(Comments, { foreignKey: "authorId", as: "comments" });
+
+Project.hasMany(Channel, { foreignKey: "projectId", as: "channels" });
+Channel.belongsTo(Project, { foreignKey: "projectId", as: "project" });
+
+Channel.hasMany(Messages, { foreignKey: "channelId", as: "messages" });
+Messages.belongsTo(Channel, { foreignKey: "channelId", as: "channel" });
+
+Messages.belongsTo(User, { foreignKey: "senderId", as: "sender" });
+User.hasMany(Messages, { foreignKey: "senderId", as: "sentMessages" });

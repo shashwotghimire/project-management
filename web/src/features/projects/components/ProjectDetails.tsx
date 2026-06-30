@@ -114,8 +114,8 @@ export default function ProjectDetails({
         <TabsContent value="tasks" className="mt-0 flex-1 overflow-auto p-6">
           <TaskList orgId={orgId} projectId={projectId} />
         </TabsContent>
-        <TabsContent value="chat" className="mt-0 flex-1 overflow-auto p-6">
-          <GroupChat />
+        <TabsContent value="chat" className="mt-0 flex-1 overflow-hidden p-6">
+          <GroupChat orgId={orgId} projectId={projectId} />
         </TabsContent>
         <TabsContent value="members" className="mt-0 flex-1 overflow-auto p-6">
           <ProjectMembersTable orgId={orgId} projectId={projectId} />
