@@ -2,6 +2,7 @@ import { Channel } from "./channel.model";
 import { Comments } from "./comments.model";
 import { Invitations } from "./invitation.model";
 import { Messages } from "./messages.model";
+import { Notifications } from "./notifications.model";
 import { OrganizationsMember } from "./organizations-members.model";
 import { Organization } from "./organizations.model";
 import { ProjectMembers } from "./project-members.model";
@@ -95,3 +96,6 @@ Messages.belongsTo(Channel, { foreignKey: "channelId", as: "channel" });
 
 Messages.belongsTo(User, { foreignKey: "senderId", as: "sender" });
 User.hasMany(Messages, { foreignKey: "senderId", as: "sentMessages" });
+
+User.hasMany(Notifications, { foreignKey: "userId", as: "notifications" });
+Notifications.belongsTo(User, { foreignKey: "userId", as: "user" });

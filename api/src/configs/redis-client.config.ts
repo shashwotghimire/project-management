@@ -1,7 +1,7 @@
 import Redis from "ioredis";
 
 export const connection = {
-  host: "localhost",
+  host: process.env.REDIS_HOST ?? "localhost",
   port: 6379,
 };
 

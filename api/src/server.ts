@@ -1,6 +1,6 @@
+import "dotenv/config";
 import { createServer } from "http";
 import app from "./app";
-import "dotenv/config";
 import { connectDb } from "./configs/db.config";
 import { Server } from "socket.io";
 import { registerSocketEvents } from "./ws";

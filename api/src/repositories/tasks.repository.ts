@@ -5,7 +5,6 @@ import { TaskPriority, TaskStatus } from "../types/tasks";
 import { User } from "../models/users.model";
 import { Organization } from "../models/organizations.model";
 import { Project } from "../models/projects.model";
-import { ProjectMembers } from "../models/project-members.model";
 
 export const createTask = async (data: {
   title: string;
@@ -201,14 +200,6 @@ export const getUserTasksForCalendar = async ({
         where: { organizationId: orgId },
         required: true,
         attributes: ["id", "name"],
-        include: [
-          {
-            model: ProjectMembers,
-            where: { userId },
-            attributes: [],
-            required: true,
-          },
-        ],
       },
     ],
   });

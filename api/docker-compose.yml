@@ -19,5 +19,31 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
 
+  api:
+    build: .
+    container_name: api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - REDIS_HOST=redis
+      - PGHOST=postgres
+    ports:
+      - "${PORT:-8080}:${PORT:-8080}"
+    depends_on:
+      - postgres
+      - redis
+
+  worker:
+    build: .
+    container_name: worker
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - REDIS_HOST=redis
+      - PGHOST=postgres
+    command: node dist/workers/email.worker.js
+    depends_on:
+      - redis
+
 volumes:
   postgres_data:

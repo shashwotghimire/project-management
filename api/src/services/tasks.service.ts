@@ -177,11 +177,13 @@ export const getTaskByIdService = async ({
       "Task not found",
     );
   }
-  const assignedTaskUserDetails = await getAssignedToTaskUserDetails({
-    projectId: task.projectId,
-    taskId: task.id,
-    userId: task.assignedTo,
-  });
+  const assignedTaskUserDetails = task.assignedTo
+    ? await getAssignedToTaskUserDetails({
+        projectId: task.projectId,
+        taskId: task.id,
+        userId: task.assignedTo,
+      })
+    : null;
   const result = { task, assignedTaskUserDetails };
   await redis.set(key, JSON.stringify(result), "EX", 300);
   return result;
