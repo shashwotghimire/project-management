@@ -19,7 +19,7 @@ export class Notifications extends Model<
   declare title: string;
   declare message: string;
   declare isRead: CreationOptional<boolean>;
-  declare href: CreationOptional<string>;
+  declare href: CreationOptional<string | null>;
 }
 
 Notifications.init(

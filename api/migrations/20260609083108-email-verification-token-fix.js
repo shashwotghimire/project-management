@@ -3,14 +3,14 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.addColumn('users', 'email_verification_token', {
-      type: Sequelize.STRING,
-      allowNull: true,
-      unique: true,
+    await queryInterface.addConstraint('users', {
+      fields: ['email_verification_token'],
+      type: 'unique',
+      name: 'users_email_verification_token_unique',
     });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.removeColumn('users', 'email_verification_token');
+    await queryInterface.removeConstraint('users', 'users_email_verification_token_unique');
   },
 };

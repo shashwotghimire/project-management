@@ -3,21 +3,24 @@ services:
     image: redis:8.8-alpine
     container_name: redis
     restart: unless-stopped
-    ports:
-      - "6379:6379"
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    networks:
+      - internal
 
   postgres:
     image: postgres:18
     container_name: postgres-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: app_db
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql
+    networks:
+      - internal
 
   api:
     build: .
@@ -32,6 +35,9 @@ services:
     depends_on:
       - postgres
       - redis
+    networks:
+      - internal
+      - default
 
   worker:
     build: .
@@ -44,6 +50,11 @@ services:
     command: node dist/workers/email.worker.js
     depends_on:
       - redis
-
+    networks:
+      - internal
 volumes:
   postgres_data:
+  redis_data:
+
+networks:
+  internal:
