@@ -1,4 +1,5 @@
 import { ApiError } from "../helpers/ApiError";
+import { createNotificationService } from "./notifications.service";
 import {
   createInvitation,
   existingPendingInvitation,
@@ -129,6 +130,12 @@ export const updateInvitationStatusService = async ({
 
     const admin = await findUserById(org.adminId);
     if (admin) {
+      await createNotificationService({
+        userId: admin.id,
+        orgId: org.id,
+        title: "Invitation accepted",
+        message: `${user.username} accepted your invitation to join ${org.name}`,
+      });
       await emailQueue.add("invite-accepted", {
         to: admin.email,
         subject: `${user.username} accepted your invitation to ${org.name}`,

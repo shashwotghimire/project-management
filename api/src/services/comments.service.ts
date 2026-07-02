@@ -1,6 +1,10 @@
 import { ApiError } from "../helpers/ApiError";
 import { emailQueue } from "../queues/email.queue";
-import { getOrgByAdminId, getOrgById } from "../repositories/organizations.repository";
+import { createNotificationService } from "./notifications.service";
+import {
+  getOrgByAdminId,
+  getOrgById,
+} from "../repositories/organizations.repository";
 import { isUserMemberOfProject } from "../repositories/projects.repository";
 import { getTaskById } from "../repositories/tasks.repository";
 import { findUserById } from "../repositories/users.repository";
@@ -62,10 +66,22 @@ export const createCommentService = async (data: {
   if (recipientId) {
     const recipient = await findUserById(recipientId);
     if (recipient) {
+      await createNotificationService({
+        userId: recipient.id,
+        orgId: data.organizationId,
+        projectId: data.projectId,
+        title: "New comment on your task",
+        message: `${authorName} commented on task: ${task.title}`,
+      });
       await emailQueue.add("comment-created", {
         to: recipient.email,
         subject: `New comment on task: ${task.title}`,
-        html: commentCreatedEmailTemplate(recipient.username, authorName, task.title, data.content),
+        html: commentCreatedEmailTemplate(
+          recipient.username,
+          authorName,
+          task.title,
+          data.content,
+        ),
       });
     }
   }

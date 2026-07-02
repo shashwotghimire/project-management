@@ -1,4 +1,7 @@
-import { createNotification, getUserNotificationsInOrg } from "../repositories/notifications.repository";
+import {
+  createNotification,
+  getUserNotificationsInOrg,
+} from "../repositories/notifications.repository";
 import { emitNotificationToUser } from "../ws/notification";
 import { userMemberOfOrg } from "../repositories/organizations.repository";
 import { ApiError } from "../helpers/ApiError";
@@ -20,6 +23,12 @@ export const getUserNotificationsService = async (data: {
   orgId: string;
 }) => {
   const isMember = await userMemberOfOrg(data.userId, data.orgId);
-  if (!isMember) throw new ApiError(403, "You are not a member of this organization");
-  return await getUserNotificationsInOrg(data);
+  if (!isMember)
+    throw new ApiError(
+      403,
+      "You are not a member of this organization",
+      "Forbidden",
+    );
+  const notifications = await getUserNotificationsInOrg(data);
+  return notifications;
 };

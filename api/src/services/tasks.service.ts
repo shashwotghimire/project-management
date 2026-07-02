@@ -93,6 +93,13 @@ export const createTaskService = async (data: {
     const assignee = await findUserById(data.assignedTo);
     const assigner = await findUserById(data.assignedBy);
     if (assignee && assigner) {
+      await createNotificationService({
+        userId: assignee.id,
+        orgId: project.organizationId,
+        projectId: data.projectId,
+        title: "Task assigned",
+        message: `You have been assigned a new task: ${data.title} in project ${project.name}`,
+      });
       await emailQueue.add(
         "task-assigned",
         {

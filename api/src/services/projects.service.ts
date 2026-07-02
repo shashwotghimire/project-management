@@ -1,6 +1,7 @@
 import redis from "../configs/redis-client.config";
 import { ApiError } from "../helpers/ApiError";
 import { emailQueue } from "../queues/email.queue";
+import { createNotificationService } from "./notifications.service";
 import { findUserById } from "../repositories/users.repository";
 import {
   addedToProjectEmailTemplate,
@@ -281,6 +282,13 @@ export const removeProjectMemberService = async ({
 
   const removedUser = await findUserById(targetUserId);
   if (removedUser) {
+    await createNotificationService({
+      userId: removedUser.id,
+      orgId: project.organizationId,
+      projectId,
+      title: "Removed from project",
+      message: `You have been removed from project: ${project.name}`,
+    });
     await emailQueue.add(
       "project-member-removed",
       {
@@ -335,6 +343,13 @@ export const addMemberToProjectService = async ({
   const addedUser = await findUserById(userId);
   const adder = await findUserById(assignedBy);
   if (addedUser && adder) {
+    await createNotificationService({
+      userId: addedUser.id,
+      orgId: project.organizationId,
+      projectId,
+      title: "Added to project",
+      message: `${adder.username} added you to project: ${project.name}`,
+    });
     await emailQueue.add(
       "project-member-added",
       {
