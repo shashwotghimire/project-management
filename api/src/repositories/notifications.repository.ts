@@ -6,6 +6,7 @@ export const createNotification = async (data: {
   message: string;
   orgId?: string;
   projectId?: string;
+  href?: string;
 }) => {
   return await Notifications.create({
     userId: data.userId,
@@ -13,6 +14,7 @@ export const createNotification = async (data: {
     message: data.message,
     orgId: data.orgId ?? null,
     projectId: data.projectId ?? null,
+    href: data.href ?? null,
   });
 };
 

@@ -6,6 +6,7 @@ export interface Notification {
   title: string;
   message: string;
   isRead: boolean;
+  href: string | null;
   createdAt: string;
   updatedAt: string;
 }

@@ -72,6 +72,7 @@ export const createCommentService = async (data: {
         projectId: data.projectId,
         title: "New comment on your task",
         message: `${authorName} commented on task: ${task.title}`,
+        href: `${process.env.FRONTEND_ORIGIN}/organization/${data.organizationId}/projects/${data.projectId}/tasks/${task.id}`,
       });
       await emailQueue.add("comment-created", {
         to: recipient.email,

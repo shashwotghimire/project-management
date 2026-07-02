@@ -99,6 +99,7 @@ export const createTaskService = async (data: {
         projectId: data.projectId,
         title: "Task assigned",
         message: `You have been assigned a new task: ${data.title} in project ${project.name}`,
+        href: `${process.env.FRONTEND_ORIGIN}/organization/${project.organizationId}/projects/${data.projectId}/tasks/${task.id}`,
       });
       await emailQueue.add(
         "task-assigned",
@@ -548,6 +549,7 @@ export const reassignTaskToAnotherUserService = async ({
       orgId: project.organizationId,
       title: "Task assigned",
       message: `You have been assigned a task: ${task.title} in project ${project.name}`,
+      href: `${process.env.FRONTEND_ORIGIN}/organization/${project.organizationId}/projects/${projectId}/tasks/${taskId}`,
     });
     await emailQueue.add(
       "task-assigned",
