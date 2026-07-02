@@ -19,6 +19,7 @@ export class Notifications extends Model<
   declare title: string;
   declare message: string;
   declare isRead: CreationOptional<boolean>;
+  declare href: CreationOptional<string>;
 }
 
 Notifications.init(
@@ -52,6 +53,10 @@ Notifications.init(
     isRead: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+    },
+    href: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   { sequelize, underscored: true, tableName: "notifications" },

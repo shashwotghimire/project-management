@@ -12,6 +12,7 @@ export const createNotificationService = async (data: {
   message: string;
   orgId?: string;
   projectId?: string;
+  href?: string;
 }) => {
   const notification = await createNotification(data);
   emitNotificationToUser(data.userId, notification);

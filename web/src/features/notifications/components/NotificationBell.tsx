@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Notification } from "@/types/notification-api.types";
+import Link from "next/link";
 
 interface NotificationBellProps {
   notifications: Notification[];
@@ -48,9 +49,18 @@ export function NotificationBell({
           </div>
         ) : (
           notifications.map((n) => (
-            <DropdownMenuItem key={n.id} className="flex flex-col items-start gap-0.5 py-2">
-              <span className="font-medium text-sm">{n.title}</span>
-              <span className="text-xs text-muted-foreground line-clamp-2">{n.message}</span>
+            <DropdownMenuItem key={n.id} asChild={!!n.href}>
+              {n.href ? (
+                <Link href={n.href} className="flex flex-col items-start gap-0.5 py-2 w-full cursor-pointer">
+                  <span className="font-medium text-sm">{n.title}</span>
+                  <span className="text-xs text-muted-foreground line-clamp-2">{n.message}</span>
+                </Link>
+              ) : (
+                <div className="flex flex-col items-start gap-0.5 py-2">
+                  <span className="font-medium text-sm">{n.title}</span>
+                  <span className="text-xs text-muted-foreground line-clamp-2">{n.message}</span>
+                </div>
+              )}
             </DropdownMenuItem>
           ))
         )}

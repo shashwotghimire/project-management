@@ -135,6 +135,7 @@ export const updateInvitationStatusService = async ({
         orgId: org.id,
         title: "Invitation accepted",
         message: `${user.username} accepted your invitation to join ${org.name}`,
+        href: `${process.env.FRONTEND_ORIGIN}/organization/${org.id}/members`,
       });
       await emailQueue.add("invite-accepted", {
         to: admin.email,
