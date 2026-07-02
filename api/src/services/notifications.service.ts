@@ -1,4 +1,5 @@
 import { createNotification } from "../repositories/notifications.repository";
+import { emitNotificationToUser } from "../ws/notification";
 
 export const createNotificationService = async (data: {
   userId: string;
@@ -7,5 +8,7 @@ export const createNotificationService = async (data: {
   orgId?: string;
   projectId?: string;
 }) => {
-  return await createNotification(data);
+  const notification = await createNotification(data);
+  emitNotificationToUser(data.userId, notification);
+  return notification;
 };

@@ -24,6 +24,8 @@ export const registerSocketEvents = (io: Server) => {
   io.on("connection", (socket: AuthenticatedSocket) => {
     console.log("a user connected");
 
+    socket.join(`user:${socket.userId}`);
+
     socket.on("joinChannel", (channelId: string) => {
       socket.join(channelId);
       console.log(`User joined channel ${channelId}`);
@@ -38,7 +40,12 @@ export const registerSocketEvents = (io: Server) => {
       try {
         const channel = await getChannelByIdOnly(channelId);
         if (!channel) return;
-        const message = await sendMessageService(socket.userId!, channel.projectId, channelId, content);
+        const message = await sendMessageService(
+          socket.userId!,
+          channel.projectId,
+          channelId,
+          content,
+        );
         io.to(channelId).emit("newMessage", message);
       } catch (error) {
         console.error("Error sending message:", error);

@@ -26,6 +26,7 @@ import { findUserById } from "../repositories/users.repository";
 import { emailQueue } from "../queues/email.queue";
 import { taskAssignedEmailTemplate } from "../utils/email-template.utils";
 import { TaskPriority, TaskStatus } from "../types/tasks";
+import { createNotificationService } from "./notifications.service";
 
 export const createTaskService = async (data: {
   title: string;
@@ -47,7 +48,10 @@ export const createTaskService = async (data: {
     );
   }
   if (data.assignedTo) {
-    const isMember = await isUserMemberOfProject(data.assignedTo, data.projectId);
+    const isMember = await isUserMemberOfProject(
+      data.assignedTo,
+      data.projectId,
+    );
     if (!isMember) {
       throw new ApiError(
         400,
@@ -94,7 +98,13 @@ export const createTaskService = async (data: {
         {
           to: assignee.email,
           subject: `You've been assigned a new task: ${data.title}`,
-          html: taskAssignedEmailTemplate(assignee.username, data.title, project.name, assigner.username, assigner.gravatarUrl ?? undefined),
+          html: taskAssignedEmailTemplate(
+            assignee.username,
+            data.title,
+            project.name,
+            assigner.username,
+            assigner.gravatarUrl ?? undefined,
+          ),
         },
         { attempts: 3, backoff: { type: "exponential", delay: 5000 } },
       );
@@ -526,12 +536,23 @@ export const reassignTaskToAnotherUserService = async ({
   const newAssignee = await findUserById(newUserId);
   const assigner = await findUserById(userId);
   if (newAssignee && assigner) {
+    await createNotificationService({
+      userId: newAssignee.id,
+      title: "Task assigned",
+      message: `You have been assigned a task: ${task.title} in project ${project.name}`,
+    });
     await emailQueue.add(
       "task-assigned",
       {
         to: newAssignee.email,
         subject: `You've been assigned a task: ${task.title}`,
-        html: taskAssignedEmailTemplate(newAssignee.username, task.title, project.name, assigner.username, assigner.gravatarUrl ?? undefined),
+        html: taskAssignedEmailTemplate(
+          newAssignee.username,
+          task.title,
+          project.name,
+          assigner.username,
+          assigner.gravatarUrl ?? undefined,
+        ),
       },
       { attempts: 3, backoff: { type: "exponential", delay: 5000 } },
     );
