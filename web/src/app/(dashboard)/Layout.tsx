@@ -1,4 +1,5 @@
 import ProtectedRoutes from "@/components/ProtectedRoutes";
+import { SocketProvider } from "@/features/notifications/components/SocketProvider";
 import React from "react";
 
 export default function dashboardLayout({
@@ -6,5 +7,9 @@ export default function dashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <ProtectedRoutes>{children}</ProtectedRoutes>;
+  return (
+    <ProtectedRoutes>
+      <SocketProvider>{children}</SocketProvider>
+    </ProtectedRoutes>
+  );
 }

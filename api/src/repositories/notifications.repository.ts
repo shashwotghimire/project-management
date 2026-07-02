@@ -15,3 +15,17 @@ export const createNotification = async (data: {
     projectId: data.projectId ?? null,
   });
 };
+
+export const getUserNotificationsInOrg = async (data: {
+  userId: string;
+  orgId: string;
+}) => {
+  return await Notifications.findAll({
+    where: {
+      userId: data.userId,
+      orgId: data.orgId,
+    },
+    order: [["createdAt", "DESC"]],
+    limit: 15,
+  });
+};

@@ -538,6 +538,7 @@ export const reassignTaskToAnotherUserService = async ({
   if (newAssignee && assigner) {
     await createNotificationService({
       userId: newAssignee.id,
+      orgId: project.organizationId,
       title: "Task assigned",
       message: `You have been assigned a task: ${task.title} in project ${project.name}`,
     });

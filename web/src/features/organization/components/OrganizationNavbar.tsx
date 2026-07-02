@@ -4,14 +4,17 @@ import React from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useGetOrganizationById } from "@/features/organization/hooks/useOrganization";
 import { useParams } from "next/navigation";
-import { Bell, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { NotificationBell } from "@/features/notifications/components/NotificationBell";
+import { useGetUserNotifications } from "@/features/notifications/hooks/useNotifications";
 import { CreateProjectModal } from "@/features/projects/components/CreateProjectModal";
 
 export function OrganizationNavbar() {
   const params = useParams<{ id: string }>();
   const orgId = params?.id ?? "";
   const { data: org } = useGetOrganizationById(orgId);
+  const { data: notifications = [] } = useGetUserNotifications(orgId);
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
     <header className="h-14 flex items-center justify-between px-4 border-b bg-white">
@@ -21,9 +24,7 @@ export function OrganizationNavbar() {
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" className="text-muted-foreground">
-          <Bell className="size-4" />
-        </Button>
+        <NotificationBell notifications={notifications} unreadCount={unreadCount} />
         <CreateProjectModal orgId={orgId} />
       </div>
     </header>
