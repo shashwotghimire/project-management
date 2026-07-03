@@ -149,7 +149,7 @@ export function AppSidebar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-3 w-full rounded-lg px-1 py-1.5 hover:bg-zinc-100 transition-colors text-left outline-none">
-                {gravatarUrl ? (
+                {gravatarUrl?.startsWith("http") ? (
                   <img
                     src={gravatarUrl}
                     alt={user.username}

@@ -7,6 +7,7 @@ import {
   getUsersProjectsService,
   removeProjectMemberService,
   updateProjectService,
+  uploadProjectLogoService,
 } from "@/services/project.service";
 import {
   CreateProjectRequest,
@@ -97,6 +98,16 @@ export const useUpdateProject = (orgId: string, projectId: string) => {
       queryClient.invalidateQueries({ queryKey: ["project", orgId, projectId] });
       queryClient.invalidateQueries({ queryKey: ["projects", orgId] });
       queryClient.invalidateQueries({ queryKey: ["dashboard-projects", orgId] });
+    },
+  });
+};
+
+export const useUploadProjectLogo = (orgId: string, projectId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation<{ url: string }, Error, File>({
+    mutationFn: (file) => uploadProjectLogoService(orgId, projectId, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["project", orgId, projectId] });
     },
   });
 };

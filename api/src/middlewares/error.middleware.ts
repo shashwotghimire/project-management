@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
+import multer from "multer";
 import { ApiError } from "../helpers/ApiError";
 
 export const errorHandler = (
@@ -13,6 +14,15 @@ export const errorHandler = (
   let message = "Error processing request";
   let error = "Internal server error";
   let validationError: any = undefined;
+
+  if (err instanceof multer.MulterError) {
+    const message = err.code === "LIMIT_FILE_SIZE" ? "File too large (max 10 MB)" : err.message;
+    return res.status(400).json({ success: false, message, error: err.code });
+  }
+
+  if (err instanceof Error && err.message.startsWith("Unsupported file type")) {
+    return res.status(400).json({ success: false, message: err.message, error: "INVALID_FILE_TYPE" });
+  }
 
   if (err instanceof ZodError) {
     statusCode = 400;

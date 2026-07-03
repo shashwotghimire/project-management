@@ -15,7 +15,7 @@ export default function ChatBubble({ message, isOwn }: ChatBubbleProps) {
 
   return (
     <div className={cn("flex min-w-0 items-end gap-2", isOwn && "flex-row-reverse")}>
-      {message.sender.gravatarUrl ? (
+      {message.sender.gravatarUrl?.startsWith("http") ? (
         <img
           src={message.sender.gravatarUrl}
           alt={message.sender.username}

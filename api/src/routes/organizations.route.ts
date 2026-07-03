@@ -7,6 +7,7 @@ import {
   getUsersOrganizations,
   removeOrgMember,
   updateOrganization,
+  uploadOrgLogo,
 } from "../controllers/organizations.controller";
 import { getTasksAssignedToUser, getUserTasksForCalendar } from "../controllers/tasks.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
@@ -19,7 +20,9 @@ import {
   getUsersOrganizationsSchema,
   removeOrgMemberSchema,
   updateOrganizationSchema,
+  uploadOrgLogoSchema,
 } from "../validations/organizations.validation";
+import { upload } from "../middlewares/multer.middleware";
 import { getTasksAssignedToUserSchema, getUserTasksForCalendarSchema } from "../validations/tasks.validation";
 
 const router = Router();
@@ -80,6 +83,14 @@ router.get(
   authMiddleware,
   validate(getUserTasksForCalendarSchema),
   getUserTasksForCalendar,
+);
+
+router.patch(
+  "/:orgId/logo",
+  authMiddleware,
+  upload.single("file"),
+  validate(uploadOrgLogoSchema),
+  uploadOrgLogo,
 );
 
 export default router;

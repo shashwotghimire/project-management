@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,7 +18,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Project, ProjectStatus } from "@/types/project-api.types";
-import { useUpdateProject } from "../hooks/useProject";
+import { useUpdateProject, useUploadProjectLogo } from "../hooks/useProject";
+import { Upload } from "lucide-react";
 
 interface EditProjectDialogProps {
   open: boolean;
@@ -34,30 +35,37 @@ export default function EditProjectDialog({
   project,
 }: EditProjectDialogProps) {
   const [name, setName] = useState(project.name);
-  const [logoUrl, setLogoUrl] = useState(project.logoUrl ?? "");
   const [status, setStatus] = useState<ProjectStatus>(project.status);
   const [error, setError] = useState<string | null>(null);
+  const [pendingLogo, setPendingLogo] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   const { mutate: updateProject, isPending } = useUpdateProject(orgId, project.id);
+  const { mutate: uploadLogo, isPending: isUploadingLogo } = useUploadProjectLogo(orgId, project.id);
 
   useEffect(() => {
     if (open) {
       setName(project.name);
-      setLogoUrl(project.logoUrl ?? "");
       setStatus(project.status);
       setError(null);
+      setPendingLogo(null);
+      setLogoPreview(null);
     }
   }, [open, project]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (pendingLogo) {
+      uploadLogo(pendingLogo, {
+        onError: () => setError("Failed to upload logo. Please try again."),
+      });
+    }
+
     updateProject(
-      {
-        name: name.trim(),
-        logoUrl: logoUrl.trim() || null,
-        status,
-      },
+      { name: name.trim(), status },
       {
         onSuccess: () => onOpenChange(false),
         onError: () => setError("Failed to update project. Please try again."),
@@ -82,14 +90,43 @@ export default function EditProjectDialog({
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="project-logo">Logo URL</Label>
-            <Input
-              id="project-logo"
-              type="url"
-              placeholder="https://..."
-              value={logoUrl}
-              onChange={(e) => setLogoUrl(e.target.value)}
-            />
+            <Label>Logo</Label>
+            <div className="flex items-center gap-3">
+              {(logoPreview || project.logoUrl) && (
+                <img
+                  src={logoPreview ?? project.logoUrl!}
+                  alt={project.name}
+                  className="size-10 rounded object-cover border"
+                />
+              )}
+              <input
+                ref={logoInputRef}
+                type="file"
+                accept=".jpg,.jpeg,.png"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  setPendingLogo(file);
+                  setLogoPreview(URL.createObjectURL(file));
+                  e.target.value = "";
+                }}
+              />
+              <div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  type="button"
+                  onClick={() => logoInputRef.current?.click()}
+                >
+                  <Upload className="size-3.5 mr-1.5" />
+                  {pendingLogo ? "Change logo" : "Upload logo"}
+                </Button>
+                {pendingLogo && (
+                  <p className="text-xs text-muted-foreground mt-1">{pendingLogo.name}</p>
+                )}
+              </div>
+            </div>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="project-status">Status</Label>
@@ -111,8 +148,8 @@ export default function EditProjectDialog({
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Saving…" : "Save changes"}
+            <Button type="submit" disabled={isPending || isUploadingLogo}>
+              {isPending || isUploadingLogo ? "Saving…" : "Save changes"}
             </Button>
           </div>
         </form>

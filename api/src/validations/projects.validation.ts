@@ -74,3 +74,10 @@ export const removeProjectMemberSchema = z.object({
     userId: z.uuidv4("Invalid user ID"),
   }),
 });
+
+export const uploadProjectLogoSchema = z.object({
+  params: z.object({
+    orgId: z.uuidv4("Invalid organization ID"),
+    projectId: z.uuidv4("Invalid project ID"),
+  }),
+});

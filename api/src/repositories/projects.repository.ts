@@ -156,3 +156,11 @@ export async function getProjectMembers(projectId: string) {
     ],
   });
 }
+
+export async function updateProjectLogo(projectId: string, logoUrl: string): Promise<Project | null> {
+  const project = await Project.findByPk(projectId);
+  if (!project) return null;
+  project.logoUrl = logoUrl;
+  await project.save();
+  return project;
+}

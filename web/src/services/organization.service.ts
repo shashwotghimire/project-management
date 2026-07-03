@@ -66,3 +66,16 @@ export const getOrgMembersService = async (
   );
   return response.data.data;
 };
+
+export const uploadOrgLogoService = async (
+  orgId: string,
+  file: File,
+): Promise<{ url: string }> => {
+  const form = new FormData();
+  form.append("file", file);
+  const response = await api.patch<{ success: boolean; data: { url: string } }>(
+    `/organizations/${orgId}/logo`,
+    form,
+  );
+  return response.data.data;
+};

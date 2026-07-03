@@ -11,6 +11,7 @@ import {
   getUserProjectsSchema,
   removeProjectMemberSchema,
   updateProjectSchema,
+  uploadProjectLogoSchema,
 } from "../validations/projects.validation";
 import {
   addMemberToProject,
@@ -22,7 +23,9 @@ import {
   getUserProjects,
   removeProjectMember,
   updateProject,
+  uploadProjectLogo,
 } from "../controllers/projects.controller";
+import { upload } from "../middlewares/multer.middleware";
 
 const router = Router({ mergeParams: true });
 
@@ -81,6 +84,14 @@ router.delete(
   authMiddleware,
   validate(removeProjectMemberSchema),
   removeProjectMember,
+);
+
+router.patch(
+  "/:projectId/logo",
+  authMiddleware,
+  upload.single("file"),
+  validate(uploadProjectLogoSchema),
+  uploadProjectLogo,
 );
 
 export default router;

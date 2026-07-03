@@ -89,3 +89,17 @@ export const updateProjectService = async (
   );
   return response.data.data;
 };
+
+export const uploadProjectLogoService = async (
+  orgId: string,
+  projectId: string,
+  file: File,
+): Promise<{ url: string }> => {
+  const form = new FormData();
+  form.append("file", file);
+  const response = await api.patch<{ success: boolean; data: { url: string } }>(
+    `/organizations/${orgId}/projects/${projectId}/logo`,
+    form,
+  );
+  return response.data.data;
+};

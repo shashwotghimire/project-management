@@ -1,4 +1,5 @@
 import { ApiError } from "../helpers/ApiError";
+import { getS3PresignedUrl } from "./s3.service";
 import { emailQueue } from "../queues/email.queue";
 import { createNotificationService } from "./notifications.service";
 import {
@@ -126,7 +127,17 @@ export const getCommentsByTaskService = async ({
       "Only project members can view comments.",
     );
   }
-  return await getCommentsByTask(taskId, { page, limit });
+  const raw = await getCommentsByTask(taskId, { page, limit });
+  const comments = await Promise.all(
+    raw.comments.map(async (row: any) => {
+      const plain = row.toJSON ? row.toJSON() : { ...row };
+      if (typeof plain.author?.gravatarUrl === "string" && plain.author.gravatarUrl.startsWith("uploads/")) {
+        plain.author.gravatarUrl = await getS3PresignedUrl(plain.author.gravatarUrl);
+      }
+      return plain;
+    }),
+  );
+  return { ...raw, comments };
 };
 
 export const updateCommentService = async ({

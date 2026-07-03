@@ -48,11 +48,17 @@ export function MembersTable({ orgId }: { orgId: string }) {
           <TableRow key={member.User.id}>
             <TableCell className="py-4">
               <div className="flex items-center gap-2">
-                <img
-                  src={member.User.gravatarUrl}
-                  alt={member.User.username}
-                  className="h-7 w-7 rounded-full object-cover"
-                />
+                {member.User.gravatarUrl?.startsWith("http") ? (
+                  <img
+                    src={member.User.gravatarUrl}
+                    alt={member.User.username}
+                    className="h-7 w-7 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold uppercase">
+                    {member.User.username.charAt(0)}
+                  </div>
+                )}
                 <span className="font-medium">{member.User.username}</span>
               </div>
             </TableCell>

@@ -4,6 +4,7 @@ import {
   loginUser,
   registerUser,
   updateUserProfile,
+  uploadUserAvatar,
   verifyEmail,
 } from "../controllers/auth.controller";
 import { validate } from "../middlewares/validation.middleware";
@@ -11,9 +12,11 @@ import {
   loginUserSchema,
   registerUserSchema,
   updateUserProfileSchema,
+  uploadUserAvatarSchema,
   verifyEmailSchema,
 } from "../validations/auth.validation";
 import { authMiddleware } from "../middlewares/auth.middleware";
+import { upload } from "../middlewares/multer.middleware";
 
 const router = Router();
 
@@ -26,6 +29,13 @@ router.patch(
   authMiddleware,
   validate(updateUserProfileSchema),
   updateUserProfile,
+);
+router.patch(
+  "/me/avatar",
+  authMiddleware,
+  upload.single("file"),
+  validate(uploadUserAvatarSchema),
+  uploadUserAvatar,
 );
 
 export default router;

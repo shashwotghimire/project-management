@@ -10,7 +10,6 @@ import Kanban from "@/features/tasks/components/Kanban";
 import TaskList from "@/features/tasks/components/TaskList";
 import GroupChat from "./GroupChat";
 import ProjectMembersTable from "./ProjectMembersTable";
-import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import {
@@ -64,12 +63,10 @@ export default function ProjectDetails({
           <div className="flex flex-col gap-2">
             <div className="group flex items-center gap-2">
               {project.logoUrl && (
-                <Image
+                <img
                   src={project.logoUrl}
                   alt={project.name}
                   className="h-10 w-10 rounded-md object-cover"
-                  width={40}
-                  height={40}
                 />
               )}
               <DropdownMenu>

@@ -59,11 +59,23 @@ export default function ProjectMembersTable({ orgId, projectId }: ProjectMembers
           <TableRow key={member.userId}>
             <TableCell className="py-4">
               <div className="flex items-center gap-2">
-                <img
-                  src={member.member.gravatarUrl}
-                  alt={member.member.username}
-                  className="h-7 w-7 rounded-full object-cover"
-                />
+                {member.member.gravatarUrl ? (
+                  <img
+                    src={member.member.gravatarUrl}
+                    alt={member.member.username}
+                    className="h-7 w-7 rounded-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                      e.currentTarget.nextElementSibling?.removeAttribute("hidden");
+                    }}
+                  />
+                ) : null}
+                <div
+                  hidden={!!member.member.gravatarUrl}
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold uppercase"
+                >
+                  {member.member.username.charAt(0)}
+                </div>
                 <span className="font-medium">{member.member.username}</span>
               </div>
             </TableCell>

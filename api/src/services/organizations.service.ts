@@ -8,8 +8,10 @@ import {
   getUsersOrganizations,
   removeOrgMember,
   updateOrganization,
+  updateOrgLogo,
   userMemberOfOrg,
 } from "../repositories/organizations.repository";
+import { uploadToS3, getS3PresignedUrl, deleteFromS3 } from "./s3.service";
 import redis from "../configs/redis-client.config";
 import { emailQueue } from "../queues/email.queue";
 import { findUserById } from "../repositories/users.repository";
@@ -123,17 +125,23 @@ export const getOrgByIdService = async (orgId: string, userId: string) => {
       "You do not have access to this organization",
     );
   }
-  const key = `org:${orgId}`;
-  const cached = await redis.get(key);
+  const cacheKey = `org:${orgId}`;
+  const cached = await redis.get(cacheKey);
+  let plain: Record<string, unknown>;
+
   if (cached) {
-    return JSON.parse(cached);
+    plain = JSON.parse(cached);
+  } else {
+    const org = await getOrgById(orgId);
+    if (!org) throw new ApiError(404, "Organization not found", "Organization not found");
+    plain = org.toJSON() as Record<string, unknown>;
+    await redis.set(cacheKey, JSON.stringify(plain), "EX", 300);
   }
-  const org = await getOrgById(orgId);
-  if (!org) {
-    throw new ApiError(404, "Organization not found", "Organization not found");
+
+  if (typeof plain.logoUrl === "string" && plain.logoUrl.startsWith("uploads/")) {
+    plain.logoUrl = await getS3PresignedUrl(plain.logoUrl);
   }
-  await redis.set(key, JSON.stringify(org), "EX", 300);
-  return org;
+  return plain;
 };
 
 export const removeOrgMemberService = async ({
@@ -190,5 +198,38 @@ export const getAllMembersOfOrgService = async (
   if (!org) {
     throw new ApiError(404, "Organization not found", "Organization not found");
   }
-  return await getAllMembersOfOrg(orgId);
+  const raw = await getAllMembersOfOrg(orgId);
+  return Promise.all(
+    raw.map(async (row: any) => {
+      const plain = row.toJSON ? row.toJSON() : { ...row };
+      if (typeof plain.User?.gravatarUrl === "string" && plain.User.gravatarUrl.startsWith("uploads/")) {
+        plain.User.gravatarUrl = await getS3PresignedUrl(plain.User.gravatarUrl);
+      }
+      return plain;
+    }),
+  );
+};
+
+export const uploadOrgLogoService = async ({
+  orgId,
+  adminId,
+  file,
+}: {
+  orgId: string;
+  adminId: string;
+  file: Express.Multer.File;
+}) => {
+  const org = await getOrgByAdminId(adminId, orgId);
+  if (!org) throw new ApiError(403, "Forbidden", "Only the org admin can upload a logo");
+
+  const oldKey = org.logoUrl?.startsWith("uploads/") ? org.logoUrl : null;
+
+  const { key } = await uploadToS3(file);
+  const updated = await updateOrgLogo(orgId, adminId, key);
+
+  if (oldKey) deleteFromS3(oldKey).catch(() => {});
+
+  await redis.del(`org:${orgId}`);
+  const url = await getS3PresignedUrl(key);
+  return { org: updated, url };
 };

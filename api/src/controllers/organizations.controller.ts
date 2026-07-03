@@ -9,6 +9,7 @@ import {
   getUsersOrganizationsService,
   removeOrgMemberService,
   updateOrganizationService,
+  uploadOrgLogoService,
 } from "../services/organizations.service";
 import { ApiResponse } from "../helpers/ApiResponse";
 import { ApiError } from "../helpers/ApiError";
@@ -131,5 +132,18 @@ export const getAllMembersOfOrg = asyncHandler<AuthRequest>(
           members,
         ),
       );
+  },
+);
+
+export const uploadOrgLogo = asyncHandler<AuthRequest>(
+  async (req: AuthRequest, res: Response) => {
+    const orgId = isString(req.params.orgId);
+    if (!req.file) {
+      throw new ApiError(400, "No file provided", "A file is required");
+    }
+    const result = await uploadOrgLogoService({ orgId, adminId: req.user.id, file: req.file });
+    return res
+      .status(200)
+      .json(new ApiResponse(true, "Logo uploaded successfully", result));
   },
 );

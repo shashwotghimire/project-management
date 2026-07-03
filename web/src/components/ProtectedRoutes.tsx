@@ -9,10 +9,10 @@ const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
   const { data, isLoading, error } = useGetUserProfile();
   const router = useRouter();
   useEffect(() => {
-    if (!isLoading && (error || !data)) {
+    if (!isLoading && !data) {
       router.replace("/login");
     }
-  }, [data, isLoading, error]);
+  }, [data, isLoading]);
   if (isLoading) {
     return <Spinner fullPage />;
   }

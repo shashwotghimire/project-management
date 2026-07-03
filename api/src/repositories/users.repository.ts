@@ -54,3 +54,11 @@ export const updateUserEmailVerified = async (userId: string) => {
     },
   );
 };
+
+export const updateUserAvatar = async (userId: string, gravatarUrl: string) => {
+  const user = await User.findByPk(userId);
+  if (!user) return null;
+  user.gravatarUrl = gravatarUrl;
+  await user.save();
+  return user;
+};

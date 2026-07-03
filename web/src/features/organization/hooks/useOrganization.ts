@@ -3,6 +3,7 @@ import {
   getOrgMembersService,
   getOrganizationByIdService,
   updateOrganizationService,
+  uploadOrgLogoService,
 } from "@/services/organization.service";
 import { UpdateOrganizationRequest } from "@/types/organization-api.types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -39,5 +40,15 @@ export const useGetOrgMembers = (orgId: string) => {
     queryKey: ["org-members", orgId],
     queryFn: () => getOrgMembersService(orgId),
     enabled: !!orgId,
+  });
+};
+
+export const useUploadOrgLogo = (orgId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation<{ url: string }, Error, File>({
+    mutationFn: (file) => uploadOrgLogoService(orgId, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["organization", orgId] });
+    },
   });
 };

@@ -28,10 +28,12 @@ export default function ProjectCardItem({ project }: { project: Project }) {
     <Card className="hover:ring-primary/30 cursor-pointer transition-shadow hover:shadow-md rounded-none">
       <CardHeader>
         <div className="flex items-start gap-3">
-          {project.logoUrl ? (
+          {project.logoUrl?.startsWith("http") ? (
             <Image
               src={project.logoUrl}
               alt={project.name}
+              width={40}
+              height={40}
               className="h-10 w-10 rounded-lg object-cover ring-1 ring-foreground/10"
             />
           ) : (

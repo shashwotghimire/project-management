@@ -3,6 +3,7 @@ import {
   loginService,
   registerService,
   updateUserProfileService,
+  uploadUserAvatarService,
 } from "@/services/auth.service";
 import {
   GetUserResponse,
@@ -57,5 +58,15 @@ export const useGetUserProfile = () => {
     },
     staleTime: 5 * 60 * 1000, // treat data as fresh for 5 mins — no refetch on remount
     retry: false,
+  });
+};
+
+export const useUploadUserAvatar = () => {
+  const queryClient = useQueryClient();
+  return useMutation<{ url: string }, Error, File>({
+    mutationFn: (file) => uploadUserAvatarService(file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+    },
   });
 };

@@ -2,6 +2,7 @@ import { User } from "../models/users.model";
 import { ApiError } from "../helpers/ApiError";
 import { comparePassword, hashPassword } from "../helpers/hash.helper";
 import { generateAccessToken } from "../helpers/jwt.helper";
+import { uploadToS3, getS3PresignedUrl, deleteFromS3 } from "./s3.service";
 import {
   createNewUser,
   findUserByEmailVerificationToken,
@@ -9,6 +10,7 @@ import {
   updateUserEmailVerified,
   findUserById,
   updateUser,
+  updateUserAvatar,
 } from "../repositories/users.repository";
 import { createRandomToken } from "../utils/crypto.utils";
 import { verifyEmailTemplate } from "../utils/email-template.utils";
@@ -144,15 +146,37 @@ export const updateUserProfileService = async (
 };
 
 export const getUserProfileService = async (userId: string) => {
-  const key = `user:${userId}`;
-  const cached = await redis.get(key);
+  const cacheKey = `user:${userId}`;
+  const cached = await redis.get(cacheKey);
+  let plain: Record<string, unknown>;
+
   if (cached) {
-    return JSON.parse(cached);
+    plain = JSON.parse(cached);
+  } else {
+    const user = await findUserById(userId);
+    if (!user) throw new ApiError(404, "Not found", "User not found");
+    plain = user.toJSON() as Record<string, unknown>;
+    await redis.set(cacheKey, JSON.stringify(plain), "EX", 300);
   }
+
+  if (typeof plain.gravatarUrl === "string" && plain.gravatarUrl.startsWith("uploads/")) {
+    plain.gravatarUrl = await getS3PresignedUrl(plain.gravatarUrl);
+  }
+  return plain;
+};
+
+export const uploadUserAvatarService = async (userId: string, file: Express.Multer.File) => {
   const user = await findUserById(userId);
-  if (!user) {
-    throw new ApiError(404, "Not found", "User not found");
-  }
-  await redis.set(key, JSON.stringify(user), "EX", 300);
-  return user;
+  if (!user) throw new ApiError(404, "User not found", "User not found");
+
+  const oldKey = user.gravatarUrl?.startsWith("uploads/") ? user.gravatarUrl : null;
+
+  const { key } = await uploadToS3(file);
+  const updated = await updateUserAvatar(userId, key);
+
+  if (oldKey) deleteFromS3(oldKey).catch(() => {});
+
+  await redis.del(`user:${userId}`);
+  const url = await getS3PresignedUrl(key);
+  return { user: updated, url };
 };

@@ -1,23 +1,27 @@
 "use client";
 
-import { useState } from "react";
-import { useGetUserProfile, useUpdateUserProfile } from "@/features/auth/hooks/useAuth";
+import { useRef, useState } from "react";
+import { useGetUserProfile, useUpdateUserProfile, useUploadUserAvatar } from "@/features/auth/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import OnboardingNav from "@/features/onboarding/components/OnboardingNav";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Upload } from "lucide-react";
 
 export function ProfilePageClient() {
   const { data: user } = useGetUserProfile();
   const updateProfile = useUpdateUserProfile();
+  const uploadAvatar = useUploadUserAvatar();
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const [username, setUsername] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [pendingAvatar, setPendingAvatar] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
   const passwordMismatch =
     newPassword && confirmPassword && newPassword !== confirmPassword;
@@ -26,22 +30,31 @@ export function ProfilePageClient() {
     e.preventDefault();
     if (passwordMismatch) return;
 
+    if (pendingAvatar) {
+      uploadAvatar.mutate(pendingAvatar, {
+        onSuccess: () => {
+          setPendingAvatar(null);
+          setAvatarPreview(null);
+        },
+      });
+    }
+
     const data: Record<string, string> = {};
     if (username.trim()) data.username = username.trim();
     if (newPassword) {
       data.currentPassword = currentPassword;
       data.newPassword = newPassword;
     }
-    if (!Object.keys(data).length) return;
-
-    updateProfile.mutate(data, {
-      onSuccess: () => {
-        setCurrentPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
-        setUsername("");
-      },
-    });
+    if (Object.keys(data).length) {
+      updateProfile.mutate(data, {
+        onSuccess: () => {
+          setCurrentPassword("");
+          setNewPassword("");
+          setConfirmPassword("");
+          setUsername("");
+        },
+      });
+    }
   };
 
   return (
@@ -65,10 +78,10 @@ export function ProfilePageClient() {
           <div>
             <h2 className="text-sm font-semibold mb-4">Profile picture</h2>
             <div className="flex items-center gap-5">
-              {user?.gravatarUrl ? (
+              {avatarPreview || user?.gravatarUrl ? (
                 <img
-                  src={user.gravatarUrl}
-                  alt={user.username}
+                  src={avatarPreview ?? user!.gravatarUrl}
+                  alt={user?.username}
                   className="size-20 rounded-full object-cover"
                 />
               ) : (
@@ -77,12 +90,34 @@ export function ProfilePageClient() {
                 </div>
               )}
               <div>
-                <Button variant="outline" size="sm" disabled type="button">
-                  Upload photo
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept=".jpg,.jpeg,.png"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setPendingAvatar(file);
+                    setAvatarPreview(URL.createObjectURL(file));
+                    e.target.value = "";
+                  }}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  type="button"
+                  onClick={() => avatarInputRef.current?.click()}
+                >
+                  <Upload className="size-3.5 mr-1.5" />
+                  {pendingAvatar ? "Change photo" : "Upload photo"}
                 </Button>
                 <p className="text-xs text-muted-foreground mt-1.5">
-                  Photo upload coming soon.
+                  {pendingAvatar ? `Selected: ${pendingAvatar.name}` : "JPG or PNG, max 10 MB."}
                 </p>
+                {uploadAvatar.isError && (
+                  <p className="text-xs text-red-600 mt-1">Upload failed.</p>
+                )}
               </div>
             </div>
           </div>
@@ -157,9 +192,9 @@ export function ProfilePageClient() {
           <div className="flex items-center gap-4">
             <Button
               type="submit"
-              disabled={updateProfile.isPending || !!passwordMismatch}
+              disabled={updateProfile.isPending || uploadAvatar.isPending || !!passwordMismatch}
             >
-              {updateProfile.isPending ? "Saving…" : "Save changes"}
+              {updateProfile.isPending || uploadAvatar.isPending ? "Saving…" : "Save changes"}
             </Button>
             {updateProfile.isSuccess && (
               <p className="text-sm text-green-600">Profile updated.</p>

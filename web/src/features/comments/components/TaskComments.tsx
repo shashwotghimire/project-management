@@ -115,7 +115,7 @@ export default function TaskComments({
         ) : (
           comments.map((comment) => (
             <div key={comment.id} className="flex gap-3">
-              {comment.author?.gravatarUrl ? (
+              {comment.author?.gravatarUrl?.startsWith("http") ? (
                 <Image
                   src={comment.author.gravatarUrl}
                   alt={comment.author.username}

@@ -22,7 +22,7 @@ export function UserDropdownMenu({ user }: UserDropdownMenuProps) {
   const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem("access_token");
+    localStorage.removeItem("accessToken");
     queryClient.clear();
     router.push("/login");
   };
@@ -30,11 +30,17 @@ export function UserDropdownMenu({ user }: UserDropdownMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <img
-          src={user?.gravatarUrl}
-          alt="User avatar"
-          className="w-8 h-8 rounded-full cursor-pointer"
-        />
+        {user?.gravatarUrl?.startsWith("http") ? (
+          <img
+            src={user.gravatarUrl}
+            alt="User avatar"
+            className="w-8 h-8 rounded-full cursor-pointer object-cover"
+          />
+        ) : (
+          <div className="flex w-8 h-8 rounded-full cursor-pointer bg-muted items-center justify-center text-xs font-semibold uppercase">
+            {user?.username?.charAt(0) ?? "?"}
+          </div>
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-48" align="end">
         <DropdownMenuLabel>

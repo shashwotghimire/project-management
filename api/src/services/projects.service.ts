@@ -24,7 +24,9 @@ import {
   isUserMemberOfProject,
   removeProjectMember,
   updateProject,
+  updateProjectLogo,
 } from "../repositories/projects.repository";
+import { uploadToS3, getS3PresignedUrl, deleteFromS3 } from "./s3.service";
 
 export const createProjectService = async ({
   name,
@@ -129,11 +131,21 @@ export const getUserProjectsService = async ({
   if (cached) {
     return JSON.parse(cached);
   }
-  const projects = await getProjectsByUserId(userId, organizationId, {
+  const raw = await getProjectsByUserId(userId, organizationId, {
     page,
     limit,
     search,
   });
+  const data = await Promise.all(
+    raw.data.map(async (row: any) => {
+      const plain = row.toJSON ? row.toJSON() : { ...row };
+      if (typeof plain.Project?.logoUrl === "string" && plain.Project.logoUrl.startsWith("uploads/")) {
+        plain.Project.logoUrl = await getS3PresignedUrl(plain.Project.logoUrl);
+      }
+      return plain;
+    }),
+  );
+  const projects = { ...raw, data };
   await redis.set(key, JSON.stringify(projects), "EX", 300);
   return projects;
 };
@@ -150,7 +162,16 @@ export const getDashboardProjectsService = async ({
   if (cached) {
     return JSON.parse(cached);
   }
-  const projects = await getDashboardProjects(userId, organizationId);
+  const raw = await getDashboardProjects(userId, organizationId);
+  const projects = await Promise.all(
+    raw.map(async (row: any) => {
+      const plain = row.toJSON ? row.toJSON() : { ...row };
+      if (typeof plain.Project?.logoUrl === "string" && plain.Project.logoUrl.startsWith("uploads/")) {
+        plain.Project.logoUrl = await getS3PresignedUrl(plain.Project.logoUrl);
+      }
+      return plain;
+    }),
+  );
   await redis.set(key, JSON.stringify(projects), "EX", 300);
   return projects;
 };
@@ -199,14 +220,28 @@ export const getProjectMembersService = async ({
   if (!project) {
     throw new ApiError(404, "Project not found", "Project not found");
   }
-  const key = `project:${projectId}:members`;
-  const cached = await redis.get(key);
+  const cacheKey = `project:${projectId}:members`;
+  const cached = await redis.get(cacheKey);
+  let plain: any[];
+
   if (cached) {
-    return JSON.parse(cached);
+    plain = JSON.parse(cached);
+  } else {
+    const members = await getProjectMembers(projectId);
+    plain = members.map((m) => m.toJSON());
+    await redis.set(cacheKey, JSON.stringify(plain), "EX", 300);
   }
-  const members = await getProjectMembers(projectId);
-  await redis.set(key, JSON.stringify(members), "EX", 300);
-  return members;
+
+  await Promise.all(
+    plain.map(async (m) => {
+      const url = m.member?.gravatarUrl;
+      if (typeof url === "string" && url.startsWith("uploads/")) {
+        m.member.gravatarUrl = await getS3PresignedUrl(url);
+      }
+    }),
+  );
+
+  return plain;
 };
 
 export const getProjectByIdService = async ({
@@ -220,17 +255,23 @@ export const getProjectByIdService = async ({
   if (!isMember) {
     throw new ApiError(403, "Access denied", "Access denied");
   }
-  const key = `project:${projectId}`;
-  const cached = await redis.get(key);
+  const cacheKey = `project:${projectId}`;
+  const cached = await redis.get(cacheKey);
+  let plain: Record<string, unknown>;
+
   if (cached) {
-    return JSON.parse(cached);
+    plain = JSON.parse(cached);
+  } else {
+    const project = await getProjectById(projectId);
+    if (!project) throw new ApiError(404, "Project not found", "Project not found");
+    plain = project.toJSON() as Record<string, unknown>;
+    await redis.set(cacheKey, JSON.stringify(plain), "EX", 300);
   }
-  const project = await getProjectById(projectId);
-  if (!project) {
-    throw new ApiError(404, "Project not found", "Project not found");
+
+  if (typeof plain.logoUrl === "string" && plain.logoUrl.startsWith("uploads/")) {
+    plain.logoUrl = await getS3PresignedUrl(plain.logoUrl);
   }
-  await redis.set(key, JSON.stringify(project), "EX", 300);
-  return project;
+  return plain;
 };
 
 export const removeProjectMemberService = async ({
@@ -364,4 +405,29 @@ export const addMemberToProjectService = async ({
   }
 
   return result;
+};
+
+export const uploadProjectLogoService = async ({
+  projectId,
+  userId,
+  file,
+}: {
+  projectId: string;
+  userId: string;
+  file: Express.Multer.File;
+}) => {
+  const isAdmin = await isUserAdminOfProject(userId, projectId);
+  if (!isAdmin) throw new ApiError(403, "Forbidden", "Only an org admin can upload a project logo");
+
+  const project = await getProjectById(projectId);
+  const oldKey = project?.logoUrl?.startsWith("uploads/") ? project.logoUrl : null;
+
+  const { key } = await uploadToS3(file);
+  const updated = await updateProjectLogo(projectId, key);
+
+  if (oldKey) deleteFromS3(oldKey).catch(() => {});
+
+  await redis.del(`project:${projectId}`);
+  const url = await getS3PresignedUrl(key);
+  return { project: updated, url };
 };

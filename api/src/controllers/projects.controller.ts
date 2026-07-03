@@ -2,6 +2,7 @@ import { Response } from "express";
 import asyncHandler from "../helpers/asyncHandler";
 import { AuthRequest } from "../middlewares/auth.middleware";
 import { ApiResponse } from "../helpers/ApiResponse";
+import { ApiError } from "../helpers/ApiError";
 import {
   addMemberToProjectService,
   createProjectService,
@@ -12,6 +13,7 @@ import {
   getUserProjectsService,
   removeProjectMemberService,
   updateProjectService,
+  uploadProjectLogoService,
 } from "../services/projects.service";
 import { isString } from "../helpers/check-string.helper";
 
@@ -168,5 +170,18 @@ export const addMemberToProject = asyncHandler<AuthRequest>(
       .json(
         new ApiResponse(true, "Member added to project successfully", member),
       );
+  },
+);
+
+export const uploadProjectLogo = asyncHandler<AuthRequest>(
+  async (req: AuthRequest, res: Response) => {
+    const projectId = isString(req.params.projectId);
+    if (!req.file) {
+      throw new ApiError(400, "No file provided", "A file is required");
+    }
+    const result = await uploadProjectLogoService({ projectId, userId: req.user.id, file: req.file });
+    return res
+      .status(200)
+      .json(new ApiResponse(true, "Logo uploaded successfully", result));
   },
 );

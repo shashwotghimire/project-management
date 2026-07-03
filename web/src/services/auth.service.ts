@@ -47,3 +47,10 @@ export const updateUserProfileService = async (
   ).data;
   return res.data;
 };
+
+export const uploadUserAvatarService = async (file: File): Promise<{ url: string }> => {
+  const form = new FormData();
+  form.append("file", file);
+  const res = await api.patch<{ success: boolean; data: { url: string } }>("/auth/me/avatar", form);
+  return res.data.data;
+};

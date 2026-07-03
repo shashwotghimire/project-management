@@ -183,7 +183,7 @@ export default function TaskDetails({
                     <p className="text-sm font-semibold leading-tight">{assignee.username}</p>
                     <p className="text-xs text-muted-foreground">{assignee.email}</p>
                   </div>
-                  {assignee.gravatarUrl ? (
+                  {assignee.gravatarUrl?.startsWith("http") ? (
                     <Image
                       src={assignee.gravatarUrl}
                       alt={assignee.username}

@@ -19,6 +19,7 @@ import {
 import { emailQueue } from "../queues/email.queue";
 import { channelMessageEmailTemplate } from "../utils/email-template.utils";
 import { findUserById } from "../repositories/users.repository";
+import { getS3PresignedUrl } from "./s3.service";
 
 const assertOrgAdmin = async (userId: string, orgId: string) => {
   const org = await getOrgByAdminId(userId, orgId);
@@ -75,7 +76,16 @@ export const getChannelMessagesService = async (
   channelId: string,
 ) => {
   await assertProjectMember(userId, projectId);
-  return getMessagesByChannel(channelId);
+  const raw = await getMessagesByChannel(channelId);
+  return Promise.all(
+    raw.map(async (row: any) => {
+      const plain = row.toJSON ? row.toJSON() : { ...row };
+      if (typeof plain.sender?.gravatarUrl === "string" && plain.sender.gravatarUrl.startsWith("uploads/")) {
+        plain.sender.gravatarUrl = await getS3PresignedUrl(plain.sender.gravatarUrl);
+      }
+      return plain;
+    }),
+  );
 };
 
 export const sendMessageService = async (

@@ -11,6 +11,7 @@ import {
 import { useGetUsersProjects } from "../hooks/useProject";
 import Link from "next/link";
 import MemberAvatars from "./MemberAvatars";
+import Image from "next/image";
 
 export function ProjectsTable({ orgId }: { orgId: string }) {
   const { data, isPending, error } = useGetUsersProjects(orgId);
@@ -32,7 +33,21 @@ export function ProjectsTable({ orgId }: { orgId: string }) {
             <TableCell className="py-4 font-medium">
               <Link
                 href={`/organization/${orgId}/projects/${project.Project.id}`}
+                className="flex items-center gap-2"
               >
+                {project.Project.logoUrl?.startsWith("http") ? (
+                  <Image
+                    src={project.Project.logoUrl}
+                    alt={project.Project.name}
+                    width={24}
+                    height={24}
+                    className="rounded-sm object-cover shrink-0"
+                  />
+                ) : (
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-sm bg-muted text-xs font-semibold uppercase">
+                    {project.Project.name.charAt(0)}
+                  </div>
+                )}
                 {project.Project.name}
               </Link>
             </TableCell>

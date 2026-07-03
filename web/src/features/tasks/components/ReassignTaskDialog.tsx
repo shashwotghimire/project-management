@@ -77,7 +77,7 @@ export default function ReassignTaskDialog({
                     isCurrentAssignee && "opacity-60 cursor-default",
                   )}
                 >
-                  {user.gravatarUrl ? (
+                  {user.gravatarUrl?.startsWith("http") ? (
                     <Image
                       src={user.gravatarUrl}
                       alt={user.username}

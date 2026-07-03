@@ -5,6 +5,7 @@ import {
   loginUserService,
   registerService,
   updateUserProfileService,
+  uploadUserAvatarService,
   verifyEmailService,
 } from "../services/auth.service";
 import { ApiResponse } from "../helpers/ApiResponse";
@@ -70,5 +71,17 @@ export const getUserProfile = asyncHandler<AuthRequest>(
     return res
       .status(200)
       .json(new ApiResponse(true, "User profile retrieved successfully", user));
+  },
+);
+
+export const uploadUserAvatar = asyncHandler<AuthRequest>(
+  async (req: AuthRequest, res: Response) => {
+    if (!req.file) {
+      throw new ApiError(400, "No file provided", "A file is required");
+    }
+    const result = await uploadUserAvatarService(req.user.id, req.file);
+    return res
+      .status(200)
+      .json(new ApiResponse(true, "Avatar uploaded successfully", result));
   },
 );

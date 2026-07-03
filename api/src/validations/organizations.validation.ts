@@ -61,3 +61,9 @@ export const removeOrgMemberSchema = z.object({
     userId: z.uuidv4("Invalid user ID"),
   }),
 });
+
+export const uploadOrgLogoSchema = z.object({
+  params: z.object({
+    orgId: z.uuidv4("Invalid organization ID"),
+  }),
+});

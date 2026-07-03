@@ -110,7 +110,7 @@ export default function TaskCard({
         </div>
         {assignee && (
           <div className="flex items-center gap-1.5 shrink-0">
-            {assignee.gravatarUrl ? (
+            {assignee.gravatarUrl?.startsWith("http") ? (
               <Image
                 src={assignee.gravatarUrl}
                 alt={assignee.username}
