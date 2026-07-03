@@ -15,7 +15,10 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: process.env.FRONTEND_ORIGIN ?? "http://localhost:3000",
+    origin: [
+      process.env.FRONTEND_ORIGIN ?? "http://localhost:3000",
+      process.env.FRONTEND_ORIGIN_PROD!,
+    ],
   }),
 );
 app.use("/api/auth", authRoutes);
