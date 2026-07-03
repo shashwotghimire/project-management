@@ -1,0 +1,110 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: postgres-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-app_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - internal
+
+  redis:
+    image: redis:8.8-alpine
+    container_name: redis
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-redis}
+    command: sh -c 'redis-server --requirepass "$$REDIS_PASSWORD"'
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", 'redis-cli -a "$$REDIS_PASSWORD" ping | grep PONG']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - internal
+
+  api:
+    build: ./api
+    container_name: api
+    restart: unless-stopped
+    env_file: ./api/.env
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redis}
+      - PGHOST=postgres
+      - PGDATABASE=${POSTGRES_DB:-app_db}
+      - PGUSER=${POSTGRES_USER:-postgres}
+      - PGPASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - PGSSLMODE=disable
+    ports:
+      - "${PORT:-8080}:${PORT:-8080}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+      - default
+
+  worker:
+    build: ./api
+    container_name: worker
+    restart: unless-stopped
+    env_file: ./api/.env
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redis}
+      - PGHOST=postgres
+      - PGDATABASE=${POSTGRES_DB:-app_db}
+      - PGUSER=${POSTGRES_USER:-postgres}
+      - PGPASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - PGSSLMODE=disable
+    command: node dist/worker.js
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+
+  # web:
+  #   build:
+  #     context: ./web
+  #     args:
+  #       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080/api}
+  #       NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL:-http://localhost:8080}
+  #   container_name: web
+  #   restart: unless-stopped
+  #   environment:
+  #     PORT: 3000
+  #     HOSTNAME: 0.0.0.0
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - api
+  #   networks:
+  #     - default
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  internal:
