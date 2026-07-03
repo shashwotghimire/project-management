@@ -18,6 +18,7 @@ import {
   getTasksInProject,
   getUserTasksForCalendar,
   reassignTaskToAnotherUser,
+  tasksDueSoon,
   updateTask,
   updateTaskPosition,
   updateTaskStatus,
@@ -567,6 +568,28 @@ export const reassignTaskToAnotherUserService = async ({
       { attempts: 3, backoff: { type: "exponential", delay: 5000 } },
     );
   }
-
   return result;
+};
+
+export const getTasksDueSoonService = async ({
+  userId,
+  orgId,
+  startDate,
+  endDate,
+}: {
+  userId: string;
+  orgId: string;
+  startDate: string;
+  endDate: string;
+}) => {
+  const isUserMemberOfOrg = await userMemberOfOrg(userId, orgId);
+  if (!isUserMemberOfOrg) {
+    throw new ApiError(
+      403,
+      "Forbidden",
+      "Only members of the organization can view their due tasks.",
+    );
+  }
+  const tasks = await tasksDueSoon(userId, orgId, startDate, endDate);
+  return tasks;
 };

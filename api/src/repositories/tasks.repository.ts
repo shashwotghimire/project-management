@@ -204,3 +204,47 @@ export const getUserTasksForCalendar = async ({
     ],
   });
 };
+
+export const tasksDueSoon = async (
+  userId: string,
+  organizationId: string,
+  startDate: string,
+  endDate: string,
+) => {
+  const tasks = await Tasks.findAll({
+    where: {
+      assignedTo: userId,
+      status: { [Op.ne]: "completed" },
+      dueDate: { [Op.between]: [startDate, endDate] },
+    },
+    include: {
+      model: Project,
+      where: { organizationId },
+      attributes: ["id", "name", "organizationId"],
+    },
+  });
+  return tasks;
+};
+
+export const getAllTasksDueSoon = async (startDate: Date, endDate: Date) => {
+  return await Tasks.findAll({
+    where: {
+      assignedTo: { [Op.ne]: null },
+      status: { [Op.ne]: "completed" },
+      dueDate: { [Op.between]: [startDate, endDate] },
+    },
+    include: [
+      {
+        model: Project,
+        as: "project",
+        attributes: ["id", "name", "organizationId"],
+        required: true,
+      },
+      {
+        model: User,
+        as: "assignee",
+        attributes: ["id", "email", "username", "gravatarUrl"],
+      },
+    ],
+  });
+};
