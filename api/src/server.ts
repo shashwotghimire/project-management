@@ -10,7 +10,10 @@ const PORT = process.env.PORT;
 
 export const server = createServer(app);
 const io = new Server(server, {
-  cors: { origin: process.env.FRONTEND_ORIGIN, credentials: true },
+  cors: {
+    origin: [process.env.FRONTEND_ORIGIN!, process.env.FRONTEND_ORIGIN_PROD!],
+    credentials: true,
+  },
 });
 setNotificationServer(io);
 registerSocketEvents(io);
