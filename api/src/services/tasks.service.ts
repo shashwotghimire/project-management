@@ -30,6 +30,12 @@ import { TaskPriority, TaskStatus } from "../types/tasks";
 import { createNotificationService } from "./notifications.service";
 import { getS3PresignedUrl } from "./s3.service";
 
+type TaskJsonWithAssignee = {
+  assignee?: {
+    gravatarUrl?: string | null;
+  };
+};
+
 export const createTaskService = async (data: {
   title: string;
   description: string;
@@ -156,16 +162,23 @@ export const getTasksInProjectService = async ({
   if (cached) return JSON.parse(cached);
 
   const raw = await getTasksInProject(projectId, page, limit);
-  const data = await Promise.all(
-    raw.data.map(async (task: any) => {
-      const plain = task.toJSON ? task.toJSON() : { ...task };
-      if (typeof plain.assignee?.gravatarUrl === "string" && plain.assignee.gravatarUrl.startsWith("uploads/")) {
-        plain.assignee.gravatarUrl = await getS3PresignedUrl(plain.assignee.gravatarUrl);
+  const tasks = await Promise.all(
+    raw.tasks.map(async (task) => {
+      const plain = (task.toJSON
+        ? task.toJSON()
+        : { ...task }) as TaskJsonWithAssignee;
+      if (
+        typeof plain.assignee?.gravatarUrl === "string" &&
+        plain.assignee.gravatarUrl.startsWith("uploads/")
+      ) {
+        plain.assignee.gravatarUrl = await getS3PresignedUrl(
+          plain.assignee.gravatarUrl,
+        );
       }
       return plain;
     }),
   );
-  const result = { ...raw, data };
+  const result = { ...raw, tasks };
   await redis.set(key, JSON.stringify(result), "EX", 300);
   return result;
 };
@@ -214,9 +227,16 @@ export const getTaskByIdService = async ({
         userId: task.assignedTo,
       })
     : null;
-  const plainTask = task.toJSON ? task.toJSON() : { ...task };
-  if (typeof plainTask.assignee?.gravatarUrl === "string" && plainTask.assignee.gravatarUrl.startsWith("uploads/")) {
-    plainTask.assignee.gravatarUrl = await getS3PresignedUrl(plainTask.assignee.gravatarUrl);
+  const plainTask = (task.toJSON
+    ? task.toJSON()
+    : { ...task }) as TaskJsonWithAssignee;
+  if (
+    typeof plainTask.assignee?.gravatarUrl === "string" &&
+    plainTask.assignee.gravatarUrl.startsWith("uploads/")
+  ) {
+    plainTask.assignee.gravatarUrl = await getS3PresignedUrl(
+      plainTask.assignee.gravatarUrl,
+    );
   }
   const result = { task: plainTask, assignedTaskUserDetails };
   await redis.set(key, JSON.stringify(result), "EX", 300);

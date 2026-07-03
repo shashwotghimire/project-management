@@ -5,9 +5,11 @@ import {
   InferAttributes,
   InferCreationAttributes,
   Model,
+  NonAttribute,
 } from "sequelize";
 import { sequelize } from "../configs/db.config";
 import { TaskPriority, TaskStatus } from "../types/tasks";
+import type { User } from "./users.model";
 
 export class Tasks extends Model<
   InferAttributes<Tasks>,
@@ -25,6 +27,7 @@ export class Tasks extends Model<
   declare position: CreationOptional<number>;
   declare dueDate: CreationOptional<string | null>;
   declare completedAt: CreationOptional<string>;
+  declare assignee?: NonAttribute<User>;
 }
 
 Tasks.init(
