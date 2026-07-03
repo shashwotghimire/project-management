@@ -1,9 +1,12 @@
 import api from "@/lib/axios";
 import {
   CreateOrganizationResponse,
+  DeleteOrganizationResponse,
   GetOrgMembersResponse,
   GetUsersOrganizationsResponse,
   OrganizationByIdResponse,
+  UpdateOrganizationRequest,
+  UpdateOrganizationResponse,
 } from "@/types/organization-api.types";
 
 export const getUsersOrganizationsService = async (
@@ -36,6 +39,23 @@ export const getOrganizationByIdService = async (orgId: string) => {
     `/organizations/${orgId}`,
   );
   return response.data.data;
+};
+
+export const updateOrganizationService = async (
+  orgId: string,
+  data: UpdateOrganizationRequest,
+): Promise<UpdateOrganizationResponse["data"]> => {
+  const response = await api.patch<UpdateOrganizationResponse>(
+    `/organizations/${orgId}`,
+    data,
+  );
+  return response.data.data;
+};
+
+export const deleteOrganizationService = async (
+  orgId: string,
+): Promise<void> => {
+  await api.delete<DeleteOrganizationResponse>(`/organizations/${orgId}`);
 };
 
 export const getOrgMembersService = async (

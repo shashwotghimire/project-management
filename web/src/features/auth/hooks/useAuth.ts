@@ -2,6 +2,7 @@ import {
   getUserProfileService,
   loginService,
   registerService,
+  updateUserProfileService,
 } from "@/services/auth.service";
 import {
   GetUserResponse,
@@ -9,8 +10,10 @@ import {
   LoginResponse,
   RegisterRequest,
   RegisterResponse,
+  UpdateUserProfileRequest,
+  UpdateUserProfileResponse,
 } from "@/types/auth-api.types";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useLogin = () => {
   return useMutation<LoginResponse["data"], Error, LoginRequest>({
@@ -28,6 +31,20 @@ export const useRegister = () => {
   return useMutation<RegisterResponse["data"], Error, RegisterRequest>({
     mutationFn: (data: RegisterRequest) => {
       return registerService(data.email, data.password, data.username);
+    },
+  });
+};
+
+export const useUpdateUserProfile = () => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    UpdateUserProfileResponse["data"],
+    Error,
+    UpdateUserProfileRequest
+  >({
+    mutationFn: (data) => updateUserProfileService(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
   });
 };

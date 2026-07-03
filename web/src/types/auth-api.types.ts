@@ -45,3 +45,15 @@ export interface GetUserResponse {
   message: string;
   data: AuthUser;
 }
+
+export interface UpdateUserProfileRequest {
+  username?: string;
+  currentPassword?: string;
+  newPassword?: string;
+}
+
+export interface UpdateUserProfileResponse {
+  success: boolean;
+  message: string;
+  data: AuthUser;
+}

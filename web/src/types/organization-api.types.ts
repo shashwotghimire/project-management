@@ -74,3 +74,22 @@ export interface GetOrgMembersResponse {
   message: string;
   data: OrgMember[];
 }
+
+export interface UpdateOrganizationRequest {
+  name?: string;
+  description?: string;
+  websiteUrl?: string;
+  logoUrl?: string;
+}
+
+export interface UpdateOrganizationResponse {
+  success: boolean;
+  message: string;
+  data: Organization;
+}
+
+export interface DeleteOrganizationResponse {
+  success: boolean;
+  message: string;
+  data: null;
+}

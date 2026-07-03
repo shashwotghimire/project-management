@@ -1,3 +1,4 @@
+import { User } from "../models/users.model";
 import { ApiError } from "../helpers/ApiError";
 import { comparePassword, hashPassword } from "../helpers/hash.helper";
 import { generateAccessToken } from "../helpers/jwt.helper";
@@ -7,6 +8,7 @@ import {
   findUserByEmail,
   updateUserEmailVerified,
   findUserById,
+  updateUser,
 } from "../repositories/users.repository";
 import { createRandomToken } from "../utils/crypto.utils";
 import { verifyEmailTemplate } from "../utils/email-template.utils";
@@ -105,6 +107,40 @@ export const loginUserService = async (data: {
     isEmailVerified: user.emailVerified,
   });
   return { user, accessToken };
+};
+
+export const updateUserProfileService = async (
+  userId: string,
+  data: { username?: string; currentPassword?: string; newPassword?: string },
+) => {
+  const user = await User.scope("withPassword").findByPk(userId);
+  if (!user) throw new ApiError(404, "Not found", "User not found");
+
+  const updates: { username?: string; password?: string } = {};
+
+  if (data.username) {
+    updates.username = data.username;
+  }
+
+  if (data.newPassword) {
+    if (!data.currentPassword) {
+      throw new ApiError(
+        400,
+        "Bad request",
+        "Current password is required to set a new password",
+      );
+    }
+    const isValid = await comparePassword(data.currentPassword, user.password);
+    if (!isValid) {
+      throw new ApiError(400, "Bad request", "Current password is incorrect");
+    }
+    updates.password = await hashPassword(data.newPassword);
+  }
+
+  const updated = await updateUser(userId, updates);
+  const key = `user:${userId}`;
+  await redis.del(key);
+  return updated;
 };
 
 export const getUserProfileService = async (userId: string) => {

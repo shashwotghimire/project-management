@@ -1,8 +1,11 @@
 import {
+  deleteOrganizationService,
   getOrgMembersService,
   getOrganizationByIdService,
+  updateOrganizationService,
 } from "@/services/organization.service";
-import { useQuery } from "@tanstack/react-query";
+import { UpdateOrganizationRequest } from "@/types/organization-api.types";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useGetOrganizationById = (orgId: string) => {
   return useQuery({
@@ -11,6 +14,23 @@ export const useGetOrganizationById = (orgId: string) => {
       const response = await getOrganizationByIdService(orgId);
       return response;
     },
+  });
+};
+
+export const useUpdateOrganization = (orgId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: UpdateOrganizationRequest) =>
+      updateOrganizationService(orgId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["organization", orgId] });
+    },
+  });
+};
+
+export const useDeleteOrganization = (orgId: string) => {
+  return useMutation({
+    mutationFn: () => deleteOrganizationService(orgId),
   });
 };
 

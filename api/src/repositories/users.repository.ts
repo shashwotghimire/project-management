@@ -31,6 +31,18 @@ export const findUserByEmailVerificationToken = (token: string) => {
   return User.findOne({ where: { emailVerificationToken: token } });
 };
 
+export const updateUser = async (
+  userId: string,
+  data: { username?: string; password?: string },
+) => {
+  const user = await User.findByPk(userId);
+  if (!user) return null;
+  if (data.username) user.username = data.username;
+  if (data.password) user.password = data.password;
+  await user.save();
+  return user;
+};
+
 export const updateUserEmailVerified = async (userId: string) => {
   return User.update(
     {

@@ -4,6 +4,7 @@ import {
   getUserProfileService,
   loginUserService,
   registerService,
+  updateUserProfileService,
   verifyEmailService,
 } from "../services/auth.service";
 import { ApiResponse } from "../helpers/ApiResponse";
@@ -46,6 +47,21 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
     .status(200)
     .json(new ApiResponse(true, "Login successful", result));
 });
+
+export const updateUserProfile = asyncHandler<AuthRequest>(
+  async (req: AuthRequest, res: Response) => {
+    const userId = req.user.id;
+    const { username, currentPassword, newPassword } = req.body;
+    const user = await updateUserProfileService(userId, {
+      username,
+      currentPassword,
+      newPassword,
+    });
+    return res
+      .status(200)
+      .json(new ApiResponse(true, "Profile updated successfully", user));
+  },
+);
 
 export const getUserProfile = asyncHandler<AuthRequest>(
   async (req: AuthRequest, res: Response) => {

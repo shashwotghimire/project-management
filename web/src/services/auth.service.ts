@@ -3,6 +3,8 @@ import {
   GetUserResponse,
   LoginResponse,
   RegisterResponse,
+  UpdateUserProfileRequest,
+  UpdateUserProfileResponse,
 } from "@/types/auth-api.types";
 
 export const loginService = async (
@@ -34,5 +36,14 @@ export const getUserProfileService = async (): Promise<
   GetUserResponse["data"]
 > => {
   const res = (await api.get<GetUserResponse>("/auth/me")).data;
+  return res.data;
+};
+
+export const updateUserProfileService = async (
+  data: UpdateUserProfileRequest,
+): Promise<UpdateUserProfileResponse["data"]> => {
+  const res = (
+    await api.patch<UpdateUserProfileResponse>("/auth/me", data)
+  ).data;
   return res.data;
 };

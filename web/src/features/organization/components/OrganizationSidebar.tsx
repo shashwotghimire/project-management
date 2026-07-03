@@ -22,6 +22,7 @@ import {
 import Logo from "@/components/Logo";
 import { useGetOrganizationById } from "@/features/organization/hooks/useOrganization";
 import { useGetUserProfile } from "@/features/auth/hooks/useAuth";
+import { useQueryClient } from "@tanstack/react-query";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -52,11 +53,13 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { data: org } = useGetOrganizationById(orgId);
   const { data: user } = useGetUserProfile();
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
+    queryClient.clear();
     router.push("/login");
   };
 
@@ -175,7 +178,7 @@ export function AppSidebar() {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild className="cursor-pointer">
-                <Link href={`/organization/${orgId}/settings`}>
+                <Link href="/profile">
                   <UserCircle className="size-4 mr-2" />
                   Profile
                 </Link>
