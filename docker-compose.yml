@@ -39,7 +39,7 @@ services:
       - internal
 
   api:
-    image: gchr.io/shashwotghimire/project-management:latest
+    image: ghcr.io/shashwotghimire/project-management:latest
     build: ./api
     container_name: api
     restart: unless-stopped
