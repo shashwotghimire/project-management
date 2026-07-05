@@ -39,6 +39,7 @@ services:
       - internal
 
   api:
+    image: gchr.io/shashwotghimire/project-management:latest
     build: ./api
     container_name: api
     restart: unless-stopped
@@ -63,6 +64,7 @@ services:
       - default
 
   worker:
+    image: ghcr.io/shashwotghimire/project-management:latest
     build: ./api
     container_name: worker
     restart: unless-stopped

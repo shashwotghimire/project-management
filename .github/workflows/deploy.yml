@@ -45,7 +45,7 @@ jobs:
           script: |
             set -e
                     echo "${{secrets.GITHUB_TOKEN}}" | docker login ghcr.io -u ${{github.actor}} --password-stdin
-                    cd /projects/project-management
+                    cd projects/project-management
                     sudo docker compose pull api worker
                     sudo docker compose up -d --no-deps api worker
                     sudo docker image prune -f
