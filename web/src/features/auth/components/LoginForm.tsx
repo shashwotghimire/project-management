@@ -59,6 +59,10 @@ export const LoginForm = () => {
             {isPending ? "Logging you in" : "Log in"}
           </Button>
           {error && <p className="text-red-500">{error.message}</p>}
+          <p className="text-sm text-center text-muted-foreground">
+            No account?{" "}
+            <a href="/register" className="font-medium hover:underline">Register</a>
+          </p>
         </form>
       </Card>
     </div>

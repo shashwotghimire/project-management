@@ -11,6 +11,8 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+export const metadata: Metadata = {
   title: "Project Management | Plan, schedule, and discuss work",
   description:
     "A focused project workspace for boards, task calendars, members, notifications, and project chat.",

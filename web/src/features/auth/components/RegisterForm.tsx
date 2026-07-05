@@ -66,6 +66,10 @@ export const RegisterForm = () => {
           </Button>
           {error && <p className="text-red-500">{error.message}</p>}
           {message && <p className="text-green-500">{message}</p>}
+          <p className="text-sm text-center text-muted-foreground">
+            Already registered?{" "}
+            <a href="/login" className="font-medium hover:underline">Log in</a>
+          </p>
         </form>
       </Card>
     </div>

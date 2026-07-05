@@ -1,10 +1,11 @@
 import React from "react";
+import Link from "next/link";
 
 function Logo() {
   return (
-    <div>
-      <h1 className="text-xl font-bold">Project Management </h1>
-    </div>
+    <Link href="/onboarding">
+      <h1 className="text-xl font-bold">TeamWork</h1>
+    </Link>
   );
 }
 

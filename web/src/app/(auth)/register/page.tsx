@@ -1,11 +1,13 @@
 import { PublicRoutes } from "@/components/PublicRoutes";
 import { AuthGraphicsRegister } from "@/features/auth/components/AuthGraphics";
+import { AuthNavbar } from "@/features/auth/components/AuthNavbar";
 import { RegisterForm } from "@/features/auth/components/RegisterForm";
 
 function RegisterPage() {
   return (
     <PublicRoutes>
-      <div className="h-screen flex overflow-hidden">
+      <div className="relative h-screen flex overflow-hidden">
+        <AuthNavbar />
         <div className="hidden md:block md:w-1/2">
           <AuthGraphicsRegister />
         </div>

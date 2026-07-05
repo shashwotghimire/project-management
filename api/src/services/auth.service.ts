@@ -51,7 +51,7 @@ export const registerService = async (data: {
     {
       to: user.email,
       subject: "Verify your email",
-      html: verifyEmailTemplate(user.username, emailVerificationToken),
+      html: verifyEmailTemplate(user.username, `${process.env.FRONTEND_ORIGIN_PROD || process.env.FRONTEND_ORIGIN}/verify-email?token=${emailVerificationToken}`),
     },
     {
       attempts: 3,
