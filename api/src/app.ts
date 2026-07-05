@@ -10,6 +10,7 @@ import commentRoutes from "./routes/comments.route";
 import channelRoutes from "./routes/channels.route";
 import aiRoutes from "./routes/llm.route";
 import notificationRoutes from "./routes/notifications.route";
+import checkRoutes from "./routes/check.route";
 
 const app = express();
 app.use(express.json());
@@ -21,6 +22,7 @@ app.use(
     ],
   }),
 );
+app.use("/api/check", checkRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/organizations", organizationRoutes);
 app.use("/api/invitations", invitationRoutes);
