@@ -5,6 +5,7 @@ import {
   updateOrganizationService,
   uploadOrgLogoService,
 } from "@/services/organization.service";
+import { getDashboardSummaryService, regenerateDashboardSummaryService } from "@/services/llm.service";
 import { UpdateOrganizationRequest } from "@/types/organization-api.types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -49,6 +50,25 @@ export const useUploadOrgLogo = (orgId: string) => {
     mutationFn: (file) => uploadOrgLogoService(orgId, file),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["organization", orgId] });
+    },
+  });
+};
+
+export const useGetDashboardSummary = (orgId: string) => {
+  return useQuery({
+    queryKey: ["dashboard-summary", orgId],
+    queryFn: () => getDashboardSummaryService(orgId),
+    enabled: !!orgId,
+    staleTime: Infinity,
+  });
+};
+
+export const useRegenerateDashboardSummary = (orgId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => regenerateDashboardSummaryService(orgId),
+    onSuccess: (data) => {
+      queryClient.setQueryData(["dashboard-summary", orgId], data);
     },
   });
 };

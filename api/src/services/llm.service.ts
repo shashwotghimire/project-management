@@ -1,7 +1,17 @@
-import { Op } from "sequelize";
 import client from "../configs/llm.config";
 import { getTasksAssignedToUser } from "../repositories/tasks.repository";
 import { getProjectsByUserId } from "../repositories/projects.repository";
+import { getAiSummary, upsertAiSummary } from "../repositories/ai-summary.repository";
+
+export async function getDashboardSummary(data: {
+  userId: string;
+  orgId: string;
+}): Promise<string> {
+  const { userId, orgId } = data;
+  const cached = await getAiSummary(userId, orgId);
+  if (cached) return cached.content;
+  return generateDashboardSummary({ userId, orgId });
+}
 
 export async function generateDashboardSummary(data: {
   userId: string;
@@ -30,10 +40,7 @@ export async function generateDashboardSummary(data: {
   ).length;
 
   const overdueTasks = orgTasks.filter(
-    (t) =>
-      t.dueDate &&
-      new Date(t.dueDate) < now &&
-      t.status !== "completed",
+    (t) => t.dueDate && new Date(t.dueDate) < now && t.status !== "completed",
   ).length;
 
   const projectsResult = await getProjectsByUserId(userId, orgId, {
@@ -50,7 +57,7 @@ export async function generateDashboardSummary(data: {
     system: `You write single-sentence status summaries for a project management dashboard.
 Rules:
 - Output ONLY the summary text, nothing else.
-- Max 2 short sentences.
+- Minimum 2 Max 3 short sentences.
 - Lead with the most urgent/important number.
 - Plain, direct tone (no exclamation marks, no "Great news!").
 - If a count is 0, omit it rather than saying "0 tasks..."`,
@@ -66,5 +73,7 @@ Rules:
   });
 
   const block = response.content.find((b) => b.type === "text");
-  return block?.type === "text" ? block.text : "";
+  const text = block?.type === "text" ? block.text : "";
+  if (text) await upsertAiSummary(userId, orgId, text);
+  return text;
 }

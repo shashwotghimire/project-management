@@ -1,3 +1,4 @@
+import { AiSummary } from "./ai-summary.model";
 import { Channel } from "./channel.model";
 import { Comments } from "./comments.model";
 import { Invitations } from "./invitation.model";
@@ -99,3 +100,9 @@ User.hasMany(Messages, { foreignKey: "senderId", as: "sentMessages" });
 
 User.hasMany(Notifications, { foreignKey: "userId", as: "notifications" });
 Notifications.belongsTo(User, { foreignKey: "userId", as: "user" });
+
+AiSummary.belongsTo(User, { foreignKey: "userId" });
+User.hasOne(AiSummary, { foreignKey: "userId" });
+
+AiSummary.belongsTo(Organization, { foreignKey: "orgId" });
+Organization.hasMany(AiSummary, { foreignKey: "orgId" });
