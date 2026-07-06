@@ -3,6 +3,8 @@ import { Project } from "../models/projects.model";
 import { ProjectMembers } from "../models/project-members.model";
 import { OrganizationsMember } from "../models/organizations-members.model";
 import { User } from "../models/users.model";
+import { Organization } from "../models/organizations.model";
+import { ApiError } from "../helpers/ApiError";
 import { sequelize } from "../configs/db.config";
 
 export async function createProject(data: {
@@ -36,6 +38,23 @@ export async function isUserMemberOfProject(
   userId: string,
   projectId: string,
 ): Promise<boolean> {
+  const user = await User.findByPk(userId);
+  const isSuperadmin = user?.role === "superadmin";
+
+  if (!isSuperadmin) {
+    const project = await Project.findByPk(projectId);
+    if (project) {
+      const org = await Organization.findByPk(project.organizationId);
+      if (org && org.blocked) {
+        throw new ApiError(
+          403,
+          "This organization has been suspended",
+          "Organization suspended",
+        );
+      }
+    }
+  }
+
   const member = await ProjectMembers.findOne({ where: { userId, projectId } });
   return !!member;
 }

@@ -1,5 +1,6 @@
 import { User } from "../models/users.model";
 import { UserRoles } from "../types/roles";
+import { Op } from "sequelize";
 
 export const findUserByEmail = (email: string) => {
   return User.scope("withPassword").findOne({ where: { email } });
@@ -61,4 +62,40 @@ export const updateUserAvatar = async (userId: string, gravatarUrl: string) => {
   user.gravatarUrl = gravatarUrl;
   await user.save();
   return user;
+};
+
+// Super Admin repository functions
+export const getAllUsersForAdmin = async ({
+  page,
+  limit,
+  query,
+}: {
+  page: number;
+  limit: number;
+  query?: string;
+}) => {
+  const whereClause: any = {};
+  if (query?.trim()) {
+    whereClause[Op.or] = [
+      { username: { [Op.iLike]: `%${query.trim()}%` } },
+      { email: { [Op.iLike]: `%${query.trim()}%` } },
+    ];
+  }
+
+  const { rows, count } = await User.findAndCountAll({
+    where: whereClause,
+    limit,
+    offset: (page - 1) * limit,
+    order: [["createdAt", "DESC"]],
+  });
+
+  return {
+    users: rows,
+    pagination: {
+      page,
+      limit,
+      total: count,
+      pages: Math.ceil(count / limit),
+    },
+  };
 };

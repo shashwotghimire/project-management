@@ -542,3 +542,93 @@ export function channelMessageEmailTemplate(
 </html>
   `.trim();
 }
+
+export function orgSuspendedEmailTemplate(username: string, orgName: string): string {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Organization Suspended</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f4f5;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+          <tr>
+            <td style="background:#ef4444;padding:32px 40px;">
+              <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;">Project Management</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:40px;">
+              <h2 style="margin:0 0 16px;color:#111827;font-size:20px;">Organization Suspended</h2>
+              <p style="margin:0 0 12px;color:#374151;font-size:15px;line-height:1.6;">Hi ${username},</p>
+              <p style="margin:0 0 32px;color:#374151;font-size:15px;line-height:1.6;">
+                We are writing to inform you that your organization <strong>${orgName}</strong> has been suspended by a platform administrator.
+                Members of this organization will not be able to access any projects, tasks, or chats until it is unblocked.
+              </p>
+              <p style="margin:0;color:#6b7280;font-size:14px;line-height:1.6;">
+                If you believe this is a mistake, please contact support.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px 40px;border-top:1px solid #e5e7eb;">
+              <p style="margin:0;color:#9ca3af;font-size:12px;">&copy; ${new Date().getFullYear()} Project Management. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+}
+
+export function orgUnsuspendedEmailTemplate(username: string, orgName: string): string {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Organization Reactivated</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f4f5;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+          <tr>
+            <td style="background:#10b981;padding:32px 40px;">
+              <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;">Project Management</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:40px;">
+              <h2 style="margin:0 0 16px;color:#111827;font-size:20px;">Organization Reactivated</h2>
+              <p style="margin:0 0 12px;color:#374151;font-size:15px;line-height:1.6;">Hi ${username},</p>
+              <p style="margin:0 0 32px;color:#374151;font-size:15px;line-height:1.6;">
+                Great news! Your organization <strong>${orgName}</strong> has been reactivated.
+                Members of this organization can now access their projects, tasks, and chats.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px 40px;border-top:1px solid #e5e7eb;">
+              <p style="margin:0;color:#9ca3af;font-size:12px;">&copy; ${new Date().getFullYear()} Project Management. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+}
+
