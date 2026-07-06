@@ -143,6 +143,12 @@ export interface ReassignTaskResponse {
   data: null;
 }
 
+export interface GetMyOrgTasksResponse {
+  success: boolean;
+  message: string;
+  data: Task[];
+}
+
 export const columns = [
   { title: "To Do", status: "todo" },
   { title: "In Progress", status: "in_progress" },

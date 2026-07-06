@@ -4,6 +4,7 @@ import {
   CreateTaskResponse,
   DeleteTaskRequest,
   DeleteTaskResponse,
+  GetMyOrgTasksResponse,
   GetProjectTasksResponse,
   GetTaskByIdResponse,
   PaginatedTasks,
@@ -108,6 +109,13 @@ export const createTaskService = async ({
   const response = await api.post<CreateTaskResponse>(
     `/organizations/${orgId}/projects/${projectId}/tasks`,
     { title, description, status, priority, assignedTo },
+  );
+  return response.data.data;
+};
+
+export const getMyOrgTasksService = async (orgId: string): Promise<Task[]> => {
+  const response = await api.get<GetMyOrgTasksResponse>(
+    `/organizations/${orgId}/my-tasks`,
   );
   return response.data.data;
 };

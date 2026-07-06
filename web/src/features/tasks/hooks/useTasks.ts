@@ -1,6 +1,7 @@
 import {
   createTaskService,
   deleteTaskService,
+  getMyOrgTasksService,
   getProjectTasksService,
   getTaskByIdService,
   reassignTaskService,
@@ -20,6 +21,13 @@ import {
   UpdateTaskStatusRequest,
 } from "@/types/task-api.types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+export const useGetMyOrgTasks = (orgId: string) => {
+  return useQuery<Task[]>({
+    queryKey: ["my-tasks", orgId],
+    queryFn: () => getMyOrgTasksService(orgId),
+  });
+};
 
 export const useGetProjectTasks = (
   orgId: string,
