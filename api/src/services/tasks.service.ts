@@ -97,6 +97,7 @@ export const createTaskService = async (data: {
   if (data.assignedTo) {
     await redis.del(`tasks:user:${data.assignedTo}`);
     await redis.del(`tasks:${data.projectId}:user:${data.assignedTo}`);
+    await redis.del(`tasks:calendar:${project.organizationId}:${data.assignedTo}`);
 
     const assignee = await findUserById(data.assignedTo);
     const assigner = await findUserById(data.assignedBy);
@@ -365,7 +366,10 @@ export const updateTaskService = async ({
 
   const keys = await redis.keys(`tasks:${projectId}:*`);
   const toDelete = [`task:${taskId}`, ...keys];
-  if (task.assignedTo) toDelete.push(`tasks:user:${task.assignedTo}`);
+  if (task.assignedTo) {
+    toDelete.push(`tasks:user:${task.assignedTo}`);
+    toDelete.push(`tasks:calendar:${project.organizationId}:${task.assignedTo}`);
+  }
   if (toDelete.length) await redis.del(...toDelete);
 
   return updated;
@@ -444,7 +448,10 @@ export const updateTaskStatusService = async ({
 
   const keys = await redis.keys(`tasks:${projectId}:*`);
   const toDelete = [`task:${taskId}`, ...keys];
-  if (task.assignedTo) toDelete.push(`tasks:user:${task.assignedTo}`);
+  if (task.assignedTo) {
+    toDelete.push(`tasks:user:${task.assignedTo}`);
+    toDelete.push(`tasks:calendar:${project.organizationId}:${task.assignedTo}`);
+  }
   if (toDelete.length) await redis.del(...toDelete);
 };
 
@@ -573,9 +580,13 @@ export const reassignTaskToAnotherUserService = async ({
 
   const keys = await redis.keys(`tasks:${projectId}:*`);
   const toDelete = [`task:${taskId}`, ...keys];
-  // invalidate both old and new assignee's user-level caches
-  if (task.assignedTo) toDelete.push(`tasks:user:${task.assignedTo}`);
+  // invalidate both old and new assignee's user-level and calendar caches
+  if (task.assignedTo) {
+    toDelete.push(`tasks:user:${task.assignedTo}`);
+    toDelete.push(`tasks:calendar:${project.organizationId}:${task.assignedTo}`);
+  }
   toDelete.push(`tasks:user:${newUserId}`);
+  toDelete.push(`tasks:calendar:${project.organizationId}:${newUserId}`);
   if (toDelete.length) await redis.del(...toDelete);
 
   const newAssignee = await findUserById(newUserId);
