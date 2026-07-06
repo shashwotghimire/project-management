@@ -1,29 +1,33 @@
 "use client";
 
-import { Bell } from "lucide-react";
+import { Bell, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Notification } from "@/types/notification-api.types";
 import Link from "next/link";
+import { useDeleteNotification } from "@/features/notifications/hooks/useNotifications";
 
 interface NotificationBellProps {
   notifications: Notification[];
   unreadCount: number;
+  orgId: string;
   onOpen?: () => void;
 }
 
 export function NotificationBell({
   notifications,
   unreadCount,
+  orgId,
   onOpen,
 }: NotificationBellProps) {
+  const { mutate: deleteNotification } = useDeleteNotification(orgId);
+
   return (
     <DropdownMenu onOpenChange={(open) => open && onOpen?.()}>
       <DropdownMenuTrigger asChild>
@@ -49,19 +53,30 @@ export function NotificationBell({
           </div>
         ) : (
           notifications.map((n) => (
-            <DropdownMenuItem key={n.id} asChild={!!n.href}>
-              {n.href ? (
-                <Link href={n.href} className="flex flex-col items-start gap-0.5 py-2 w-full cursor-pointer">
-                  <span className="font-medium text-sm">{n.title}</span>
-                  <span className="text-xs text-muted-foreground line-clamp-2">{n.message}</span>
-                </Link>
-              ) : (
-                <div className="flex flex-col items-start gap-0.5 py-2">
-                  <span className="font-medium text-sm">{n.title}</span>
-                  <span className="text-xs text-muted-foreground line-clamp-2">{n.message}</span>
-                </div>
-              )}
-            </DropdownMenuItem>
+            <div key={n.id} className="group relative flex items-start px-2 py-2 hover:bg-accent rounded-sm">
+              <div className="flex-1 min-w-0">
+                {n.href ? (
+                  <Link href={n.href} className="flex flex-col gap-0.5 cursor-pointer">
+                    <span className="font-medium text-sm">{n.title}</span>
+                    <span className="text-xs text-muted-foreground line-clamp-2">{n.message}</span>
+                  </Link>
+                ) : (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="font-medium text-sm">{n.title}</span>
+                    <span className="text-xs text-muted-foreground line-clamp-2">{n.message}</span>
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteNotification(n.id);
+                }}
+                className="ml-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground"
+              >
+                <X className="size-3.5" />
+              </button>
+            </div>
           ))
         )}
       </DropdownMenuContent>

@@ -24,7 +24,7 @@ export function OrganizationNavbar() {
       </div>
 
       <div className="flex items-center gap-2">
-        <NotificationBell notifications={notifications} unreadCount={unreadCount} />
+        <NotificationBell notifications={notifications} unreadCount={unreadCount} orgId={orgId} />
         <CreateProjectModal orgId={orgId} />
       </div>
     </header>

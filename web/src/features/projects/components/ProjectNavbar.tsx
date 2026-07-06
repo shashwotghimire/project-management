@@ -23,7 +23,7 @@ export function ProjectNavbar() {
       </div>
 
       <div className="flex items-center gap-2">
-        <NotificationBell notifications={notifications} unreadCount={unreadCount} />
+        <NotificationBell notifications={notifications} unreadCount={unreadCount} orgId={orgId} />
         <CreateTaskModal orgId={orgId} projectId="" />
       </div>
     </header>

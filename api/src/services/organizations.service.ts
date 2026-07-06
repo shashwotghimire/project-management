@@ -61,7 +61,18 @@ export const getUsersOrganizationsService = async ({
   limit: number;
   query?: string;
 }) => {
-  return await getUsersOrganizations({ userId, page, limit, query });
+  const result = await getUsersOrganizations({ userId, page, limit, query });
+  const organizations = await Promise.all(
+    result.organizations.map(async (member) => {
+      const plain = member.toJSON() as Record<string, unknown>;
+      const org = plain.Organization as Record<string, unknown> | undefined;
+      if (org && typeof org.logoUrl === "string" && org.logoUrl.startsWith("uploads/")) {
+        org.logoUrl = await getS3PresignedUrl(org.logoUrl);
+      }
+      return plain;
+    }),
+  );
+  return { ...result, organizations };
 };
 
 export const updateOrganizationService = async ({

@@ -18,6 +18,10 @@ export const createNotification = async (data: {
   });
 };
 
+export const deleteNotificationById = async (id: string, userId: string) => {
+  return await Notifications.destroy({ where: { id, userId } });
+};
+
 export const getUserNotificationsInOrg = async (data: {
   userId: string;
   orgId: string;

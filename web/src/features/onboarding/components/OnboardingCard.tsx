@@ -76,30 +76,30 @@ const OnboardingCard = () => {
                   router.push(`/organization/${organization.Organization.id}`)
                 }
               >
-                <Card className="mt-2 p-2 hover:bg-muted/50 cursor-pointer transition-colors">
-                  <div className="">
+                <Card className="mt-2 p-3 hover:bg-muted/50 cursor-pointer transition-colors">
+                  <div className="flex items-center gap-3">
                     {organization.Organization.logoUrl ? (
                       <img
                         src={organization.Organization.logoUrl}
                         alt={organization.Organization.name}
-                        className="w-10 h-10 rounded-full"
+                        className="w-10 h-10 rounded-full object-cover shrink-0"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center shrink-0">
                         <span className="text-lg font-bold">
                           {organization.Organization.name.charAt(0)}
                         </span>
                       </div>
                     )}
-                  </div>
-                  <div className="p-2 flex justify-between">
-                    <div className="text-sm font-semibold">
-                      {organization.Organization.name}
-                    </div>
-                    <div>
-                      {organization.userRoleInOrg === "org admin"
-                        ? "Admin"
-                        : "Member"}
+                    <div className="flex flex-1 justify-between items-center">
+                      <div className="text-sm font-semibold">
+                        {organization.Organization.name}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {organization.userRoleInOrg === "org admin"
+                          ? "Admin"
+                          : "Member"}
+                      </div>
                     </div>
                   </div>
                 </Card>

@@ -7,3 +7,7 @@ export const getUserNotificationsService = async (orgId: string): Promise<Notifi
   );
   return response.data.data;
 };
+
+export const deleteNotificationService = async (orgId: string, notificationId: string): Promise<void> => {
+  await api.delete(`/organizations/${orgId}/notifications/${notificationId}`);
+};

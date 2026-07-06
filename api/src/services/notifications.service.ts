@@ -1,5 +1,6 @@
 import {
   createNotification,
+  deleteNotificationById,
   getUserNotificationsInOrg,
 } from "../repositories/notifications.repository";
 import { emitNotificationToUser } from "../ws/notification";
@@ -17,6 +18,14 @@ export const createNotificationService = async (data: {
   const notification = await createNotification(data);
   emitNotificationToUser(data.userId, notification);
   return notification;
+};
+
+export const deleteNotificationService = async (data: {
+  notificationId: string;
+  userId: string;
+}) => {
+  const deleted = await deleteNotificationById(data.notificationId, data.userId);
+  if (!deleted) throw new ApiError(404, "Notification not found", "Not found");
 };
 
 export const getUserNotificationsService = async (data: {

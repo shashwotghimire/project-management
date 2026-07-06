@@ -23,7 +23,7 @@ export function ProjectDetailsNavbar({ actions }: { actions?: ReactNode }) {
 
       <div className="flex items-center gap-2">
         {actions}
-        <NotificationBell notifications={notifications} unreadCount={unreadCount} />
+        <NotificationBell notifications={notifications} unreadCount={unreadCount} orgId={orgId} />
       </div>
     </header>
   );
