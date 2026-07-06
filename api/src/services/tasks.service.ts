@@ -498,7 +498,8 @@ export const getUserTasksForCalendarService = async ({
   orgId: string;
 }) => {
   const isUserMemberOfOrg = await userMemberOfOrg(userId, orgId);
-  if (!isUserMemberOfOrg) {
+  const isOrgAdmin = await getOrgByAdminId(userId, orgId);
+  if (!isUserMemberOfOrg && !isOrgAdmin) {
     throw new ApiError(
       403,
       "Forbidden",
