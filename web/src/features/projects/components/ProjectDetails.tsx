@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useGetProjectById } from "../hooks/useProject";
+import { useGetProjectById, useGetProjectTaskStats } from "../hooks/useProject";
 import ProjectStatusBadge from "./ProjectStatusBadge";
 import MemberAvatars from "./MemberAvatars";
 import AddMembers from "./AddMembers";
@@ -37,6 +37,7 @@ export default function ProjectDetails({
     isLoading,
     isError,
   } = useGetProjectById(orgId, projectId);
+  const { data: stats } = useGetProjectTaskStats(orgId, projectId);
 
   if (isLoading) {
     return <Spinner fullPage />;
@@ -93,6 +94,55 @@ export default function ProjectDetails({
           </div>
           <AddMembers orgId={orgId} projectId={projectId} />
         </div>
+
+        {/* Stats strip */}
+        {stats && (
+          <div className="flex flex-wrap items-center gap-4 text-sm">
+            {/* Progress */}
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground">Progress</span>
+              <div className="flex items-center gap-1.5">
+                <div className="h-1.5 w-24 overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full rounded-full bg-primary transition-all"
+                    style={{
+                      width: stats.totalTasks > 0
+                        ? `${Math.round((stats.totalCompletedTasks / stats.totalTasks) * 100)}%`
+                        : "0%",
+                    }}
+                  />
+                </div>
+                <span className="font-medium">
+                  {stats.totalTasks > 0
+                    ? `${Math.round((stats.totalCompletedTasks / stats.totalTasks) * 100)}%`
+                    : "0%"}
+                </span>
+              </div>
+            </div>
+
+            <div className="h-4 w-px bg-border" />
+
+            {/* Priority counts */}
+            <div className="flex items-center gap-3">
+              <span className="text-muted-foreground">Priority</span>
+              <span className="flex items-center gap-1">
+                <span className="inline-block h-2 w-2 rounded-full bg-red-500" />
+                <span className="font-medium">{stats.totalHighPriorityTasks}</span>
+                <span className="text-muted-foreground">High</span>
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="inline-block h-2 w-2 rounded-full bg-yellow-500" />
+                <span className="font-medium">{stats.totalMediumPriorityTasks}</span>
+                <span className="text-muted-foreground">Medium</span>
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="inline-block h-2 w-2 rounded-full bg-green-500" />
+                <span className="font-medium">{stats.totalLowPriorityTasks}</span>
+                <span className="text-muted-foreground">Low</span>
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Tabs fill remaining height */}

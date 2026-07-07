@@ -108,6 +108,9 @@ export interface ProjectTaskStats {
   totalCompletedTasks: number;
   totalTodoTasks: number;
   totalInProgressTasks: number;
+  totalLowPriorityTasks: number;
+  totalMediumPriorityTasks: number;
+  totalHighPriorityTasks: number;
 }
 
 export interface GetProjectTaskStatsResponse {

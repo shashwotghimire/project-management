@@ -21,6 +21,7 @@ import {
   getProjectMembers,
   getProjectsByUserId,
   getProjectTaskStatusInfo,
+  getProjectTasksPriorityStatusInfo,
   isUserAdminOfProject,
   isUserMemberOfProject,
   removeProjectMember,
@@ -449,5 +450,9 @@ export const getProjectTaskStatsService = async ({
 }) => {
   const isMember = await isUserMemberOfProject(userId, projectId);
   if (!isMember) throw new ApiError(403, "Forbidden", "You are not a member of this project");
-  return getProjectTaskStatusInfo(projectId);
+  const [status, priority] = await Promise.all([
+    getProjectTaskStatusInfo(projectId),
+    getProjectTasksPriorityStatusInfo(projectId),
+  ]);
+  return { ...status, ...priority };
 };
