@@ -102,3 +102,16 @@ export interface UpdateProjectResponse {
   message: string;
   data: Project;
 }
+
+export interface ProjectTaskStats {
+  totalTasks: number;
+  totalCompletedTasks: number;
+  totalTodoTasks: number;
+  totalInProgressTasks: number;
+}
+
+export interface GetProjectTaskStatsResponse {
+  success: boolean;
+  message: string;
+  data: ProjectTaskStats;
+}

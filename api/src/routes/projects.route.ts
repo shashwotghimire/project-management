@@ -8,6 +8,7 @@ import {
   getDashboardProjectsSchema,
   getProjectByIdSchema,
   getProjectMembersSchema,
+  getProjectTaskStatsSchema,
   getUserProjectsSchema,
   removeProjectMemberSchema,
   updateProjectSchema,
@@ -20,6 +21,7 @@ import {
   getDashboardProjects,
   getProjectById,
   getProjectMembers,
+  getProjectTaskStats,
   getUserProjects,
   removeProjectMember,
   updateProject,
@@ -84,6 +86,13 @@ router.delete(
   authMiddleware,
   validate(removeProjectMemberSchema),
   removeProjectMember,
+);
+
+router.get(
+  "/:projectId/task-stats",
+  authMiddleware,
+  validate(getProjectTaskStatsSchema),
+  getProjectTaskStats,
 );
 
 router.patch(

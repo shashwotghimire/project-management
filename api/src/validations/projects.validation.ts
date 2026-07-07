@@ -75,6 +75,12 @@ export const removeProjectMemberSchema = z.object({
   }),
 });
 
+export const getProjectTaskStatsSchema = z.object({
+  params: z.object({
+    projectId: z.uuidv4("Invalid project ID"),
+  }),
+});
+
 export const uploadProjectLogoSchema = z.object({
   params: z.object({
     orgId: z.uuidv4("Invalid organization ID"),

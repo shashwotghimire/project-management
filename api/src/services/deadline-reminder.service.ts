@@ -27,7 +27,7 @@ export const sendDeadlineReminders = async () => {
       projectId: task.projectId,
       title: "Task due soon",
       message: `"${task.title}" is due within 24 hours`,
-      href: `${process.env.FRONTEND_ORIGIN}/organization/${project.organizationId}/projects/${task.projectId}/tasks/${task.id}`,
+      href: `${process.env.FRONTEND_ORIGIN_PROD || process.env.FRONTEND_ORIGIN}/organization/${project.organizationId}/projects/${task.projectId}/tasks/${task.id}`,
     });
 
     await emailQueue.add(
@@ -63,7 +63,7 @@ export const sendOverdueTasksReminder = async () => {
       projectId: task.projectId,
       title: "Task overdue",
       message: `"${task.title}" is overdue`,
-      href: `${process.env.FRONTEND_ORIGIN}/organization/${project.organizationId}/projects/${task.projectId}/tasks/${task.id}`,
+      href: `${process.env.FRONTEND_ORIGIN_PROD || process.env.FRONTEND_ORIGIN}/organization/${project.organizationId}/projects/${task.projectId}/tasks/${task.id}`,
     });
 
     await emailQueue.add(

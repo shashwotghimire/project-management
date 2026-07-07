@@ -9,9 +9,10 @@ import {
 import { FolderOpen } from "lucide-react";
 import ProjectStatusBadge from "./ProjectStatusBadge";
 import MemberAvatars from "./MemberAvatars";
+import ProjectProgress from "./ProjectProgress";
 import Image from "next/image";
 
-export default function ProjectCardItem({ project }: { project: Project }) {
+export default function ProjectCardItem({ project, orgId }: { project: Project; orgId: string }) {
   const initials = project.name
     .split(" ")
     .slice(0, 2)
@@ -49,6 +50,13 @@ export default function ProjectCardItem({ project }: { project: Project }) {
           </div>
         </div>
       </CardHeader>
+      <div className="px-6 pb-3">
+        <ProjectProgress
+          orgId={orgId}
+          projectId={project.id}
+          barClassName="h-1.5 w-full"
+        />
+      </div>
       <CardFooter className="flex items-center justify-between">
         <ProjectStatusBadge status={project.status} />
         <MemberAvatars orgId={project.organizationId} projectId={project.id} />

@@ -20,6 +20,7 @@ import {
   getProjectById,
   getProjectMembers,
   getProjectsByUserId,
+  getProjectTaskStatusInfo,
   isUserAdminOfProject,
   isUserMemberOfProject,
   removeProjectMember,
@@ -329,7 +330,7 @@ export const removeProjectMemberService = async ({
       projectId,
       title: "Removed from project",
       message: `You have been removed from project: ${project.name}`,
-      href: `${process.env.FRONTEND_ORIGIN}/organization/${project.organizationId}/projects`,
+      href: `${process.env.FRONTEND_ORIGIN_PROD || process.env.FRONTEND_ORIGIN}/organization/${project.organizationId}/projects`,
     });
     await emailQueue.add(
       "project-member-removed",
@@ -391,14 +392,21 @@ export const addMemberToProjectService = async ({
       projectId,
       title: "Added to project",
       message: `${adder.username} added you to project: ${project.name}`,
-      href: `${process.env.FRONTEND_ORIGIN}/organization/${project.organizationId}/projects/${projectId}`,
+      href: `${process.env.FRONTEND_ORIGIN_PROD || process.env.FRONTEND_ORIGIN}/organization/${project.organizationId}/projects/${projectId}`,
     });
     await emailQueue.add(
       "project-member-added",
       {
         to: addedUser.email,
         subject: `You've been added to project: ${project.name}`,
-        html: addedToProjectEmailTemplate(addedUser.username, project.name, adder.username, adder.gravatarUrl ?? undefined),
+        html: addedToProjectEmailTemplate(
+          addedUser.username,
+          project.name,
+          adder.username,
+          adder.gravatarUrl?.startsWith("uploads/")
+            ? await getS3PresignedUrl(adder.gravatarUrl)
+            : (adder.gravatarUrl ?? undefined),
+        ),
       },
       { attempts: 3, backoff: { type: "exponential", delay: 5000 } },
     );
@@ -430,4 +438,16 @@ export const uploadProjectLogoService = async ({
   await redis.del(`project:${projectId}`);
   const url = await getS3PresignedUrl(key);
   return { project: updated, url };
+};
+
+export const getProjectTaskStatsService = async ({
+  projectId,
+  userId,
+}: {
+  projectId: string;
+  userId: string;
+}) => {
+  const isMember = await isUserMemberOfProject(userId, projectId);
+  if (!isMember) throw new ApiError(403, "Forbidden", "You are not a member of this project");
+  return getProjectTaskStatusInfo(projectId);
 };

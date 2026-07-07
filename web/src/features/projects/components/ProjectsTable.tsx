@@ -11,6 +11,7 @@ import {
 import { useGetUsersProjects } from "../hooks/useProject";
 import Link from "next/link";
 import MemberAvatars from "./MemberAvatars";
+import ProjectProgress from "./ProjectProgress";
 import Image from "next/image";
 
 export function ProjectsTable({ orgId }: { orgId: string }) {
@@ -57,12 +58,7 @@ export function ProjectsTable({ orgId }: { orgId: string }) {
               {project.Project.status === "active" ? "Active" : "Archived"}
             </TableCell>
             <TableCell className="py-4">
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-32 overflow-hidden rounded-full bg-muted">
-                  <div className="h-full w-1/3 rounded-full bg-primary/40" />
-                </div>
-                <span className="text-xs text-muted-foreground">—</span>
-              </div>
+              <ProjectProgress orgId={orgId} projectId={project.Project.id} />
             </TableCell>
             <TableCell className="py-4">
               <MemberAvatars orgId={orgId} projectId={project.Project.id} />

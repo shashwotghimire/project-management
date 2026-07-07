@@ -4,6 +4,7 @@ import {
   getDashboardProjectsService,
   getProjectByIdService,
   getProjectMembersService,
+  getProjectTaskStatsService,
   getUsersProjectsService,
   removeProjectMemberService,
   updateProjectService,
@@ -99,6 +100,13 @@ export const useUpdateProject = (orgId: string, projectId: string) => {
       queryClient.invalidateQueries({ queryKey: ["projects", orgId] });
       queryClient.invalidateQueries({ queryKey: ["dashboard-projects", orgId] });
     },
+  });
+};
+
+export const useGetProjectTaskStats = (orgId: string, projectId: string) => {
+  return useQuery({
+    queryKey: ["project-task-stats", orgId, projectId],
+    queryFn: () => getProjectTaskStatsService(orgId, projectId),
   });
 };
 

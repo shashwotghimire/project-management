@@ -20,6 +20,7 @@ import {
   findUserById,
 } from "../repositories/users.repository";
 import { emailQueue } from "../queues/email.queue";
+import { getS3PresignedUrl } from "./s3.service";
 
 export const getInvitationDetailsService = async (token: string) => {
   const invitation = await getInvitationDetailsByToken(token);
@@ -66,13 +67,20 @@ export const createInvitationService = async ({
     );
   }
   const invitationToken = createInvitationToken();
-  const inviteUrl = `${process.env.FRONTEND_ORIGIN}/invite?token=${invitationToken}`;
+  const inviteUrl = `${process.env.FRONTEND_ORIGIN_PROD || process.env.FRONTEND_ORIGIN}/invite?token=${invitationToken}`;
   await emailQueue.add(
     "org-invitation",
     {
       to: email,
       subject: `You're invited to join ${org.name}`,
-      html: invitationEmailTemplate(org.name, user.username, inviteUrl, user.gravatarUrl ?? undefined),
+      html: invitationEmailTemplate(
+        org.name,
+        user.username,
+        inviteUrl,
+        user.gravatarUrl?.startsWith("uploads/")
+          ? await getS3PresignedUrl(user.gravatarUrl)
+          : (user.gravatarUrl ?? undefined),
+      ),
     },
     {
       attempts: 3,
@@ -135,7 +143,7 @@ export const updateInvitationStatusService = async ({
         orgId: org.id,
         title: "Invitation accepted",
         message: `${user.username} accepted your invitation to join ${org.name}`,
-        href: `${process.env.FRONTEND_ORIGIN}/organization/${org.id}/members`,
+        href: `${process.env.FRONTEND_ORIGIN_PROD || process.env.FRONTEND_ORIGIN}/organization/${org.id}/members`,
       });
       await emailQueue.add("invite-accepted", {
         to: admin.email,

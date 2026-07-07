@@ -65,7 +65,10 @@ export function invitationEmailTemplate(
   `.trim();
 }
 
-export function verifyEmailTemplate(username: string, verificationUrl: string): string {
+export function verifyEmailTemplate(
+  username: string,
+  verificationUrl: string,
+): string {
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -223,7 +226,11 @@ export function addedToProjectEmailTemplate(
   `.trim();
 }
 
-export function inviteAcceptedEmailTemplate(adminUsername: string, inviteeName: string, orgName: string): string {
+export function inviteAcceptedEmailTemplate(
+  adminUsername: string,
+  inviteeName: string,
+  orgName: string,
+): string {
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -315,7 +322,10 @@ export function commentCreatedEmailTemplate(
   `.trim();
 }
 
-export function orgCreatedEmailTemplate(username: string, orgName: string): string {
+export function orgCreatedEmailTemplate(
+  username: string,
+  orgName: string,
+): string {
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -357,7 +367,11 @@ export function orgCreatedEmailTemplate(username: string, orgName: string): stri
   `.trim();
 }
 
-export function projectCreatedEmailTemplate(username: string, projectName: string, orgName: string): string {
+export function projectCreatedEmailTemplate(
+  username: string,
+  projectName: string,
+  orgName: string,
+): string {
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -596,7 +610,10 @@ export function channelMessageEmailTemplate(
   `.trim();
 }
 
-export function orgSuspendedEmailTemplate(username: string, orgName: string): string {
+export function orgSuspendedEmailTemplate(
+  username: string,
+  orgName: string,
+): string {
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -642,7 +659,10 @@ export function orgSuspendedEmailTemplate(username: string, orgName: string): st
   `.trim();
 }
 
-export function orgUnsuspendedEmailTemplate(username: string, orgName: string): string {
+export function orgUnsuspendedEmailTemplate(
+  username: string,
+  orgName: string,
+): string {
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -684,4 +704,3 @@ export function orgUnsuspendedEmailTemplate(username: string, orgName: string): 
 </html>
   `.trim();
 }
-

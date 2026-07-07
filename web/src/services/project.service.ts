@@ -5,6 +5,7 @@ import {
   GetDashboardProjectsResponse,
   GetProjectByIdResponse,
   GetProjectMembersResponse,
+  GetProjectTaskStatsResponse,
   GetUsersProjectsParams,
   GetUsersProjectsResponse,
   UpdateProjectRequest,
@@ -86,6 +87,16 @@ export const updateProjectService = async (
   const response = await api.patch<UpdateProjectResponse>(
     `/organizations/${orgId}/projects/${projectId}`,
     body,
+  );
+  return response.data.data;
+};
+
+export const getProjectTaskStatsService = async (
+  orgId: string,
+  projectId: string,
+): Promise<GetProjectTaskStatsResponse["data"]> => {
+  const response = await api.get<GetProjectTaskStatsResponse>(
+    `/organizations/${orgId}/projects/${projectId}/task-stats`,
   );
   return response.data.data;
 };

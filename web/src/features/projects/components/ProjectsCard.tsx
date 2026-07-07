@@ -56,7 +56,7 @@ export default function ProjectsCard({ orgId }: { orgId: string }) {
               key={member.id}
               href={`/organization/${orgId}/projects/${member.Project.id}`}
             >
-              <ProjectCardItem project={member.Project} />
+              <ProjectCardItem project={member.Project} orgId={orgId} />
             </Link>
           ))}
         </div>

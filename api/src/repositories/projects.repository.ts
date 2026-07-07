@@ -6,6 +6,7 @@ import { User } from "../models/users.model";
 import { Organization } from "../models/organizations.model";
 import { ApiError } from "../helpers/ApiError";
 import { sequelize } from "../configs/db.config";
+import { Tasks } from "../models/tasks.model";
 
 export async function createProject(data: {
   name: string;
@@ -176,10 +177,63 @@ export async function getProjectMembers(projectId: string) {
   });
 }
 
-export async function updateProjectLogo(projectId: string, logoUrl: string): Promise<Project | null> {
+export async function updateProjectLogo(
+  projectId: string,
+  logoUrl: string,
+): Promise<Project | null> {
   const project = await Project.findByPk(projectId);
   if (!project) return null;
   project.logoUrl = logoUrl;
   await project.save();
   return project;
+}
+
+export async function getProjectTaskStatusInfo(projectId: string) {
+  const totalTasks = await Tasks.count({
+    where: {
+      projectId,
+    },
+  });
+  const totalCompletedTasks = await Tasks.count({
+    where: {
+      projectId,
+      status: "completed",
+    },
+  });
+
+  const totalTodoTasks = await Tasks.count({
+    where: {
+      projectId,
+      status: "todo",
+    },
+  });
+  const totalInProgressTasks = await Tasks.count({
+    where: {
+      projectId,
+      status: "in_progress",
+    },
+  });
+  return {
+    totalTasks,
+    totalCompletedTasks,
+    totalTodoTasks,
+    totalInProgressTasks,
+  };
+}
+
+export async function getProjectTasksPriorityStatusInfo(projectId: string) {
+  const totalLowPriorityTasks = await Tasks.count({
+    where: { projectId, priority: "low" },
+  });
+  const totalMediumPriorityTasks = await Tasks.count({
+    where: { projectId, priority: "medium" },
+  });
+  const totalHighPriorityTasks = await Tasks.count({
+    where: { projectId, priority: "high" },
+  });
+  return {
+    totalLowPriorityTasks,
+    totalMediumPriorityTasks,
+    totalHighPriorityTasks,
+  };
 }

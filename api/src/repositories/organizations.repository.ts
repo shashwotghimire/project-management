@@ -207,7 +207,11 @@ export const getAllMembersOfOrg = async (orgId: string) => {
   });
 };
 
-export const updateOrgLogo = async (orgId: string, adminId: string, logoUrl: string) => {
+export const updateOrgLogo = async (
+  orgId: string,
+  adminId: string,
+  logoUrl: string,
+) => {
   const org = await getOrgByAdminId(adminId, orgId);
   if (!org) return null;
   org.logoUrl = logoUrl;
