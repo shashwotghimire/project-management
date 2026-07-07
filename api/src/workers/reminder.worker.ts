@@ -1,10 +1,14 @@
 import { Worker } from "bullmq";
-import { sendDeadlineReminders } from "../services/deadline-reminder.service";
+import {
+  sendDeadlineReminders,
+  sendOverdueTasksReminder,
+} from "../services/deadline-reminder.service";
 import { connection } from "../configs/redis-client.config";
 export const reminderWorker = new Worker(
   "reminder",
   async (job) => {
     await sendDeadlineReminders();
+    await sendOverdueTasksReminder();
   },
   { connection },
 );

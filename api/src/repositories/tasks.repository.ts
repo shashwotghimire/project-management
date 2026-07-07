@@ -248,3 +248,24 @@ export const getAllTasksDueSoon = async (startDate: Date, endDate: Date) => {
     ],
   });
 };
+
+export const getAllTasksOverdue = async (currentDate: Date) => {
+  return await Tasks.findAll({
+    where: {
+      dueDate: { [Op.lt]: currentDate },
+      status: { [Op.ne]: "completed" },
+    },
+    include: [
+      {
+        model: Project,
+        as: "project",
+        attributes: ["id", "name", "organizationId"],
+      },
+      {
+        model: User,
+        as: "assignee",
+        attributes: ["id", "email", "username", "gravatarUrl"],
+      },
+    ],
+  });
+};
