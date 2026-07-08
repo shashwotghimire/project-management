@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { useGetOrgActivityLogs } from "../hooks/useOrganization";
 import { OrgActivityLog, OrgActivityAction } from "@/types/organization-api.types";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import Image from "next/image";
 
 const ACTION_LABELS: Record<OrgActivityAction, string> = {
   org_updated: "updated the organization",
@@ -26,13 +25,11 @@ function Avatar({ actor }: { actor: OrgActivityLog["actor"] }) {
   const name = actorName(actor);
   const initials = name.slice(0, 2).toUpperCase();
 
-  if (actor.gravatarUrl) {
+  if (actor.gravatarUrl?.startsWith("http")) {
     return (
-      <Image
+      <img
         src={actor.gravatarUrl}
         alt={name}
-        width={32}
-        height={32}
         className="size-8 rounded-full object-cover shrink-0"
       />
     );

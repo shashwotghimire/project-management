@@ -3,7 +3,6 @@
 import { ScrollText } from "lucide-react";
 import { useGetTaskActivityLogs } from "../hooks/useTasks";
 import { TaskActivityLog, TaskActivityAction } from "@/types/task-api.types";
-import Image from "next/image";
 
 const ACTION_LABELS: Record<TaskActivityAction, string> = {
   task_created: "created this task",
@@ -28,13 +27,11 @@ function actorName(actor: TaskActivityLog["actor"]) {
 
 function Avatar({ actor }: { actor: TaskActivityLog["actor"] }) {
   const name = actorName(actor);
-  if (actor.gravatarUrl) {
+  if (actor.gravatarUrl?.startsWith("http")) {
     return (
-      <Image
+      <img
         src={actor.gravatarUrl}
         alt={name}
-        width={24}
-        height={24}
         className="size-6 rounded-full object-cover shrink-0"
       />
     );
