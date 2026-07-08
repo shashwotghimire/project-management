@@ -162,14 +162,26 @@ export const getTasksInProjectService = async ({
   }
   const key = `tasks:${projectId}:p${page}:l${limit}`;
   const cached = await redis.get(key);
-  if (cached) return JSON.parse(cached);
+  let plainTasks: TaskJsonWithAssignee[];
+  let meta: Record<string, unknown>;
 
-  const raw = await getTasksInProject(projectId, page, limit);
+  if (cached) {
+    const parsed = JSON.parse(cached);
+    const { tasks: cachedTasks, ...rest } = parsed;
+    plainTasks = cachedTasks;
+    meta = rest;
+  } else {
+    const raw = await getTasksInProject(projectId, page, limit);
+    const { tasks: rawTasks, ...rest } = raw;
+    plainTasks = rawTasks.map((task) =>
+      (task.toJSON ? task.toJSON() : { ...task }) as TaskJsonWithAssignee,
+    );
+    meta = rest;
+    await redis.set(key, JSON.stringify({ ...meta, tasks: plainTasks }), "EX", 300);
+  }
+
   const tasks = await Promise.all(
-    raw.tasks.map(async (task) => {
-      const plain = (task.toJSON
-        ? task.toJSON()
-        : { ...task }) as TaskJsonWithAssignee;
+    plainTasks.map(async (plain) => {
       if (
         typeof plain.assignee?.gravatarUrl === "string" &&
         plain.assignee.gravatarUrl.startsWith("uploads/")
@@ -181,9 +193,8 @@ export const getTasksInProjectService = async ({
       return plain;
     }),
   );
-  const result = { ...raw, tasks };
-  await redis.set(key, JSON.stringify(result), "EX", 300);
-  return result;
+
+  return { ...meta, tasks };
 };
 
 export const getTaskByIdService = async ({
@@ -213,26 +224,33 @@ export const getTaskByIdService = async ({
   }
   const key = `task:${taskId}`;
   const cached = await redis.get(key);
-  if (cached) return JSON.parse(cached);
+  let plainTask: TaskJsonWithAssignee;
+  let assignedTaskUserDetails: unknown;
 
-  const task = await getTaskById(taskId);
-  if (!task) {
-    throw new ApiError(
-      404,
-      "Task with the given ID does not exist.",
-      "Task not found",
-    );
+  if (cached) {
+    const parsed = JSON.parse(cached);
+    plainTask = parsed.task;
+    assignedTaskUserDetails = parsed.assignedTaskUserDetails;
+  } else {
+    const task = await getTaskById(taskId);
+    if (!task) {
+      throw new ApiError(
+        404,
+        "Task with the given ID does not exist.",
+        "Task not found",
+      );
+    }
+    assignedTaskUserDetails = task.assignedTo
+      ? await getAssignedToTaskUserDetails({
+          projectId: task.projectId,
+          taskId: task.id,
+          userId: task.assignedTo,
+        })
+      : null;
+    plainTask = (task.toJSON ? task.toJSON() : { ...task }) as TaskJsonWithAssignee;
+    await redis.set(key, JSON.stringify({ task: plainTask, assignedTaskUserDetails }), "EX", 300);
   }
-  const assignedTaskUserDetails = task.assignedTo
-    ? await getAssignedToTaskUserDetails({
-        projectId: task.projectId,
-        taskId: task.id,
-        userId: task.assignedTo,
-      })
-    : null;
-  const plainTask = (task.toJSON
-    ? task.toJSON()
-    : { ...task }) as TaskJsonWithAssignee;
+
   if (
     typeof plainTask.assignee?.gravatarUrl === "string" &&
     plainTask.assignee.gravatarUrl.startsWith("uploads/")
@@ -241,9 +259,7 @@ export const getTaskByIdService = async ({
       plainTask.assignee.gravatarUrl,
     );
   }
-  const result = { task: plainTask, assignedTaskUserDetails };
-  await redis.set(key, JSON.stringify(result), "EX", 300);
-  return result;
+  return { task: plainTask, assignedTaskUserDetails };
 };
 
 export const getTasksAssignedToUserService = async ({

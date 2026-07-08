@@ -192,6 +192,7 @@ export const getUserTasksForCalendar = async ({
     where: {
       assignedTo: userId,
       dueDate: { [Op.ne]: null },
+      status: { [Op.ne]: "completed" },
     },
     include: [
       {
