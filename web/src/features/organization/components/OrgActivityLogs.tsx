@@ -19,17 +19,17 @@ const ACTION_LABELS: Record<OrgActivityAction, string> = {
 };
 
 function actorName(actor: OrgActivityLog["actor"]) {
-  return `${actor.firstName} ${actor.lastName}`.trim();
+  return actor.username;
 }
 
 function Avatar({ actor }: { actor: OrgActivityLog["actor"] }) {
   const name = actorName(actor);
   const initials = name.slice(0, 2).toUpperCase();
 
-  if (actor.profilePicture) {
+  if (actor.gravatarUrl) {
     return (
       <Image
-        src={actor.profilePicture}
+        src={actor.gravatarUrl}
         alt={name}
         width={32}
         height={32}

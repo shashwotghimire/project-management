@@ -23,15 +23,15 @@ const ACTION_LABELS: Record<TaskActivityAction, string> = {
 };
 
 function actorName(actor: TaskActivityLog["actor"]) {
-  return `${actor.firstName} ${actor.lastName}`.trim();
+  return actor.username;
 }
 
 function Avatar({ actor }: { actor: TaskActivityLog["actor"] }) {
   const name = actorName(actor);
-  if (actor.profilePicture) {
+  if (actor.gravatarUrl) {
     return (
       <Image
-        src={actor.profilePicture}
+        src={actor.gravatarUrl}
         alt={name}
         width={24}
         height={24}

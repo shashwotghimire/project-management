@@ -167,9 +167,8 @@ export type TaskActivityAction =
 
 export interface TaskActivityLogActor {
   id: string;
-  firstName: string;
-  lastName: string;
-  profilePicture: string | null;
+  username: string;
+  gravatarUrl: string | null;
 }
 
 export interface TaskActivityLog {

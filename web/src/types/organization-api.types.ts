@@ -107,9 +107,8 @@ export type OrgActivityAction =
 
 export interface OrgActivityLogActor {
   id: string;
-  firstName: string;
-  lastName: string;
-  profilePicture: string | null;
+  username: string;
+  gravatarUrl: string | null;
 }
 
 export interface OrgActivityLog {

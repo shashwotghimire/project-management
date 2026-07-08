@@ -32,12 +32,12 @@ export const getOrgActivityLogs = async (
       {
         model: User,
         as: "actor",
-        attributes: ["id", "firstName", "lastName", "profilePicture"],
+        attributes: ["id", "username", "gravatarUrl"],
       },
       {
         model: User,
         as: "targetUser",
-        attributes: ["id", "firstName", "lastName", "profilePicture"],
+        attributes: ["id", "username", "gravatarUrl"],
       },
       {
         model: Project,
@@ -78,7 +78,7 @@ export const getTaskActivityLogs = async (
       {
         model: User,
         as: "actor",
-        attributes: ["id", "firstName", "lastName", "profilePicture"],
+        attributes: ["id", "username", "gravatarUrl"],
       },
     ],
     order: [["createdAt", "DESC"]],
