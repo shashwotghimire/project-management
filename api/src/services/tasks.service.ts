@@ -277,7 +277,19 @@ export const getTaskByIdService = async ({
       plainTask.assignee.gravatarUrl,
     );
   }
-  return { task: plainTask, assignedTaskUserDetails };
+
+  let resolvedAssignee = assignedTaskUserDetails as any;
+  if (resolvedAssignee?.assignee?.gravatarUrl?.startsWith("uploads/")) {
+    resolvedAssignee = {
+      ...resolvedAssignee,
+      assignee: {
+        ...resolvedAssignee.assignee,
+        gravatarUrl: await getS3PresignedUrl(resolvedAssignee.assignee.gravatarUrl),
+      },
+    };
+  }
+
+  return { task: plainTask, assignedTaskUserDetails: resolvedAssignee };
 };
 
 export const getTasksAssignedToUserService = async ({

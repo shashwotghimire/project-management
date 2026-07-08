@@ -2,6 +2,29 @@ import { ApiError } from "../helpers/ApiError";
 import { getOrgActivityLogs, getTaskActivityLogs } from "../repositories/activity-log.repository";
 import { userMemberOfOrg } from "../repositories/organizations.repository";
 import { isUserMemberOfProject } from "../repositories/projects.repository";
+import { getS3PresignedUrl } from "./s3.service";
+
+async function resolveGravatarUrl(url: string | null | undefined): Promise<string | null> {
+  if (typeof url === "string" && url.startsWith("uploads/")) {
+    return await getS3PresignedUrl(url);
+  }
+  return url ?? null;
+}
+
+async function resolveLogActors(rows: any[]): Promise<any[]> {
+  return Promise.all(
+    rows.map(async (row) => {
+      const plain = row.toJSON ? row.toJSON() : { ...row };
+      if (plain.actor) {
+        plain.actor = { ...plain.actor, gravatarUrl: await resolveGravatarUrl(plain.actor.gravatarUrl) };
+      }
+      if (plain.targetUser) {
+        plain.targetUser = { ...plain.targetUser, gravatarUrl: await resolveGravatarUrl(plain.targetUser.gravatarUrl) };
+      }
+      return plain;
+    }),
+  );
+}
 
 export const getOrgActivityLogsService = async ({
   orgId,
@@ -26,7 +49,7 @@ export const getOrgActivityLogsService = async ({
     total: count,
     page,
     limit,
-    logs: rows,
+    logs: await resolveLogActors(rows),
   };
 };
 
@@ -55,6 +78,6 @@ export const getTaskActivityLogsService = async ({
     total: count,
     page,
     limit,
-    logs: rows,
+    logs: await resolveLogActors(rows),
   };
 };
