@@ -75,9 +75,6 @@ export function AppSidebar() {
       <SidebarHeader className="px-4 pt-4 pb-3 border-b border-zinc-200">
         <div className="flex items-center justify-between">
           <Logo />
-          <span className="text-[11px] text-muted-foreground font-medium">
-            V0.4
-          </span>
         </div>
       </SidebarHeader>
 

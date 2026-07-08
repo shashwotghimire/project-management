@@ -8,7 +8,7 @@ reminderQueue.add(
   {},
   {
     repeat: {
-      pattern: "0 */5 * * *",
+      pattern: "0 0 * * *",
     },
     removeOnComplete: true,
   },
