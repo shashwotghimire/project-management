@@ -74,7 +74,7 @@ export const getOrgActivityLogsService = async (
   limit = 50,
 ): Promise<GetOrgActivityLogsResponse["data"]> => {
   const response = await api.get<GetOrgActivityLogsResponse>(
-    `/organizations/${orgId}/logs?page=${page}&limit=${limit}`,
+    `/organizations/${orgId}/activity-logs?page=${page}&limit=${limit}`,
   );
   return response.data.data;
 };
