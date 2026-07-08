@@ -125,15 +125,16 @@ export function AppSidebar() {
             </SidebarGroupLabel>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton
+                <Button
                   asChild
-                  className="h-8 rounded-md px-3 text-sm font-normal text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                  variant="ghost"
+                  className="w-full justify-start gap-3 h-10 px-3 text-sm font-normal text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100"
                 >
                   <Link href="/admin">
-                    <ShieldCheck className="size-4 shrink-0" />
+                    <ShieldCheck className="size-4 shrink-0 text-zinc-400" />
                     <span>Super Admin</span>
                   </Link>
-                </SidebarMenuButton>
+                </Button>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
