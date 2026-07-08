@@ -21,6 +21,8 @@
     "@aws-sdk/s3-request-presigner": "^3.1079.0",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.6",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.79.2",
     "cors": "^2.8.6",
@@ -36,6 +38,8 @@
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.8",
     "socket.io": "^4.8.3",
+    "swagger-jsdoc": "^6.3.0",
+    "swagger-ui-express": "^5.0.1",
     "tsx": "^4.22.4",
     "zod": "^4.4.3"
   },

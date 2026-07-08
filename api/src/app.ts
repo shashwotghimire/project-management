@@ -1,5 +1,7 @@
 import express from "express";
 import cors from "cors";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./configs/swagger.config";
 import { errorHandler } from "./middlewares/error.middleware";
 import authRoutes from "./routes/auth.route";
 import organizationRoutes from "./routes/organizations.route";
@@ -28,6 +30,7 @@ app.use(
     ],
   }),
 );
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/check", checkRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
