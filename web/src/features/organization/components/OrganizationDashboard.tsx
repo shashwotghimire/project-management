@@ -14,7 +14,7 @@ function OrganizationDashboard({ organizationId }: { organizationId: string }) {
   const { mutate: regenerate, isPending: regenerating } = useRegenerateDashboardSummary(organizationId);
 
   if (error) {
-    const apiError = error as ApiError;
+    const apiError = error as unknown as ApiError;
     const isSuspended = apiError.status === 403;
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] gap-4 text-center px-6">
