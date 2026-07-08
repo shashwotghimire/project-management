@@ -7,6 +7,7 @@ import {
 import { getAllUsersForAdmin } from "../repositories/users.repository";
 import redis from "../configs/redis-client.config";
 import { findUserById } from "../repositories/users.repository";
+import { getS3PresignedUrl } from "./s3.service";
 import { createNotificationService } from "./notifications.service";
 import { emailQueue } from "../queues/email.queue";
 import {
@@ -31,6 +32,15 @@ export const getOrganizationsForAdminService = async ({
   }
 
   const result = await getAllOrganizationsForAdmin({ page, limit, query });
+
+  await Promise.all(
+    result.organizations.map(async (org: any) => {
+      if (typeof org.logoUrl === "string" && org.logoUrl.startsWith("uploads/")) {
+        org.logoUrl = await getS3PresignedUrl(org.logoUrl);
+      }
+    }),
+  );
+
   await redis.set(cacheKey, JSON.stringify(result), "EX", 300);
   return result;
 };
@@ -45,6 +55,22 @@ export const getOrganizationDetailsForAdminService = async (orgId: string) => {
   const result = await getOrganizationDetailsForAdmin(orgId);
   if (!result) {
     throw new ApiError(404, "Organization not found", "Organization not found");
+  }
+
+  if (typeof result.logoUrl === "string" && result.logoUrl.startsWith("uploads/")) {
+    result.logoUrl = await getS3PresignedUrl(result.logoUrl);
+  }
+
+  if (Array.isArray(result.members)) {
+    await Promise.all(
+      result.members.map(async (member: any) => {
+        const url = member.User?.gravatarUrl ?? member.dataValues?.User?.gravatarUrl;
+        if (typeof url === "string" && url.startsWith("uploads/")) {
+          const presigned = await getS3PresignedUrl(url);
+          if (member.User) member.User.gravatarUrl = presigned;
+        }
+      }),
+    );
   }
 
   await redis.set(cacheKey, JSON.stringify(result), "EX", 300);
@@ -126,6 +152,16 @@ export const getUsersForAdminService = async ({
   }
 
   const result = await getAllUsersForAdmin({ page, limit, query });
+
+  await Promise.all(
+    result.users.map(async (user: any) => {
+      const url = user.gravatarUrl ?? user.dataValues?.gravatarUrl;
+      if (typeof url === "string" && url.startsWith("uploads/")) {
+        user.gravatarUrl = await getS3PresignedUrl(url);
+      }
+    }),
+  );
+
   await redis.set(cacheKey, JSON.stringify(result), "EX", 300);
   return result;
 };

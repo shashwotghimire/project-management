@@ -18,10 +18,16 @@ import Link from "next/link";
 
 export default function AdminOrganizationsPage() {
   const [page, setPage] = useState(1);
+  const [inputValue, setInputValue] = useState("");
   const [search, setSearch] = useState("");
   const limit = 10;
 
   const { data, isLoading, isError } = useGetAdminOrganizations(page, limit, search);
+
+  const handleSearch = () => {
+    setSearch(inputValue);
+    setPage(1);
+  };
 
   const orgs = data?.organizations || [];
   const pagination = data?.pagination;
@@ -38,18 +44,21 @@ export default function AdminOrganizationsPage() {
       </div>
 
       {/* Search controls */}
-      <div className="flex items-center gap-3 bg-white p-4 rounded-xl border border-zinc-200 shadow-sm max-w-md">
-        <Search className="h-4 w-4 text-zinc-400 shrink-0" />
-        <Input
-          type="text"
-          placeholder="Search by organization name..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-          className="border-0 shadow-none focus-visible:ring-0 p-0 h-auto"
-        />
+      <div className="flex items-center gap-2 max-w-md">
+        <div className="flex items-center gap-3 bg-white flex-1 p-4 rounded-xl border border-zinc-200 shadow-sm">
+          <Search className="h-4 w-4 text-zinc-400 shrink-0" />
+          <Input
+            type="text"
+            placeholder="Search by organization name..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            className="border-0 shadow-none focus-visible:ring-0 p-0 h-auto"
+          />
+        </div>
+        <Button onClick={handleSearch} className="shrink-0">
+          Search
+        </Button>
       </div>
 
       {isLoading ? (

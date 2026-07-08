@@ -18,6 +18,7 @@ import { format } from "date-fns";
 
 export default function AdminUsersPage() {
   const [page, setPage] = useState(1);
+  const [inputValue, setInputValue] = useState("");
   const [search, setSearch] = useState("");
   const limit = 10;
 
@@ -25,6 +26,11 @@ export default function AdminUsersPage() {
 
   const users = data?.users || [];
   const pagination = data?.pagination;
+
+  const handleSearch = () => {
+    setSearch(inputValue);
+    setPage(1);
+  };
 
   return (
     <div className="p-8 max-w-6xl mx-auto space-y-8">
@@ -38,18 +44,21 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Search controls */}
-      <div className="flex items-center gap-3 bg-white p-4 rounded-xl border border-zinc-200 shadow-sm max-w-md">
-        <Search className="h-4 w-4 text-zinc-400 shrink-0" />
-        <Input
-          type="text"
-          placeholder="Search by username or email..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-          className="border-0 shadow-none focus-visible:ring-0 p-0 h-auto"
-        />
+      <div className="flex items-center gap-2 max-w-md">
+        <div className="flex items-center gap-3 bg-white flex-1 p-4 rounded-xl border border-zinc-200 shadow-sm">
+          <Search className="h-4 w-4 text-zinc-400 shrink-0" />
+          <Input
+            type="text"
+            placeholder="Search by username or email..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            className="border-0 shadow-none focus-visible:ring-0 p-0 h-auto"
+          />
+        </div>
+        <Button onClick={handleSearch} className="shrink-0">
+          Search
+        </Button>
       </div>
 
       {isLoading ? (
@@ -85,9 +94,17 @@ export default function AdminUsersPage() {
                 <TableRow key={user.id} className="hover:bg-zinc-50/50">
                   <TableCell className="font-medium text-zinc-900 pl-6">
                     <div className="flex items-center gap-3">
-                      <div className="size-8 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center text-xs font-bold text-zinc-600">
-                        {user.username.slice(0, 2).toUpperCase()}
-                      </div>
+                      {user.gravatarUrl?.startsWith("http") ? (
+                        <img
+                          src={user.gravatarUrl}
+                          alt={user.username}
+                          className="size-8 rounded-full object-cover border border-zinc-200"
+                        />
+                      ) : (
+                        <div className="size-8 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center text-xs font-bold text-zinc-600">
+                          {user.username.slice(0, 2).toUpperCase()}
+                        </div>
+                      )}
                       <span>{user.username}</span>
                     </div>
                   </TableCell>

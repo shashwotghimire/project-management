@@ -37,6 +37,7 @@ export interface AdminUser {
   email: string;
   role: string;
   emailVerified: boolean;
+  gravatarUrl: string | null;
   createdAt: string;
   updatedAt: string;
 }
