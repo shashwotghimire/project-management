@@ -23,6 +23,8 @@ import {
   updateTaskStatus,
   updateTaskPosition,
 } from "../controllers/tasks.controller";
+import { getTaskActivityLogs } from "../controllers/activity-log.controller";
+import { getTaskActivityLogsSchema } from "../validations/activity-log.validation";
 
 const router = Router({ mergeParams: true });
 
@@ -69,6 +71,12 @@ router.patch(
   authMiddleware,
   validate(reassignTaskSchema),
   reassignTaskToAnotherUser,
+);
+router.get(
+  "/:taskId/logs",
+  authMiddleware,
+  validate(getTaskActivityLogsSchema),
+  getTaskActivityLogs,
 );
 
 export default router;

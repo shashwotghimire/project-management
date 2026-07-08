@@ -28,7 +28,8 @@ export const createInvitation = asyncHandler<AuthRequest>(
       organizationId,
       invitedBy,
     });
-    res.status(201).json(invitation);
+    const { token: _token, ...safeInvitation } = (invitation as any).toJSON();
+    res.status(201).json(new ApiResponse(true, "Invitation sent successfully", safeInvitation));
   },
 );
 

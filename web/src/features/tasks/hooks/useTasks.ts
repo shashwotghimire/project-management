@@ -3,6 +3,7 @@ import {
   deleteTaskService,
   getMyOrgTasksService,
   getProjectTasksService,
+  getTaskActivityLogsService,
   getTaskByIdService,
   reassignTaskService,
   updateTaskPositionService,
@@ -194,6 +195,20 @@ export const useDeleteTask = (orgId: string, projectId: string) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks", orgId, projectId], exact: false });
     },
+  });
+};
+
+export const useGetTaskActivityLogs = (
+  orgId: string,
+  projectId: string,
+  taskId: string,
+  page = 1,
+  limit = 50,
+) => {
+  return useQuery({
+    queryKey: ["task-logs", orgId, projectId, taskId, page, limit],
+    queryFn: () => getTaskActivityLogsService(orgId, projectId, taskId, page, limit),
+    enabled: !!taskId,
   });
 };
 

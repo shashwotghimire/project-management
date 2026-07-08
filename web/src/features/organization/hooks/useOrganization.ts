@@ -1,5 +1,6 @@
 import {
   deleteOrganizationService,
+  getOrgActivityLogsService,
   getOrgMembersService,
   getOrganizationByIdService,
   updateOrganizationService,
@@ -60,6 +61,14 @@ export const useGetDashboardSummary = (orgId: string) => {
     queryFn: () => getDashboardSummaryService(orgId),
     enabled: !!orgId,
     staleTime: Infinity,
+  });
+};
+
+export const useGetOrgActivityLogs = (orgId: string, page = 1, limit = 50) => {
+  return useQuery({
+    queryKey: ["org-activity-logs", orgId, page, limit],
+    queryFn: () => getOrgActivityLogsService(orgId, page, limit),
+    enabled: !!orgId,
   });
 };
 

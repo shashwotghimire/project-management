@@ -16,6 +16,7 @@ import redis from "../configs/redis-client.config";
 import { emailQueue } from "../queues/email.queue";
 import { findUserById } from "../repositories/users.repository";
 import { orgCreatedEmailTemplate } from "../utils/email-template.utils";
+import { createOrgActivityLog } from "../repositories/activity-log.repository";
 
 export const createOrganizationService = async ({
   name,
@@ -106,6 +107,9 @@ export const updateOrganizationService = async ({
     description,
     websiteUrl,
   });
+
+  await createOrgActivityLog({ orgId, actorId: adminId, action: "org_updated" });
+
   return updatedOrg;
 };
 
@@ -191,6 +195,13 @@ export const removeOrgMemberService = async ({
   }
 
   await removeOrgMember(targetUserId, orgId);
+
+  await createOrgActivityLog({
+    orgId,
+    actorId: requesterId,
+    action: "member_removed",
+    targetUserId,
+  });
 };
 
 export const getAllMembersOfOrgService = async (

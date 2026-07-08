@@ -6,6 +6,7 @@ import {
   DeleteTaskResponse,
   GetMyOrgTasksResponse,
   GetProjectTasksResponse,
+  GetTaskActivityLogsResponse,
   GetTaskByIdResponse,
   PaginatedTasks,
   ReassignTaskRequest,
@@ -116,6 +117,20 @@ export const createTaskService = async ({
 export const getMyOrgTasksService = async (orgId: string): Promise<Task[]> => {
   const response = await api.get<GetMyOrgTasksResponse>(
     `/organizations/${orgId}/my-tasks`,
+  );
+  return response.data.data;
+};
+
+export const getTaskActivityLogsService = async (
+  orgId: string,
+  projectId: string,
+  taskId: string,
+  page = 1,
+  limit = 50,
+): Promise<GetTaskActivityLogsResponse["data"]> => {
+  const response = await api.get<GetTaskActivityLogsResponse>(
+    `/organizations/${orgId}/projects/${projectId}/tasks/${taskId}/logs`,
+    { params: { page, limit } },
   );
   return response.data.data;
 };

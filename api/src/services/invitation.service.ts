@@ -21,6 +21,7 @@ import {
 } from "../repositories/users.repository";
 import { emailQueue } from "../queues/email.queue";
 import { getS3PresignedUrl } from "./s3.service";
+import { createOrgActivityLog } from "../repositories/activity-log.repository";
 
 export const getInvitationDetailsService = async (token: string) => {
   const invitation = await getInvitationDetailsByToken(token);
@@ -91,12 +92,21 @@ export const createInvitationService = async ({
       removeOnComplete: true,
     },
   );
-  return await createInvitation({
+  const invitation = await createInvitation({
     email,
     organizationId,
     invitedBy,
     token: invitationToken,
   });
+
+  await createOrgActivityLog({
+    orgId: organizationId,
+    actorId: invitedBy,
+    action: "invitation_sent",
+    meta: { invitedEmail: email },
+  });
+
+  return invitation;
 };
 
 export const updateInvitationStatusService = async ({
@@ -135,6 +145,20 @@ export const updateInvitationStatusService = async ({
       );
     }
     await joinAnOrganization({ userId: user.id, orgId: org.id });
+
+    await createOrgActivityLog({
+      orgId: org.id,
+      actorId: user.id,
+      action: "member_joined",
+      meta: { invitedEmail: invitation.email },
+    });
+
+    await createOrgActivityLog({
+      orgId: org.id,
+      actorId: user.id,
+      action: "invitation_accepted",
+      meta: { invitedEmail: invitation.email },
+    });
 
     const admin = await findUserById(org.adminId);
     if (admin) {

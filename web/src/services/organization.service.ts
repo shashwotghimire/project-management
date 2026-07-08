@@ -2,6 +2,7 @@ import api from "@/lib/axios";
 import {
   CreateOrganizationResponse,
   DeleteOrganizationResponse,
+  GetOrgActivityLogsResponse,
   GetOrgMembersResponse,
   GetUsersOrganizationsResponse,
   OrganizationByIdResponse,
@@ -63,6 +64,17 @@ export const getOrgMembersService = async (
 ): Promise<GetOrgMembersResponse["data"]> => {
   const response = await api.get<GetOrgMembersResponse>(
     `/organizations/${orgId}/members`,
+  );
+  return response.data.data;
+};
+
+export const getOrgActivityLogsService = async (
+  orgId: string,
+  page = 1,
+  limit = 50,
+): Promise<GetOrgActivityLogsResponse["data"]> => {
+  const response = await api.get<GetOrgActivityLogsResponse>(
+    `/organizations/${orgId}/logs?page=${page}&limit=${limit}`,
   );
   return response.data.data;
 };

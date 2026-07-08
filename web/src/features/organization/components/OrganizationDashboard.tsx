@@ -4,6 +4,7 @@ import { useGetDashboardSummary, useGetOrganizationById, useRegenerateDashboardS
 import { useGetUserProfile } from "@/features/auth/hooks/useAuth";
 import ProjectsCard from "@/features/projects/components/ProjectsCard";
 import { UserTasksList } from "@/features/tasks/components/UserTasksList";
+import OrgActivityLogs from "./OrgActivityLogs";
 import { RefreshCw, ShieldOff } from "lucide-react";
 import { ApiError } from "@/types/api-error.types";
 
@@ -68,6 +69,9 @@ function OrganizationDashboard({ organizationId }: { organizationId: string }) {
       <div className="p-6 space-y-3">
         <h2 className="text-lg font-semibold">My Tasks</h2>
         <UserTasksList orgId={organizationId} />
+      </div>
+      <div className="p-6">
+        <OrgActivityLogs orgId={organizationId} />
       </div>
     </div>
   );

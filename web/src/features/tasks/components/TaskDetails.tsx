@@ -346,7 +346,7 @@ export default function TaskDetails({
         </div>{/* end left col */}
 
         {/* ── RIGHT col: logs ── */}
-        <TaskLogs />
+        <TaskLogs orgId={orgId} projectId={projectId} taskId={taskId} />
 
       </div>
 

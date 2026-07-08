@@ -1,3 +1,5 @@
+import { OrgActivityLog } from "./activity-log.model";
+import { TaskActivityLog } from "./task-activity-log.model";
 import { AiSummary } from "./ai-summary.model";
 import { Channel } from "./channel.model";
 import { Comments } from "./comments.model";
@@ -106,3 +108,13 @@ User.hasOne(AiSummary, { foreignKey: "userId" });
 
 AiSummary.belongsTo(Organization, { foreignKey: "orgId" });
 Organization.hasMany(AiSummary, { foreignKey: "orgId" });
+
+Organization.hasMany(OrgActivityLog, { foreignKey: "orgId", as: "activityLogs" });
+OrgActivityLog.belongsTo(Organization, { foreignKey: "orgId", as: "org" });
+OrgActivityLog.belongsTo(User, { foreignKey: "actorId", as: "actor" });
+OrgActivityLog.belongsTo(User, { foreignKey: "targetUserId", as: "targetUser" });
+OrgActivityLog.belongsTo(Project, { foreignKey: "projectId", as: "project" });
+
+Tasks.hasMany(TaskActivityLog, { foreignKey: "taskId", as: "activityLogs" });
+TaskActivityLog.belongsTo(Tasks, { foreignKey: "taskId", as: "task" });
+TaskActivityLog.belongsTo(User, { foreignKey: "actorId", as: "actor" });

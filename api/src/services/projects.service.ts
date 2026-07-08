@@ -29,6 +29,7 @@ import {
   updateProjectLogo,
 } from "../repositories/projects.repository";
 import { uploadToS3, getS3PresignedUrl, deleteFromS3 } from "./s3.service";
+import { createOrgActivityLog } from "../repositories/activity-log.repository";
 
 export const createProjectService = async ({
   name,
@@ -55,6 +56,14 @@ export const createProjectService = async ({
     organizationId,
     createdBy,
     ...(logoUrl && { logoUrl }),
+  });
+
+  await createOrgActivityLog({
+    orgId: organizationId,
+    actorId: createdBy,
+    action: "project_created",
+    projectId: project.id,
+    meta: { projectName: project.name },
   });
 
   const keys = await redis.keys(`projects:${organizationId}:*`);
@@ -201,6 +210,13 @@ export const deleteProjectService = async ({
 
   await deleteProject(projectId);
 
+  await createOrgActivityLog({
+    orgId: project.organizationId,
+    actorId: userId,
+    action: "project_deleted",
+    meta: { projectName: project.name },
+  });
+
   const keys = await redis.keys(`projects:${project.organizationId}:*`);
   const dashboardKeys = await redis.keys(`dashboard:${project.organizationId}:*`);
   const toDelete = [`project:${projectId}`, `project:${projectId}:members`, ...keys, ...dashboardKeys];
@@ -318,6 +334,14 @@ export const removeProjectMemberService = async ({
 
   await removeProjectMember(targetUserId, projectId);
 
+  await createOrgActivityLog({
+    orgId: project.organizationId,
+    actorId: requesterId,
+    action: "member_removed_from_project",
+    targetUserId,
+    projectId,
+  });
+
   const keys = await redis.keys(`projects:${project.organizationId}:*`);
   const dashboardKeys = await redis.keys(`dashboard:${project.organizationId}:*`);
   const toDelete = [`project:${projectId}:members`, ...keys, ...dashboardKeys];
@@ -378,6 +402,14 @@ export const addMemberToProjectService = async ({
   }
 
   const result = await addMemberToProject({ userId, projectId, assignedBy });
+
+  await createOrgActivityLog({
+    orgId: project.organizationId,
+    actorId: assignedBy,
+    action: "member_added_to_project",
+    targetUserId: userId,
+    projectId,
+  });
 
   const keys = await redis.keys(`projects:${project.organizationId}:*`);
   const dashboardKeys = await redis.keys(`dashboard:${project.organizationId}:*`);

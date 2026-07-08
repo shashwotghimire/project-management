@@ -10,11 +10,16 @@ import commentRoutes from "./routes/comments.route";
 import channelRoutes from "./routes/channels.route";
 import aiRoutes from "./routes/llm.route";
 import notificationRoutes from "./routes/notifications.route";
+import activityLogRoutes from "./routes/activity-log.route";
 import checkRoutes from "./routes/check.route";
 import adminRoutes from "./routes/admin.route";
+import helmet from "helmet";
+import { limiter, aiLimiter } from "./middlewares/rate-limit.middleware";
 
 const app = express();
 app.use(express.json());
+app.use(helmet());
+app.use(limiter);
 app.use(
   cors({
     origin: [
@@ -28,8 +33,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/organizations", organizationRoutes);
 app.use("/api/invitations", invitationRoutes);
-app.use("/api/ai", aiRoutes);
+app.use("/api/ai", aiLimiter, aiRoutes);
 app.use("/api/organizations/:orgId/notifications", notificationRoutes);
+app.use("/api/organizations/:orgId/activity-logs", activityLogRoutes);
 app.use("/api/organizations/:orgId/projects", projectRoutes);
 app.use("/api/organizations/:orgId/projects/:projectId/tasks", taskRoutes);
 app.use(

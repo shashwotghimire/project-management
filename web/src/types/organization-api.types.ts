@@ -93,3 +93,46 @@ export interface DeleteOrganizationResponse {
   message: string;
   data: null;
 }
+
+export type OrgActivityAction =
+  | "org_updated"
+  | "member_joined"
+  | "member_removed"
+  | "project_created"
+  | "project_deleted"
+  | "member_added_to_project"
+  | "member_removed_from_project"
+  | "invitation_sent"
+  | "invitation_accepted";
+
+export interface OrgActivityLogActor {
+  id: string;
+  firstName: string;
+  lastName: string;
+  profilePicture: string | null;
+}
+
+export interface OrgActivityLog {
+  id: string;
+  orgId: string;
+  actorId: string;
+  action: OrgActivityAction;
+  targetUserId: string | null;
+  projectId: string | null;
+  meta: Record<string, unknown> | null;
+  createdAt: string;
+  actor: OrgActivityLogActor;
+  targetUser: OrgActivityLogActor | null;
+  project: { id: string; name: string } | null;
+}
+
+export interface GetOrgActivityLogsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    total: number;
+    page: number;
+    limit: number;
+    logs: OrgActivityLog[];
+  };
+}

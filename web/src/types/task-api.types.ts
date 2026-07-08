@@ -149,6 +149,51 @@ export interface GetMyOrgTasksResponse {
   data: Task[];
 }
 
+export type TaskActivityAction =
+  | "task_created"
+  | "task_assigned"
+  | "task_reassigned"
+  | "task_unassigned"
+  | "status_changed"
+  | "priority_changed"
+  | "due_date_changed"
+  | "title_changed"
+  | "description_changed"
+  | "comment_added"
+  | "comment_edited"
+  | "comment_deleted"
+  | "task_completed"
+  | "task_reopened";
+
+export interface TaskActivityLogActor {
+  id: string;
+  firstName: string;
+  lastName: string;
+  profilePicture: string | null;
+}
+
+export interface TaskActivityLog {
+  id: string;
+  taskId: string;
+  projectId: string;
+  actorId: string;
+  action: TaskActivityAction;
+  meta: Record<string, unknown> | null;
+  createdAt: string;
+  actor: TaskActivityLogActor;
+}
+
+export interface GetTaskActivityLogsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    total: number;
+    page: number;
+    limit: number;
+    logs: TaskActivityLog[];
+  };
+}
+
 export const columns = [
   { title: "To Do", status: "todo" },
   { title: "In Progress", status: "in_progress" },
