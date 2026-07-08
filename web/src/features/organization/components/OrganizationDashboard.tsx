@@ -4,13 +4,36 @@ import { useGetDashboardSummary, useGetOrganizationById, useRegenerateDashboardS
 import { useGetUserProfile } from "@/features/auth/hooks/useAuth";
 import ProjectsCard from "@/features/projects/components/ProjectsCard";
 import { UserTasksList } from "@/features/tasks/components/UserTasksList";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, ShieldOff } from "lucide-react";
+import { ApiError } from "@/types/api-error.types";
 
 function OrganizationDashboard({ organizationId }: { organizationId: string }) {
   const { data: organization, isLoading, error } = useGetOrganizationById(organizationId);
   const { data: user } = useGetUserProfile();
   const { data: summary, isLoading: summaryLoading } = useGetDashboardSummary(organizationId);
   const { mutate: regenerate, isPending: regenerating } = useRegenerateDashboardSummary(organizationId);
+
+  if (error) {
+    const apiError = error as ApiError;
+    const isSuspended = apiError.status === 403;
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4 text-center px-6">
+        <div className="rounded-full bg-muted p-4">
+          <ShieldOff className="size-8 text-muted-foreground" />
+        </div>
+        <div>
+          <h2 className="text-lg font-semibold">
+            {isSuspended ? "Organization Suspended" : "Access Denied"}
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1 max-w-sm">
+            {isSuspended
+              ? "This organization has been suspended and is no longer accessible. Contact support if you believe this is a mistake."
+              : apiError.message || "You don't have permission to view this organization."}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
