@@ -17,6 +17,7 @@ import {
   getCommentsByTask,
   updateComment,
 } from "../repositories/comments.repository";
+import { createTaskActivityLog } from "../repositories/activity-log.repository";
 
 export const createCommentService = async (data: {
   content: string;
@@ -50,6 +51,8 @@ export const createCommentService = async (data: {
   }
 
   const comment = await createComment(data);
+
+  await createTaskActivityLog({ taskId: data.taskId, projectId: data.projectId, actorId: data.authorId, action: "comment_added" });
 
   const author = await findUserById(data.authorId);
   const authorName = author?.username ?? "Someone";
@@ -164,7 +167,9 @@ export const updateCommentService = async ({
       "Only the comment author can edit this comment.",
     );
   }
-  return await updateComment(commentId, { content });
+  const updated = await updateComment(commentId, { content });
+  await createTaskActivityLog({ taskId: comment.taskId, projectId: comment.projectId, actorId: userId, action: "comment_edited" });
+  return updated;
 };
 
 export const deleteCommentService = async ({
@@ -195,5 +200,7 @@ export const deleteCommentService = async ({
       "Only the comment author or an org admin can delete this comment.",
     );
   }
-  return await deleteComment(commentId);
+  const result = await deleteComment(commentId);
+  await createTaskActivityLog({ taskId: comment.taskId, projectId: comment.projectId, actorId: userId, action: "comment_deleted" });
+  return result;
 };

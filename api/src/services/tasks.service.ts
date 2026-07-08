@@ -29,6 +29,7 @@ import { taskAssignedEmailTemplate } from "../utils/email-template.utils";
 import { TaskPriority, TaskStatus } from "../types/tasks";
 import { createNotificationService } from "./notifications.service";
 import { getS3PresignedUrl } from "./s3.service";
+import { createTaskActivityLog } from "../repositories/activity-log.repository";
 
 type TaskJsonWithAssignee = {
   assignee?: {
@@ -91,6 +92,23 @@ export const createTaskService = async (data: {
     );
   }
   const task = await createTask(data);
+
+  await createTaskActivityLog({
+    taskId: task.id,
+    projectId: data.projectId,
+    actorId: data.createdBy,
+    action: "task_created",
+  });
+
+  if (data.assignedTo) {
+    await createTaskActivityLog({
+      taskId: task.id,
+      projectId: data.projectId,
+      actorId: data.createdBy,
+      action: "task_assigned",
+      meta: { assignedTo: data.assignedTo },
+    });
+  }
 
   const keys = await redis.keys(`tasks:${data.projectId}:*`);
   if (keys.length) await redis.del(...keys);
@@ -382,6 +400,19 @@ export const updateTaskService = async ({
   }
   const updated = await updateTask(taskId, data);
 
+  if (data.title !== undefined && data.title !== task.title) {
+    await createTaskActivityLog({ taskId, projectId, actorId: userId, action: "title_changed", meta: { from: task.title, to: data.title } });
+  }
+  if (data.description !== undefined && data.description !== task.description) {
+    await createTaskActivityLog({ taskId, projectId, actorId: userId, action: "description_changed" });
+  }
+  if (data.priority !== undefined && data.priority !== task.priority) {
+    await createTaskActivityLog({ taskId, projectId, actorId: userId, action: "priority_changed", meta: { from: task.priority, to: data.priority } });
+  }
+  if (data.dueDate !== undefined) {
+    await createTaskActivityLog({ taskId, projectId, actorId: userId, action: "due_date_changed", meta: { to: data.dueDate } });
+  }
+
   const keys = await redis.keys(`tasks:${projectId}:*`);
   const toDelete = [`task:${taskId}`, ...keys];
   if (task.assignedTo) {
@@ -463,6 +494,12 @@ export const updateTaskStatusService = async ({
     );
   }
   await updateTaskStatus(taskId, status, position);
+
+  const action =
+    status === "completed" ? "task_completed"
+    : task.status === "completed" ? "task_reopened"
+    : "status_changed";
+  await createTaskActivityLog({ taskId, projectId, actorId: userId, action, meta: { from: task.status, to: status } });
 
   const keys = await redis.keys(`tasks:${projectId}:*`);
   const toDelete = [`task:${taskId}`, ...keys];
@@ -595,6 +632,8 @@ export const reassignTaskToAnotherUserService = async ({
     );
   }
   const result = await reassignTaskToAnotherUser({ taskId, newUserId });
+
+  await createTaskActivityLog({ taskId, projectId, actorId: userId, action: "task_reassigned", meta: { from: task.assignedTo, to: newUserId } });
 
   const keys = await redis.keys(`tasks:${projectId}:*`);
   const toDelete = [`task:${taskId}`, ...keys];
