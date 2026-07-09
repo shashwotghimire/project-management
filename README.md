@@ -2,6 +2,8 @@
 
 A multi-tenant project management platform built as part of the Arbyte Software Engineering Mentorship 2026. Teams can create organizations, run projects on Kanban boards, chat in real time, and track deadlines on a calendar.
 
+**Live:** [teamwork.shashwotghimire.com.np](https://teamwork.shashwotghimire.com.np)
+
 ---
 
 ## Features
@@ -278,139 +280,8 @@ npx sequelize-cli db:migrate:undo:all
 
 ## API documentation
 
-Base URL: `http://localhost:8080/api`
-
-All protected routes require `Authorization: Bearer <token>` in the request header. Tokens are returned at login and stored in `localStorage` on the client.
-
-Errors follow a consistent shape:
-```json
-{ "success": false, "message": "...", "errors": [] }
-```
-
-Success responses:
-```json
-{ "success": true, "message": "...", "data": {} }
-```
-
-### Auth
-
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| POST | `/auth/register` | No | Register new account |
-| POST | `/auth/login` | No | Login, returns JWT |
-| GET | `/auth/verify-email?token=` | No | Verify email address |
-| GET | `/auth/me` | Yes | Get own profile |
-| PATCH | `/auth/me` | Yes | Update profile |
-| PATCH | `/auth/me/avatar` | Yes | Upload avatar (multipart) |
-
-### Organizations
-
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| POST | `/organizations` | Yes | Create organization |
-| GET | `/organizations` | Yes | List user's organizations |
-| GET | `/organizations/:orgId` | Yes | Organization detail |
-| PATCH | `/organizations/:orgId` | Yes | Update organization |
-| DELETE | `/organizations/:orgId` | Yes | Delete organization |
-| PATCH | `/organizations/:orgId/logo` | Yes | Upload org logo |
-| GET | `/organizations/:orgId/members` | Yes | List members |
-| DELETE | `/organizations/:orgId/members/:userId` | Yes | Remove member |
-| GET | `/organizations/:orgId/my-tasks` | Yes | Tasks assigned to current user |
-| GET | `/organizations/:orgId/calendar-tasks` | Yes | Tasks formatted for calendar |
-
-### Invitations
-
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| POST | `/invitations` | Yes | Send invitation email |
-| GET | `/invitations/details?token=` | No | Get invite details by token |
-| POST | `/invitations/respond` | Yes | Accept or decline invitation |
-
-### Projects
-
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| GET | `/organizations/:orgId/projects` | Yes | List projects |
-| GET | `/organizations/:orgId/projects/dashboard` | Yes | Projects with stats |
-| POST | `/organizations/:orgId/projects` | Yes | Create project |
-| GET | `/organizations/:orgId/projects/:projectId` | Yes | Project detail |
-| PATCH | `/organizations/:orgId/projects/:projectId` | Yes | Update project |
-| DELETE | `/organizations/:orgId/projects/:projectId` | Yes | Delete project |
-| PATCH | `/organizations/:orgId/projects/:projectId/logo` | Yes | Upload project logo |
-| GET | `/organizations/:orgId/projects/:projectId/members` | Yes | List project members |
-| POST | `/organizations/:orgId/projects/:projectId/members` | Yes | Add member |
-| DELETE | `/organizations/:orgId/projects/:projectId/members/:userId` | Yes | Remove member |
-| GET | `/organizations/:orgId/projects/:projectId/task-stats` | Yes | Todo/in_progress/completed counts |
-
-### Tasks
-
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| GET | `/organizations/:orgId/projects/:projectId/tasks` | Yes | All tasks (Kanban data) |
-| POST | `/organizations/:orgId/projects/:projectId/tasks` | Yes | Create task |
-| GET | `/organizations/:orgId/projects/:projectId/tasks/:taskId` | Yes | Task detail |
-| PATCH | `/organizations/:orgId/projects/:projectId/tasks/:taskId` | Yes | Update task |
-| DELETE | `/organizations/:orgId/projects/:projectId/tasks/:taskId` | Yes | Delete task |
-| PATCH | `/organizations/:orgId/projects/:projectId/tasks/:taskId/status` | Yes | Change status |
-| PATCH | `/organizations/:orgId/projects/:projectId/tasks/:taskId/position` | Yes | Reorder in column |
-| PATCH | `/organizations/:orgId/projects/:projectId/tasks/:taskId/reassign` | Yes | Reassign task |
-
-### Comments
-
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| GET | `.../tasks/:taskId/comments` | Yes | List comments |
-| POST | `.../tasks/:taskId/comments` | Yes | Add comment |
-| PATCH | `.../tasks/:taskId/comments/:commentId` | Yes | Edit comment |
-| DELETE | `.../tasks/:taskId/comments/:commentId` | Yes | Delete comment |
-
-### Channels and messages
-
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| GET | `.../projects/:projectId/channels` | Yes | List channels |
-| POST | `.../projects/:projectId/channels` | Yes | Create channel |
-| GET | `.../projects/:projectId/channels/:channelId` | Yes | Channel detail |
-| PATCH | `.../projects/:projectId/channels/:channelId` | Yes | Update channel |
-| DELETE | `.../projects/:projectId/channels/:channelId` | Yes | Delete channel |
-| GET | `.../channels/:channelId/messages` | Yes | Message history |
-| POST | `.../channels/:channelId/messages` | Yes | Send message (also via Socket.IO) |
-
-### Notifications
-
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| GET | `/organizations/:orgId/notifications` | Yes | User's notifications |
-| DELETE | `/organizations/:orgId/notifications/:notificationId` | Yes | Dismiss notification |
-
-### AI summary
-
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| GET | `/ai/:orgId/summary` | Yes | Get cached AI org summary |
-| POST | `/ai/:orgId/summary/regenerate` | Yes | Force regenerate |
-
-### Super Admin
-
-All routes require `superadmin` role.
-
-| Method | Path | Description |
-|---|---|---|
-| GET | `/admin/organizations` | Paginated org list |
-| GET | `/admin/organizations/:orgId` | Org detail with members and projects |
-| PATCH | `/admin/organizations/:orgId/block` | Block org |
-| PATCH | `/admin/organizations/:orgId/unblock` | Unblock org |
-| GET | `/admin/users` | All users |
-| GET | `/admin/stats` | Platform stats |
-
-### Socket.IO events
-
-Connect to the Socket.IO server at `NEXT_PUBLIC_SOCKET_URL`. The client joins a room keyed to the user ID after login.
-
-| Event (server → client) | Payload | Description |
-|---|---|---|
-| `new_notification` | `{ notification }` | Fires when a new notification is created for the user |
-| `new_message` | `{ message }` | Fires when a message is sent to a channel the user is in |
+Interactive API docs (Swagger UI) are available at:
+**[api.shashwotghimire.tech/api/api-docs](https://api.shashwotghimire.tech/api/api-docs)**
 
 ---
 
@@ -462,6 +333,24 @@ Accounts with the `superadmin` role see an Admin link in the sidebar. The admin 
 4. Register two accounts to test the invite flow
 5. Create an organization, create a project, invite the second user
 6. Open the project Kanban board in both browser tabs and drag a task to see live notification delivery
+
+---
+
+## Screenshots
+
+![Landing page](web/public/landing-graphic.jpg)
+
+![Dashboard](web/public/dashboard.png)
+
+![Kanban board](web/public/Kanban.png)
+
+![Task details](web/public/Taskdetails.png)
+
+![Project](web/public/project.png)
+
+![Calendar](web/public/calendar.png)
+
+![Group chat](web/public/groupchat.png)
 
 ---
 
